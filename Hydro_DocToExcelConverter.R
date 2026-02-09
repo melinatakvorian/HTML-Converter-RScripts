@@ -30,13 +30,28 @@ invisible(lapply(packages, library, character.only = TRUE))
 #PAY ATTENTION TO THE DIRECTION OF THE SLASHES. THEY HAVE TO BE CHANGED TO FORWARD SLASHES, AS SHOWN BELOW
 input_umbrella <- 
   "N:/RStor/CEMML/ClimateChange/1_USAFClimate/1_USAF_Natural_Resources/20_2_0004_RevisitingPhase1/" #the broad folder structure
-input_specific_folder <- "_AirForceClimateViewerDev/Document to HTML Table Converter/Test Documents/VegBMGR_20251105_1" #the specific folder inside the Document to HTML Table Converter where the input files are
+input_specific_folder <- "_AirForceClimateViewerDev/Document to HTML Table Converter/FilesForTesting/Hydro_Work/Test" #the specific folder inside the Document to HTML Table Converter where the input files are
 #####NO MORE CHANGES --- -- -- -- --- - - -- -- - -  - - - - -  --- - - - - - - --- --- --- -- ---
 
 input_dir <-  paste0(input_umbrella, input_specific_folder) #Rename to your target directory. Outputs will appear here as well.
 project_name <- "TESTerror_run1" #Replace with whatever you want.
 current_date <- format(Sys.Date(), "%Y%m%d")  # e.g., "2025-09-24"
 
+#ERROR CATCH 1 ----
+
+filenames <- list.files(input_dir) #create list of files in the folder
+openfiles <- list()
+
+for(file in 1:length(filenames)){ #check that there are no open files
+  if(startsWith(filenames[file], "~")){
+    openfiles[length(openfiles)+1] <- filenames[file]
+  }else next
+} 
+
+if(!length(openfiles)==0){
+  stop("The following document(s) is open on a computer. This script cannot run unless all files are closed.\n 
+         Open files are listed below: \n", openfiles)
+}
 
 # ----- * Word->HTML function ----
 # takes Word document (input) and turns it into HTML file (output)

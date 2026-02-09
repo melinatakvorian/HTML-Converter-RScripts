@@ -30,11 +30,11 @@ invisible(lapply(packages, library, character.only = TRUE))
 #PAY ATTENTION TO THE DIRECTION OF THE SLASHES. THEY HAVE TO BE CHANGED TO FORWARD SLASHES, AS SHOWN BELOW
 input_umbrella <- 
   "N:/RStor/CEMML/ClimateChange/1_USAFClimate/1_USAF_Natural_Resources/20_2_0004_RevisitingPhase1/" #the broad folder structure
-input_specific_folder <- "_AirForceClimateViewerDev/Document to HTML Table Converter/Test Documents/VegBMGR_20251105_1" #the specific folder inside the Document to HTML Table Converter where the input files are
+input_specific_folder <- "Dover AFB/3ViewerPackages/Ecosystems/Word to HTML convertion" #the specific folder inside the Document to HTML Table Converter where the input files are
 #####NO MORE CHANGES --- -- -- -- --- - - -- -- - -  - - - - -  --- - - - - - - --- --- --- -- ---
 
 input_dir <-  paste0(input_umbrella, input_specific_folder) #Rename to your target directory. Outputs will appear here as well.
-project_name <- "BMGR_testrun_Veg" #Replace with whatever you want.
+project_name <- "Dover_run1_Veg" #Replace with whatever you want.
 current_date <- format(Sys.Date(), "%Y%m%d")  # e.g., "2025-09-24"
 
 #ERROR CATCH 1 ----
@@ -81,8 +81,8 @@ parse_html_sections <- function(html_doc, section_indices) {
   for (i in seq_along(section_indices)) { # Iterate over specified sections
     start_node <- headings[[section_indices[i]]]
     
-    #end_node <- if (i < length(section_indices)) headings[[section_indices[i + 1]]] else NULL
-    end_node <- if (i < length(section_indices)) headings[[i + 1]] else NULL
+    end_node <- if (i < length(section_indices)) headings[[section_indices[i + 1]]] else NULL #this works
+    #end_node <- if (i < length(section_indices)) headings[[i + 1]] else NULL 
     siblings <- xml2::xml_find_all(start_node, "following-sibling::*")
     if (!is.null(end_node)) {
       idx <- which(vapply(siblings, identical, logical(1), y = end_node))
@@ -104,22 +104,22 @@ parse_html_sections <- function(html_doc, section_indices) {
 # ----- *removing spaces after headings function -----
 #if sections[i] ends with " ", remove it
 remove_end_blanks <- function(result_list){
-  
+
   for(i in 1:length(result_list)){
     templist <- result_list[[i]]
-    
+
     for(heading in 1:length(templist)){
       if(endsWith(names(templist)[heading], " ")){
-        
+
         headingWithSpace <- names(templist)[heading] #save heading to local object
         print(headingWithSpace)
         endstring <- stringr::str_length(headingWithSpace) #find length of heading's string
-        
+
         endstring <- as.numeric(endstring)-1
-        
+
         headingNoSpace <- substr(headingWithSpace, 1, endstring) #remove space from end and save
         #print(headingNoSpace)
-        
+
         names(result_list[[i]])[heading] <- headingNoSpace
         print(names(result_list[[i]][heading]))
       }else next

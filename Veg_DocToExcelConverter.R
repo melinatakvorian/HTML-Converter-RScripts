@@ -27,7 +27,7 @@ invisible(lapply(packages, library, character.only = TRUE))
 
 #####CHANGE AS DIRECTED BELOW --- -- -- -- --- - - -- -- - -  - - - - -  --- - - - - - - --- --- --- -- ---
 
-#!!!PAY ATTENTION TO THE DIRECTION OF THE SLASHES. THEY HAVE TO BE CHANGED TO FORWARD SLASHES, AS SHOWN BELOW
+#PAY ATTENTION TO THE DIRECTION OF THE SLASHES. THEY HAVE TO BE CHANGED TO FORWARD SLASHES, AS SHOWN BELOW
 input_umbrella <- 
   "N:/RStor/CEMML/ClimateChange/1_USAFClimate/1_USAF_Natural_Resources/20_2_0004_RevisitingPhase1/" #the broad folder structure
 input_specific_folder <- "_AirForceClimateViewerDev/Document to HTML Table Converter/Test Documents/VegBMGR_20251105_1" #the specific folder inside the Document to HTML Table Converter where the input files are

@@ -25,18 +25,16 @@ invisible(lapply(packages, library, character.only = TRUE))
 
 ## Create paths for storing files ----
 
-# CHANGE AS DIRECTED BELOW ------------------------------------------------
+#####CHANGE AS DIRECTED BELOW --- -- -- -- --- - - -- -- - -  - - - - -  --- - - - - - - --- --- --- -- ---
 
-#!!!PAY ATTENTION TO THE DIRECTION OF THE SLASHES. THEY HAVE TO BE CHANGED TO FORWARD SLASHES, AS SHOWN BELOW
+#PAY ATTENTION TO THE DIRECTION OF THE SLASHES. THEY HAVE TO BE CHANGED TO FORWARD SLASHES, AS SHOWN BELOW
 input_umbrella <- 
-  "N:/RStor/CEMML/ClimateChange/1_USAFClimate/1_USAF_Natural_Resources/20_2_0004_RevisitingPhase1/"
-input_specific_folder <- "New Boston SFS/Hydrology/HTML Conversion" #the specific folder inside the Document to HTML Table Converter where the input files are
+  "N:/RStor/CEMML/ClimateChange/1_USAFClimate/1_USAF_Natural_Resources/20_2_0004_RevisitingPhase1/" #the broad folder structure
+input_specific_folder <- "_AirForceClimateViewerDev/Document to HTML Table Converter/Test Documents/VegBMGR_20251105_1" #the specific folder inside the Document to HTML Table Converter where the input files are
+#####NO MORE CHANGES --- -- -- -- --- - - -- -- - -  - - - - -  --- - - - - - - --- --- --- -- ---
 
 input_dir <-  paste0(input_umbrella, input_specific_folder) #Rename to your target directory. Outputs will appear here as well.
-project_name <- "UpdatedScript_run1" #Replace with whatever you want.
-
-# NO MORE CHANGES ------------------------------------------------------------------
-
+project_name <- "TESTerror_run1" #Replace with whatever you want.
 current_date <- format(Sys.Date(), "%Y%m%d")  # e.g., "2025-09-24"
 
 

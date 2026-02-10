@@ -30,10 +30,10 @@ invisible(lapply(packages, library, character.only = TRUE))
 #!!!PAY ATTENTION TO THE DIRECTION OF THE SLASHES. THEY HAVE TO BE CHANGED TO FORWARD SLASHES, AS SHOWN BELOW
 input_umbrella <- 
   "N:/RStor/CEMML/ClimateChange/1_USAFClimate/1_USAF_Natural_Resources/20_2_0004_RevisitingPhase1/" #broad folder structure
-input_specific_folder <- "_AirForceClimateViewerDev/Document to HTML Table Converter/Test Documents/TestFiles" #the specific folder inside the Document to HTML Table Converter where the input files are
+input_specific_folder <- "Travis AFB/WildlandFire" #the specific folder inside the Document to HTML Table Converter where the input files are
 
 input_dir <-  paste0(input_umbrella, input_specific_folder) #Rename to your target directory. Outputs will appear here as well.
-project_name <- "Luke_TEVA_run1" #Replace with whatever you want.
+project_name <- "Travis_Fire_run2" #Replace with whatever you want.
 
 # NO MORE CHANGES ------------------------------------------------------------------
 
@@ -149,6 +149,16 @@ for (i in seq_along(results)) {
 colnames(df)[colnames(df) == "Installation"] <- "SITENAME"
 colnames(df)[colnames(df) == "Site_Name"] <- "SITENAME"
 
+#add paragraph indentation
+  for(i in 1:nrow(df)){
+      #replace each <p> to &nbsp; <p style="text-indent:.5in">
+      temp_string <- df$SUMMARY[i]
+      temp_string1 <- stringr::str_replace_all(temp_string, "<p>", '&nbsp; <p style="text-indent:.5in">')
+        #will ALSO replace the first instance of <p>, which should be excluded.
+      df$SUMMARY[i] <- temp_string1
+  }
+#add new line spacing
+
 # Export final files ----
 out_dir <- input_dir
 if (!dir.exists(out_dir)) dir.create(out_dir, recursive = TRUE)
@@ -158,5 +168,6 @@ write_xlsx(df, file.path(out_dir, output_filename))
 message("Conversion complete. XLSX saved to: ", file.path(out_dir, output_filename))
 
 # clean environment, so that things can run properly for the next run  
-rm(list = ls()) 
+#rm(list = ls()) 
+
 

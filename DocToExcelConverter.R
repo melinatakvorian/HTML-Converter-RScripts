@@ -33,7 +33,7 @@ input_umbrella <-
 input_specific_folder <- "" #the specific folder inside the Document to HTML Table Converter where the input files are
 
 input_dir <-  paste0(input_umbrella, input_specific_folder) #Rename to your target directory. Outputs will appear here as well.
-project_name <- "Travis_Fire_run3" #Replace with whatever you want.
+project_name <- "Travis_Fire_run5" #Replace with whatever you want.
 
 # NO MORE CHANGES ------------------------------------------------------------------
 
@@ -191,7 +191,7 @@ colnames(df)[colnames(df) == "Site_Name"] <- "SITENAME"
         df[[i]][cell], c("<o:p>" = "<p>", 
                          "</o:p>" = "</p>", 
                          ' class=\\"MsoNormal\\"' = "",
-                         " <p><p> </p></p> " = " &nbsp; " ))#this condition is not working
+                         "<span style=\"mso-spacerun:yes\"> </span>" = ""))# add line for MS office formatting
       print(df[[i]][cell])
     }
   }

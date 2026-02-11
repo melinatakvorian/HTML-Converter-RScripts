@@ -186,10 +186,13 @@ colnames(df)[colnames(df) == "Site_Name"] <- "SITENAME"
   #replace the <o:p> or </o:p> with <p> </p>
   for(i in seq_along(df)){ #for each column
     for(cell in seq_along(df[[i]])){ #for each cell in each column
-      stringr::str_replace_all(df[[i]][cell], 
-                               c("<o:p>" = "<p>", 
-                               "</o:p>" = "</p>", 
-                               ' class = "MsoNormal"' = ""))
+      print(df[[i]][cell])
+      df[[i]][cell] <- stringr::str_replace_all(
+        df[[i]][cell], c("<o:p>" = "<p>", 
+                         "</o:p>" = "</p>", 
+                         ' class=\\"MsoNormal\\"' = "",
+                         " <p><p> </p></p> " = " &nbsp; " ))#this condition is not working
+      print(df[[i]][cell])
     }
   }
 

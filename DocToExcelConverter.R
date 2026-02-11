@@ -184,11 +184,12 @@ colnames(df)[colnames(df) == "Site_Name"] <- "SITENAME"
 
 # replace Microsoft stylization issues ----
   #replace the <o:p> or </o:p> with <p> </p>
-  for(i in 1:length(df)){ #for each column
-    for(cell in 1:length(df[[i]])){ #for each cell in each column
-      stringr::str_replace_all(df[[i]][cell], "<o:p>", "<p>")
-      stringr::str_replace_all(df[[i]][cell], "</o:p>", "</p>")
-      stringr::str_replace_all(df[[i]][cell], ' class = "MsoNormal"', "")
+  for(i in seq_along(df)){ #for each column
+    for(cell in seq_along(df[[i]])){ #for each cell in each column
+      stringr::str_replace_all(df[[i]][cell], 
+                               c("<o:p>" = "<p>", 
+                               "</o:p>" = "</p>", 
+                               ' class = "MsoNormal"' = ""))
     }
   }
 

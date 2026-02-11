@@ -12,7 +12,7 @@
 
 ## Install / load necessary packages ----
 
-packages <- c("pandoc","xml2","rvest","writexl", "stringr")
+packages <- c("pandoc","xml2","rvest","writexl", "stringr", "officer","devtools", "RDCOMClient")
 
 # Install packages not yet installed
 installed_packages <- packages %in% rownames(installed.packages())
@@ -29,18 +29,18 @@ invisible(lapply(packages, library, character.only = TRUE))
 
 #!!!PAY ATTENTION TO THE DIRECTION OF THE SLASHES. THEY HAVE TO BE CHANGED TO FORWARD SLASHES, AS SHOWN BELOW
 input_umbrella <- 
-  "N:/RStor/CEMML/ClimateChange/1_USAFClimate/1_USAF_Natural_Resources/20_2_0004_RevisitingPhase1/" #broad folder structure
-input_specific_folder <- "Travis AFB/WildlandFire" #the specific folder inside the Document to HTML Table Converter where the input files are
+  "C:/Users/melinata/OneDrive - Colostate/Desktop/TestFiles/TestRDCOM" #broad folder structure
+input_specific_folder <- "" #the specific folder inside the Document to HTML Table Converter where the input files are
 
 input_dir <-  paste0(input_umbrella, input_specific_folder) #Rename to your target directory. Outputs will appear here as well.
-project_name <- "Travis_Fire_run2" #Replace with whatever you want.
+project_name <- "Travis_Fire_run3" #Replace with whatever you want.
 
 # NO MORE CHANGES ------------------------------------------------------------------
 
 current_date <- format(Sys.Date(), "%Y%m%d")  # e.g., "2025-09-24"
 
 
-# ----- * Word->HTML function ----
+# ----- * Word->HTML function with pandoc ----
 # takes Word document (input) and turns it into HTML file (output)
 
 convert_docx_to_html_full <- function(docx_file) {
@@ -57,7 +57,39 @@ convert_docx_to_html_full <- function(docx_file) {
   xml2::read_html(html_file)
 }
 
+# ---- * Word -> HTML function with RDCOMClient ----
 
+convert_rdccom <- function(docx_file, filepath){
+  
+  html_file <- paste0(filepath, "/output1.html") #place to store HTML before it gets read in
+  
+  wordApp <- COMCreate("Word.Application")
+  wordApp[["Visible"]] <- TRUE
+  wordApp[["DisplayAlerts"]] <- FALSE
+  #path_To_Word_File <- "C:/Users/melinata/OneDrive - Colostate/Desktop/TestFiles/TravisAFB_WildlandFire_Tester.docx"
+  doc <- wordApp[["Documents"]]$Open(normalizePath(docx_file), ConfirmConversions = FALSE)
+  wordApp[["ActiveDocument"]]$SaveAs2(
+    FileName = normalizePath(html_file),
+    FileFormat = 8
+  )
+  doc$close(FALSE)
+  wordApp$Quit()
+  
+  xml2::read_html(html_file)
+}
+
+  #example code
+    wordApp <- COMCreate("Word.Application")
+    wordApp[["Visible"]] <- TRUE
+    wordApp[["DisplayAlerts"]] <- FALSE
+    path_To_Word_File <- "C:/Users/melinata/OneDrive - Colostate/Desktop/TestFiles/TestRDCOM/TravisAFB_WildlandFire_Tester.docx"
+    doc <- wordApp[["Documents"]]$Open(normalizePath(docx_files[[1]]), ConfirmConversions = FALSE)
+    wordApp[["ActiveDocument"]]$SaveAs2(
+      FileName = normalizePath("C:/Users/melinata/OneDrive - Colostate/Desktop/TestFiles/TestRDCOM/output.html"),
+      FileFormat = 8
+    )
+    doc$close(FALSE)
+    wordApp$Quit()
 
 # ----- * HTML->pieces function ----
 # reads HTML file (input) and separate sections for building table later 
@@ -121,7 +153,8 @@ docx_files <- docx_files[!grepl("^~\\$", basename(docx_files))]
 results <- list()
 
 for (file in docx_files) { #for each file, convert it to HTML, Identify its sections, delete empty headers, add to a results mega-list
-  html_doc <- convert_docx_to_html_full(file)
+  #html_doc <- convert_docx_to_html_full(file) #old
+  html_doc <- convert_rdccom(file, input_dir) #new
   sections <- parse_html_sections(html_doc)
   sections <- sections[names(sections) != ""] #remove accidental headers
   results[[basename(file)]] <- sections
@@ -149,15 +182,15 @@ for (i in seq_along(results)) {
 colnames(df)[colnames(df) == "Installation"] <- "SITENAME"
 colnames(df)[colnames(df) == "Site_Name"] <- "SITENAME"
 
-#add paragraph indentation
-  for(i in 1:nrow(df)){
-      #replace each <p> to &nbsp; <p style="text-indent:.5in">
-      temp_string <- df$SUMMARY[i]
-      temp_string1 <- stringr::str_replace_all(temp_string, "<p>", '&nbsp; <p style="text-indent:.5in">')
-        #will ALSO replace the first instance of <p>, which should be excluded.
-      df$SUMMARY[i] <- temp_string1
+# replace Microsoft stylization issues ----
+  #replace the <o:p> or </o:p> with <p> </p>
+  for(i in 1:length(df)){ #for each column
+    for(cell in 1:length(df[[i]])){ #for each cell in each column
+      stringr::str_replace_all(df[[i]][cell], "<o:p>", "<p>")
+      stringr::str_replace_all(df[[i]][cell], "</o:p>", "</p>")
+      stringr::str_replace_all(df[[i]][cell], ' class = "MsoNormal"', "")
+    }
   }
-#add new line spacing
 
 # Export final files ----
 out_dir <- input_dir

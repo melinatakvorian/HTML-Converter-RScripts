@@ -17,7 +17,7 @@
   # Install packages not yet installed
   installed_packages <- packages %in% rownames(installed.packages())
   if (any(installed_packages == FALSE)) {
-    install.packages(packages[!installed_packages])
+    install.packages(packages[!installed_packages]) #error here
   }
   
   # load packages
@@ -32,7 +32,7 @@
       input_umbrella <- 
       "N:/RStor/CEMML/ClimateChange/1_USAFClimate/1_USAF_Natural_Resources/20_2_0004_RevisitingPhase1/" 
     #the specific folder inside the Document to HTML Table Converter where the input files are
-      input_specific_folder <- "Dover AFB/3ViewerPackages/Ecosystems/Word to HTML convertion" 
+      input_specific_folder <- "Dover AFB/TerrestrialVegetation/Word to HTML conversion" 
       
   #the final file name will start with this and will get the date added
     project_name <- "Dover_run1_Veg" #Replace with whatever you want.
@@ -61,8 +61,9 @@
 
 # ----- *Word->HTML function ----
 # takes Word document (input) and turns it into HTML file (output)
-  convert_docx_to_html_full <- function(docx_file) {
-    html_file <- tempfile(fileext = ".html")
+  convert_docx_to_html_full <- function(docx_file, filepath) {
+    #html_file <- tempfile(fileext = ".html")
+    html_file <- paste0(filepath, "/output1.html")
     
     pandoc::pandoc_convert(
       file = docx_file,
@@ -136,14 +137,14 @@
 
 # RUN ----
   
-  #initialize obects for storing file info
+  #initialize objects for storing file info
   docx_files <- list.files(input_dir, pattern = "\\.docx$", full.names = TRUE) #pull list of all files in folder
   results_bio <- list()
   results_veg <- list()
   
   #for each file, convert it to HTML, Identify its sections, delete empty headers, add to a results mega-list
     for (file in docx_files) { 
-      html_doc <- convert_docx_to_html_full(file)
+      html_doc <- convert_docx_to_html_full(file, input_dir)
       
       #identify bio v. veg headings 
       headings <- rvest::html_nodes(html_doc, "h1")

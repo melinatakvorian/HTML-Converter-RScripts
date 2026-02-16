@@ -12,111 +12,112 @@
 
 ## Install / load necessary packages ----
 
-packages <- c("pandoc","xml2","rvest","writexl", "stringr", "officer","devtools", "RDCOMClient")
+  packages <- c("pandoc","xml2","rvest","writexl", "stringr", "officer","devtools", "RDCOMClient")
 
 # Install packages not yet installed
-installed_packages <- packages %in% rownames(installed.packages())
-if (any(installed_packages == FALSE)) {
-  install.packages(packages[!installed_packages])
-}
+  installed_packages <- packages %in% rownames(installed.packages())
+  if (any(installed_packages == FALSE)) {
+    install.packages(packages[!installed_packages])
+  }
 
 # load packages
-invisible(lapply(packages, library, character.only = TRUE))
+  invisible(lapply(packages, library, character.only = TRUE))
 
 ## Create paths for storing files ----
 
 # CHANGE AS DIRECTED BELOW ------------------------------------------------
 
 #!!!PAY ATTENTION TO THE DIRECTION OF THE SLASHES. THEY HAVE TO BE CHANGED TO FORWARD SLASHES, AS SHOWN BELOW
-input_umbrella <- 
-  "C:/Users/melinata/OneDrive - Colostate/Desktop/TestFiles/TestRDCOM" #broad folder structure
-input_specific_folder <- "" #the specific folder inside the Document to HTML Table Converter where the input files are
-
-input_dir <-  paste0(input_umbrella, input_specific_folder) #Rename to your target directory. Outputs will appear here as well.
-project_name <- "Travis_Fire_run5" #Replace with whatever you want.
+  input_umbrella <- 
+    "N:/RStor/CEMML/ClimateChange/1_USAFClimate/1_USAF_Natural_Resources/20_2_0004_RevisitingPhase1/_AirForceClimateViewerDev/" #broad folder structure
+  input_specific_folder <- "Document to HTML Table Converter/FilesForTesting/TEVA_test" #the specific folder inside the Document to HTML Table Converter where the input files are
+  
+  input_dir <-  paste0(input_umbrella, input_specific_folder) #Rename to your target directory. Outputs will appear here as well.
+  project_name <- "RDCOM_refresh1" #Replace with whatever you want.
 
 # NO MORE CHANGES ------------------------------------------------------------------
 
-current_date <- format(Sys.Date(), "%Y%m%d")  # e.g., "2025-09-24"
+  current_date <- format(Sys.Date(), "%Y%m%d")  # e.g., "2025-09-24"
 
 
 # ----- * Word->HTML function with pandoc ----
 # takes Word document (input) and turns it into HTML file (output)
-
-convert_docx_to_html_full <- function(docx_file) {
-  html_file <- tempfile(fileext = ".html")
   
-  pandoc::pandoc_convert(
-    file = docx_file,
-    output = html_file,
-    from = "docx",
-    to = "html",
-    standalone = TRUE
-  )
-  
-  xml2::read_html(html_file)
-}
+  convert_docx_to_html_full <- function(docx_file) {
+    html_file <- tempfile(fileext = ".html")
+    
+    pandoc::pandoc_convert(
+      file = docx_file,
+      output = html_file,
+      from = "docx",
+      to = "html",
+      standalone = TRUE
+    )
+    
+    xml2::read_html(html_file)
+  }
 
 # ---- * Word -> HTML function with RDCOMClient ----
 
-convert_rdccom <- function(docx_file, filepath){
-  
-  html_file <- paste0(filepath, "/output1.html") #place to store HTML before it gets read in
-  
-  wordApp <- COMCreate("Word.Application")
-  wordApp[["Visible"]] <- TRUE
-  wordApp[["DisplayAlerts"]] <- FALSE
-  #path_To_Word_File <- "C:/Users/melinata/OneDrive - Colostate/Desktop/TestFiles/TravisAFB_WildlandFire_Tester.docx"
-  doc <- wordApp[["Documents"]]$Open(normalizePath(docx_file), ConfirmConversions = FALSE)
-  wordApp[["ActiveDocument"]]$SaveAs2(
-    FileName = normalizePath(html_file),
-    FileFormat = 8
-  )
-  doc$close(FALSE)
-  wordApp$Quit()
-  
-  xml2::read_html(html_file)
-}
-
-  #example code
+  convert_rdccom <- function(docx_file, filepath){
+    
+    #html_file <- tempfile(fileext = ".html")
+    html_file <- paste0(filepath, "/output", substr(docx_file, 186, 195), ".html") #place to store HTML before it gets read in
+    
     wordApp <- COMCreate("Word.Application")
-    wordApp[["Visible"]] <- TRUE
+    wordApp[["Visible"]] <- FALSE #making the word application visible on the screen
     wordApp[["DisplayAlerts"]] <- FALSE
-    path_To_Word_File <- "C:/Users/melinata/OneDrive - Colostate/Desktop/TestFiles/TestRDCOM/TravisAFB_WildlandFire_Tester.docx"
-    doc <- wordApp[["Documents"]]$Open(normalizePath(docx_files[[1]]), ConfirmConversions = FALSE)
+    #path_To_Word_File <- "C:/Users/melinata/OneDrive - Colostate/Desktop/TestFiles/TravisAFB_WildlandFire_Tester.docx"
+    doc <- wordApp[["Documents"]]$Open(normalizePath(docx_file), ConfirmConversions = FALSE)
     wordApp[["ActiveDocument"]]$SaveAs2(
-      FileName = normalizePath("C:/Users/melinata/OneDrive - Colostate/Desktop/TestFiles/TestRDCOM/output.html"),
+      FileName = normalizePath(html_file),
       FileFormat = 8
     )
     doc$close(FALSE)
     wordApp$Quit()
+    
+    xml2::read_html(html_file)
+  }
+
+  #example code
+    # wordApp <- COMCreate("Word.Application")
+    # wordApp[["Visible"]] <- TRUE
+    # wordApp[["DisplayAlerts"]] <- FALSE
+    # path_To_Word_File <- "C:/Users/melinata/OneDrive - Colostate/Desktop/TestFiles/TestRDCOM/TravisAFB_WildlandFire_Tester.docx"
+    # doc <- wordApp[["Documents"]]$Open(normalizePath(docx_files[[1]]), ConfirmConversions = FALSE)
+    # wordApp[["ActiveDocument"]]$SaveAs2(
+    #   FileName = normalizePath("C:/Users/melinata/OneDrive - Colostate/Desktop/TestFiles/TestRDCOM/output.html"),
+    #   FileFormat = 8
+    # )
+    # doc$close(FALSE)
+    # wordApp$Quit()
 
 # ----- * HTML->pieces function ----
 # reads HTML file (input) and separate sections for building table later 
-parse_html_sections <- function(html_doc) {
-  headings <- rvest::html_nodes(html_doc, "h1") #identify headings
-  sections <- vector("list", length(headings)) #create list of headings (sections)
-  
-  for (i in seq_along(headings)) { #for each section, concatenate all the info that belongs to it (across docs)
-    start_node <- headings[[i]]
+  parse_html_sections <- function(html_doc) {
+    headings <- rvest::html_nodes(html_doc, "h1") #identify headings
+    sections <- vector("list", length(headings)) #create list of headings (sections)
     
-    end_node <- if (i < length(headings)) headings[[i + 1]] else NULL
-    siblings <- xml2::xml_find_all(start_node, "following-sibling::*")
-    if (!is.null(end_node)) {
-      idx <- which(vapply(siblings, identical, logical(1), y = end_node))
-      if (length(idx) == 0) idx <- length(siblings) + 1
-      siblings <- siblings[seq_len(idx - 1)]
+    for (i in seq_along(headings)) { #for each section, concatenate all the info that belongs to it (across docs)
+      start_node <- headings[[i]]
+      
+      end_node <- if (i < length(headings)) headings[[i + 1]] else NULL
+      siblings <- xml2::xml_find_all(start_node, "following-sibling::*")
+      if (!is.null(end_node)) {
+        idx <- which(vapply(siblings, identical, logical(1), y = end_node))
+        if (length(idx) == 0) idx <- length(siblings) + 1
+        siblings <- siblings[seq_len(idx - 1)]
+      }
+      
+      
+      # Insert a space between concatenated HTML nodes
+      content_html <- paste(as.character(siblings), collapse = " ")
+      sections[[i]] <- list(title = xml_text(start_node), content = content_html)
     }
     
-    
-    # Insert a space between concatenated HTML nodes
-    content_html <- paste(as.character(siblings), collapse = " ")
-    sections[[i]] <- list(title = xml_text(start_node), content = content_html)
+    names(sections) <- vapply(sections, `[[`, "", "title")
+    lapply(sections, `[[`, "content")
   }
-  
-  names(sections) <- vapply(sections, `[[`, "", "title")
-  lapply(sections, `[[`, "content")
-}
 
 # ----- * #removing spaces after headings function -----
 #if sections[i] ends with " ", remove it
@@ -147,40 +148,40 @@ remove_end_blanks <- function(result_list){
 }
 
 # RUN ----
-docx_files <- list.files(input_dir, pattern = "\\.docx$", full.names = TRUE) #pull list of all files in folder
-docx_files <- docx_files[!grepl("^~\\$", basename(docx_files))]
-
-results <- list()
-
-for (file in docx_files) { #for each file, convert it to HTML, Identify its sections, delete empty headers, add to a results mega-list
-  #html_doc <- convert_docx_to_html_full(file) #old
-  html_doc <- convert_rdccom(file, input_dir) #new
-  sections <- parse_html_sections(html_doc)
-  sections <- sections[names(sections) != ""] #remove accidental headers
-  results[[basename(file)]] <- sections
-}
+  docx_files <- list.files(input_dir, pattern = "\\.docx$", full.names = TRUE) #pull list of all files in folder
+  docx_files <- docx_files[!grepl("^~\\$", basename(docx_files))]
+  
+  results <- list()
+  
+  for (file in docx_files) { #for each file, convert it to HTML, Identify its sections, delete empty headers, add to a results mega-list
+    #html_doc <- convert_docx_to_html_full(file) #old
+    html_doc <- convert_rdccom(file, input_dir) #new
+    sections <- parse_html_sections(html_doc)
+    sections <- sections[names(sections) != ""] #remove accidental headers
+    results[[basename(file)]] <- sections
+   }
 
 #remove trailing spaces from headings
-results <- remove_end_blanks(results)
+  results <- remove_end_blanks(results)
 
 #unfold the results list to be able to create a dataframe
-all_headings <- unique(unlist(lapply(results, names))) #THIS SHOULD BE 37, IF THE LOOP ABOVE WORKED
+  all_headings <- unique(unlist(lapply(results, names))) #THIS SHOULD BE 37, IF THE LOOP ABOVE WORKED
 
 
 # Create dataframe and input HTML in proper sections ----
-df <- data.frame(matrix(NA_character_, length(results), length(all_headings)),
-                 stringsAsFactors = FALSE)
-colnames(df) <- all_headings
-rownames(df) <- names(results)
-for (i in seq_along(results)) {
-  for (col in names(results[[i]])) {
-    df[i, col] <- results[[i]][[col]]
+  df <- data.frame(matrix(NA_character_, length(results), length(all_headings)),
+                   stringsAsFactors = FALSE)
+  colnames(df) <- all_headings
+  rownames(df) <- names(results)
+  for (i in seq_along(results)) {
+    for (col in names(results[[i]])) {
+      df[i, col] <- results[[i]][[col]]
+    }
   }
-}
 
 #Check for incorrect naming of the installation ID, correct it
-colnames(df)[colnames(df) == "Installation"] <- "SITENAME"
-colnames(df)[colnames(df) == "Site_Name"] <- "SITENAME"
+  colnames(df)[colnames(df) == "Installation"] <- "SITENAME"
+  colnames(df)[colnames(df) == "Site_Name"] <- "SITENAME"
 
 # replace Microsoft stylization issues ----
   #replace the <o:p> or </o:p> with <p> </p>

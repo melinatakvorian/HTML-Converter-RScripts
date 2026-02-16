@@ -35,7 +35,7 @@
       input_specific_folder <- "_AirForceClimateViewerDev/Document to HTML Table Converter/FilesForTesting/VegBMGR_test" 
       
   #the final file name will start with this and will get the date added
-    project_name <- "refresh_run1" #Replace with whatever you want.
+    project_name <- "refresh_run2" #Replace with whatever you want.
     
 #####NO MORE CHANGES --- -- -- -- --- - - -- -- - -  - - - - -  --- - - - - - - --- --- --- -- ---
 
@@ -85,10 +85,13 @@
     sections <- vector("list", length(section_indices)) #create list of headings (sections)
     
     for (i in seq_along(section_indices)) { # Iterate over specified sections
+        print(paste("Parsing section:", section_indices[i]))
+        
       start_node <- headings[[section_indices[i]]]
       
       end_node <- if (i < length(section_indices)) headings[[section_indices[i + 1]]] else NULL #this works
-      #end_node <- if (i < length(section_indices)) headings[[i + 1]] else NULL 
+        print(headings[section_indices[i + 1]])
+
       siblings <- xml2::xml_find_all(start_node, "following-sibling::*")
       if (!is.null(end_node)) {
         idx <- which(vapply(siblings, identical, logical(1), y = end_node))
@@ -99,6 +102,7 @@
       # Insert a space between concatenated HTML nodes
       content_html <- paste(as.character(siblings), collapse = " ")
       sections[[i]] <- content_html
+        print(content_html)
     }
     
     # Assign section titles as names to the list elements
@@ -106,7 +110,7 @@
     sections
     
   }
-
+  
 # ----- *removing spaces after headings function -----
 #if sections[i] ends with " ", remove it
   remove_end_blanks <- function(result_list){
@@ -146,7 +150,7 @@
     for (file in docx_files) { 
       html_doc <- convert_docx_to_html_full(file, input_dir)
       
-      #identify bio v. veg headings 
+      #identify all headings
       headings <- rvest::html_nodes(html_doc, "h1")
       
       #create a list of all heading names
@@ -156,19 +160,19 @@
         nlist[length(nlist)+1] <- temp
       }
       
-      last <- length(nlist)
+      last <- as.numeric(length(nlist))
       
       # Define indices for bioclimatic and vegetation sections
       bio_indices <- c(1:5, last) # Bioclimatic sections
       veg_indices <- c(1:3, 6:(last - 1)) # Vegetation sections
       
       
-      #BIO
+      #Create BIO table list
       sections_bio <- parse_html_sections(html_doc, bio_indices)
       sections_bio <- sections_bio[names(sections_bio) != ""] #remove accidental headers
       results_bio[[basename(file)]] <- sections_bio #should be a list of headings and its text
       
-      #VEG
+      #Create VEG table listkjo
       sections_veg <- parse_html_sections(html_doc, veg_indices)
       sections_veg <- sections_veg[names(sections_veg) != ""] #remove accidental headers
       results_veg[[basename(file)]] <- sections_veg #should be a list of headings and its text
@@ -196,7 +200,7 @@
       for (col in all_headings_bio) {
         if (col %in% names(results_bio[[i]])) {
           df_bio[i, col] <- results_bio[[i]][[col]]
-        }
+        }else{df_bio[i, col] <- NA} #ChatGPT help
       }
     }
 

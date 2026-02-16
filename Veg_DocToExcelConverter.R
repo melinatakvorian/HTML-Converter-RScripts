@@ -35,7 +35,7 @@
       input_specific_folder <- "_AirForceClimateViewerDev/Document to HTML Table Converter/FilesForTesting/VegBMGR_test" 
       
   #the final file name will start with this and will get the date added
-    project_name <- "refresh_run2" #Replace with whatever you want.
+    project_name <- "seperate_parsing" #Replace with whatever you want.
     
 #####NO MORE CHANGES --- -- -- -- --- - - -- -- - -  - - - - -  --- - - - - - - --- --- --- -- ---
 
@@ -79,7 +79,7 @@
 
 # ----- *HTML->pieces function ----
 #reads HTML file (input) and separate sections for building table later
-  parse_html_sections <- function(html_doc, section_indices) {
+  parse_html_sections_bio <- function(html_doc, section_indices) {
     #identify all headings
     headings <- rvest::html_nodes(html_doc, "h1") #identify headings
     sections <- vector("list", length(section_indices)) #create list of headings (sections)
@@ -89,8 +89,9 @@
         
       start_node <- headings[[section_indices[i]]]
       
-      end_node <- if (i < length(section_indices)) headings[[section_indices[i + 1]]] else NULL #this works
-        print(headings[section_indices[i + 1]])
+      #end_node <- if (i < length(section_indices)) headings[[section_indices[i + 1]]] else NULL
+      end_node <- if (i < length(section_indices)) headings[[i + 1]] else NULL
+        #print(headings[section_indices[i + 1]])
 
       siblings <- xml2::xml_find_all(start_node, "following-sibling::*")
       if (!is.null(end_node)) {
@@ -111,6 +112,39 @@
     
   }
   
+  
+  parse_html_sections_veg <- function(html_doc, section_indices) {
+    #identify all headings
+    headings <- rvest::html_nodes(html_doc, "h1") #identify headings
+    sections <- vector("list", length(section_indices)) #create list of headings (sections)
+    
+    for (i in seq_along(section_indices)) { # Iterate over specified sections
+      print(paste("Parsing section:", section_indices[i]))
+      
+      start_node <- headings[[section_indices[i]]]
+      
+      end_node <- if (i < length(section_indices)) headings[[section_indices[i + 1]]] else NULL
+      #end_node <- if (i < length(section_indices)) headings[[i + 1]] else NULL
+      #print(headings[section_indices[i + 1]])
+      
+      siblings <- xml2::xml_find_all(start_node, "following-sibling::*")
+      if (!is.null(end_node)) {
+        idx <- which(vapply(siblings, identical, logical(1), y = end_node))
+        if (length(idx) == 0) idx <- length(siblings) + 1
+        siblings <- siblings[seq_len(idx - 1)]
+      }
+      
+      # Insert a space between concatenated HTML nodes
+      content_html <- paste(as.character(siblings), collapse = " ")
+      sections[[i]] <- content_html
+      print(content_html)
+    }
+    
+    # Assign section titles as names to the list elements
+    names(sections) <- sapply(headings[section_indices], xml_text)
+    sections
+    
+  }
 # ----- *removing spaces after headings function -----
 #if sections[i] ends with " ", remove it
   remove_end_blanks <- function(result_list){
@@ -168,12 +202,12 @@
       
       
       #Create BIO table list
-      sections_bio <- parse_html_sections(html_doc, bio_indices)
+      sections_bio <- parse_html_sections_bio(html_doc, bio_indices)
       sections_bio <- sections_bio[names(sections_bio) != ""] #remove accidental headers
       results_bio[[basename(file)]] <- sections_bio #should be a list of headings and its text
       
       #Create VEG table listkjo
-      sections_veg <- parse_html_sections(html_doc, veg_indices)
+      sections_veg <- parse_html_sections_veg(html_doc, veg_indices)
       sections_veg <- sections_veg[names(sections_veg) != ""] #remove accidental headers
       results_veg[[basename(file)]] <- sections_veg #should be a list of headings and its text
     }
@@ -207,17 +241,18 @@
   ##VEG----
 
     #find the indices within the list that are new occurrences of 'Vegetation Group Name'
-      num_files <- as.list(c(1:as.numeric(length(results_veg))))
+      num_files <- as.list(c(1:as.numeric(length(results_veg)))) #initialize list
       
-      #create mini lists for each instanve of new veg group
+      #create mini lists for each instance of new veg group
         for(file in seq_along(results_veg)){
-          veg_names <- names(results_veg[[file]])
+          veg_names <- names(results_veg[[file]]) #create list of headings from each file
           indices <- c()
           
-          for(i in seq_along(veg_names)){
-            if(veg_names[i] =="New_Vegetation_Group") indices[length(indices)+1] <- i
+          for(i in seq_along(veg_names)){ 
+            if(veg_names[i] =="New_Vegetation_Group"){  #if the heading at this index is a new veg group
+              indices[length(indices)+1] <- i} #save the index to the end of the indices list
           }
-          num_files[[file]] <- indices
+          num_files[[file]] <- indices #append the indices of new veg group to this number file in the folder
         }
 
     #use the indices to create smaller lists as keys to sections of Veg Groups in the document
@@ -226,22 +261,22 @@
       mylist <- vector("list", length(results_veg))
   
       #create mini lists, assign data to them
-      for(file in seq_along(results_veg)){
+      for(file in seq_along(results_veg)){ #for each heading
         
-        for(i in seq_along(num_files[[file]])){
-          finish <- i+1
+        for(i in seq_along(num_files[[file]])){ #in each file
+          finish <- i+1 
           
-          if(finish <= length(num_files[[file]])){
-            secondtolast <- num_files[[file]][[finish]]
-            secondtolast <- secondtolast-1
+          if(finish <= length(num_files[[file]])){ #if we aren't past the last file in the folder,
+            secondtolast <- num_files[[file]][[finish]] #get the instance of the next New Veg heading
+            secondtolast <- secondtolast-1 #we want to stop BEFORE we get to the next section
             
             num_pair <- c(num_files[[file]][[i]]:secondtolast) #create range from one to the next
             
             total_rows <- total_rows + length(num_pair) #sum all iterations to see how long the df should be
             
-            mylist[[file]][[length(mylist[[file]])+1]] <- num_pair
+            mylist[[file]][[length(mylist[[file]])+1]] <- num_pair #create a nested list with each index within a veg group section
             
-          }else{
+          }else{ #case for the last instance of new veg group
             num_pair <- c(num_files[[file]][[i]]:(length(results_veg[[file]])-1))
             total_rows <- total_rows + length(num_pair) #sum all iterations to see how long the df should be
             
@@ -264,7 +299,7 @@
           # Populate the first few columns with results_bio data (assuming it applies to all rows for this file)
           df_veg[rownum, 1] <- results_bio[[file]][[1]]
           df_veg[rownum, 2] <- results_bio[[file]][[2]]
-          df_veg[rownum, 3] <- results_bio[[file]][[3]]
+          df_veg[rownum, 3] <- results_bio[[file]][[3]] #THE COLUMN GETS RE-WRITTEN
           
           n_col <- 4 # Start filling from the 4th column
           

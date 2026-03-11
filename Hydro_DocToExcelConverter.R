@@ -30,12 +30,12 @@ invisible(lapply(packages, library, character.only = TRUE))
   #PAY ATTENTION TO THE DIRECTION OF THE SLASHES. THEY HAVE TO BE CHANGED TO FORWARD SLASHES, AS SHOWN BELOW
     #the broad folder structure
       input_umbrella <- 
-      "N:/RStor/CEMML/ClimateChange/1_USAFClimate/1_USAF_Natural_Resources/20_2_0004_RevisitingPhase1/" 
+      "N:/RStor/CEMML/ClimateChange/1_USAFClimate/1_USAF_Natural_Resources/20_2_0004_RevisitingPhase1/_AirForceClimateViewerDev/Document to HTML Table Converter" 
     #the specific folder inside the Document to HTML Table Converter where the input files are
-      input_specific_folder <- "Dover AFB/3ViewerPackages/Ecosystems/Word to HTML convertion" 
+      input_specific_folder <- "/FilesForTesting/Hydro_test" 
   
   #the final file name will start with this and will get the date added
-    project_name <- "Dover_run1_Veg" #Replace with whatever you want.
+    project_name <- "Travis_run1_Hydro" #Replace with whatever you want.
 
 #####NO MORE CHANGES --- -- -- -- --- - - -- -- - -  - - - - -  --- - - - - - - --- --- --- -- ---
 
@@ -413,4 +413,4 @@ write_xlsx(indent_df2, file.path(out_dir, output_filename))
 message("Conversion complete. XLSX saved to: ", file.path(out_dir, output_filename))
 
 # clean environment, so that things can run properly for the next run  
-rm(list = ls())
+  #rm(list = ls())

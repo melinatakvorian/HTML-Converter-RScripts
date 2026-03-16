@@ -30,12 +30,12 @@ invisible(lapply(packages, library, character.only = TRUE))
   #PAY ATTENTION TO THE DIRECTION OF THE SLASHES. THEY HAVE TO BE CHANGED TO FORWARD SLASHES, AS SHOWN BELOW
     #the broad folder structure
       input_umbrella <- 
-      "N:/RStor/CEMML/ClimateChange/1_USAFClimate/1_USAF_Natural_Resources/20_2_0004_RevisitingPhase1/_AirForceClimateViewerDev/Document to HTML Table Converter" 
+      "N:/RStor/CEMML/ClimateChange/1_USAFClimate/1_USAF_Natural_Resources/20_2_0004_RevisitingPhase1/" 
     #the specific folder inside the Document to HTML Table Converter where the input files are
-      input_specific_folder <- "/FilesForTesting/Hydro_test" 
+      input_specific_folder <- "_AirForceClimateViewerDev/Document to HTML Table Converter/FilesForTesting/Hydro_test" 
   
   #the final file name will start with this and will get the date added
-    project_name <- "References-test-run2_Hydro" #Replace with whatever you want.
+    project_name <- "chatgpt_test1" #Replace with whatever you want.
 
 #####NO MORE CHANGES --- -- -- -- --- - - -- -- - -  - - - - -  --- - - - - - - --- --- --- -- ---
 
@@ -75,6 +75,72 @@ convert_docx_to_html_full <- function(docx_file) {
   xml2::read_html(html_file)
 }
 
+# ---- * CHAT GPT HTML --> pieces function ----
+parse_html_sections <- function(html_doc) {
+  # Identify all h1 headings
+  h1_headings <- rvest::html_nodes(html_doc, "h1")
+  sections <- vector("list", length(h1_headings)) # Create list for h1 sections
+  
+  for (i in seq_along(h1_headings)) {
+    # Start node for the current h1 heading
+    start_node <- h1_headings[[i]]
+    # End node for the next h1 heading (if it exists)
+    end_node <- if (i < length(h1_headings)) h1_headings[[i + 1]] else NULL
+    
+    # Identify all siblings following the h1 heading
+    siblings <- xml2::xml_find_all(start_node, "following-sibling::*")
+    if (!is.null(end_node)) {
+      idx <- which(vapply(siblings, identical, logical(1), y = end_node))
+      if (length(idx) == 0) idx <- length(siblings) + 1
+      siblings <- siblings[seq_len(idx - 1)]
+    }
+    
+    # Filter the siblings to identify h2 subheadings
+    h2_subheadings <- siblings[xml2::xml_name(siblings) == "h2"]
+    
+    # Create a named list for h2 subheadings
+    sub_sections <- vector("list", length(h2_subheadings))
+    for (j in seq_along(h2_subheadings)) {
+      h2_start_node <- h2_subheadings[[j]]
+      h2_end_node <- if (j < length(h2_subheadings)) h2_subheadings[[j + 1]] else NULL
+      
+      h2_siblings <- xml2::xml_find_all(h2_start_node, "following-sibling::*")
+      if (!is.null(h2_end_node)) {
+        idx <- which(vapply(h2_siblings, identical, logical(1), y = h2_end_node))
+        if (length(idx) == 0) idx <- length(h2_siblings) + 1
+        h2_siblings <- h2_siblings[seq_len(idx - 1)]
+      } else if (!is.null(end_node)) {
+        idx <- which(vapply(h2_siblings, identical, logical(1), y = end_node))
+        if (length(idx) == 0) idx <- length(h2_siblings) + 1
+        h2_siblings <- h2_siblings[seq_len(idx - 1)]
+      }
+      
+      # Concatenate the content under each h2 subheading
+      h2_content_html <- paste(as.character(h2_siblings), collapse = " ")
+      sub_sections[[j]] <- h2_content_html
+    }
+    
+    # Name the sub_sections list based on the h2 titles
+    names(sub_sections) <- vapply(h2_subheadings, xml2::xml_text, "")
+    
+    # Concatenate the content under the h1 heading (excluding h2 subheadings)
+    if (length(h2_subheadings) == 0) {
+      # If no h2 subheadings exist, include all siblings
+      h1_content_html <- paste(as.character(siblings), collapse = " ")
+    } else {
+      h1_content_html <- paste(as.character(siblings[!siblings %in% h2_subheadings]), collapse = " ")
+    }
+    
+    # Assign the content to the sections list
+    sections[[i]] <- list(content = h1_content_html, sub_sections = sub_sections)
+  }
+  
+  # Assign names to the sections list based on h1 titles
+  names(sections) <- vapply(h1_headings, xml2::xml_text, "")
+  sections
+}
+
+
 # ----- * HTML->pieces function ----
 # reads HTML file (input) and separate sections for building table later
 parse_html_sections <- function(html_doc) {
@@ -89,7 +155,6 @@ parse_html_sections <- function(html_doc) {
     end_node <- if (i < length(h1_headings)) h1_headings[[i + 1]] else NULL
     
     # Identify all siblings following the h1 heading
-    #siblings <- xml2::xml_find_all(start_node, "following-sibling::*")#ORIGINAL
     siblings <- xml2::xml_find_all(start_node, "following-sibling::*[self::h1 or self::h2]")
     if (!is.null(end_node)) {
       idx <- which(vapply(siblings, identical, logical(1), y = end_node))

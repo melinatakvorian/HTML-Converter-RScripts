@@ -35,7 +35,7 @@ invisible(lapply(packages, library, character.only = TRUE))
       input_specific_folder <- "/FilesForTesting/Hydro_test" 
   
   #the final file name will start with this and will get the date added
-    project_name <- "Travis_run1_Hydro" #Replace with whatever you want.
+    project_name <- "References-test-run2_Hydro" #Replace with whatever you want.
 
 #####NO MORE CHANGES --- -- -- -- --- - - -- -- - -  - - - - -  --- - - - - - - --- --- --- -- ---
 

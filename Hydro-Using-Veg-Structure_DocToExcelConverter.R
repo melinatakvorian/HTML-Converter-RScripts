@@ -274,10 +274,10 @@ for(file in seq_along(results_disr)){ #for each heading
       
       total_rows <- total_rows + length(num_pair) #sum all iterations to see how long the df should be
       
-      mylist[[file]][[length(mylist[[file]])+1]] <- num_pair #create a nested list with each index within a disr group section
+      mylist[[file]][[length(mylist[[file]])+1]] <- num_pair #create a nested list with each index within a disruption scenario section
       
-    }else{ #case for the last instance of new disr group
-      num_pair <- c(num_files[[file]][[i]]:(length(results_disr[[file]])-1))
+    }else{ #case for the last instance of new disruption scenario
+      num_pair <- c(num_files[[file]][[i]]:length(results_disr[[file]]))
       total_rows <- total_rows + length(num_pair) #sum all iterations to see how long the df should be
       
       mylist[[file]][[length(mylist[[file]])+1]] <- num_pair

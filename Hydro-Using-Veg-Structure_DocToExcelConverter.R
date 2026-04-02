@@ -85,21 +85,15 @@ parse_html_sections_hist <- function(html_doc, section_indices) {
   sections <- vector("list", length(section_indices)) #create list of headings (sections)
   
   for (i in seq_along(section_indices)) { # Iterate over specified sections
-    print(paste("Parsing section:", section_indices[i]))
+    print(paste("Parsing section:", i))
     
     start_node <- headings[[section_indices[i]]]
     
-    # end_node <- if (i < length(section_indices)){
-    #   headings[[section_indices[i + 1]]]
-    # }else NULL
-    #end_node <- if (i < length(section_indices)) headings[[i + 1]] else NULL
-    end_node <- if (i <= length(section_indices)){
-      headings[[section_indices[i + 1]]]
-    }else NULL
+    end_node <- if (i < length(section_indices)) headings[[i + 1]] else NULL
     
     #print(headings[section_indices[i + 1]])
     
-    siblings <- xml2::xml_find_all(start_node, "following-sibling::*")
+    siblings <- xml2::xml_find_all(start_node, "following-sibling::*") #the entire rest of the doc?
     if (!is.null(end_node)) {
       idx <- which(vapply(siblings, identical, logical(1), y = end_node))
       if (length(idx) == 0) idx <- length(siblings) + 1

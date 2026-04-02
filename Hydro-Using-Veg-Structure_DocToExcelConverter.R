@@ -89,8 +89,14 @@ parse_html_sections_hist <- function(html_doc, section_indices) {
     
     start_node <- headings[[section_indices[i]]]
     
-    end_node <- if (i < length(section_indices)) headings[[section_indices[i + 1]]] else NULL
+    # end_node <- if (i < length(section_indices)){
+    #   headings[[section_indices[i + 1]]]
+    # }else NULL
     #end_node <- if (i < length(section_indices)) headings[[i + 1]] else NULL
+    end_node <- if (i <= length(section_indices)){
+      headings[[section_indices[i + 1]]]
+    }else NULL
+    
     #print(headings[section_indices[i + 1]])
     
     siblings <- xml2::xml_find_all(start_node, "following-sibling::*")

@@ -108,7 +108,6 @@
     
     # Assign section titles as names to the list elements
     names(sections) <- sapply(headings[section_indices], xml_text)
-    sections
     
   }
   
@@ -127,9 +126,9 @@
       #end_node <- if (i < length(section_indices)) headings[[i + 1]] else NULL
       #print(headings[section_indices[i + 1]])
       
-      siblings <- xml2::xml_find_all(start_node, "following-sibling::*")
-      if (!is.null(end_node)) {
-        idx <- which(vapply(siblings, identical, logical(1), y = end_node))
+      siblings <- xml2::xml_find_all(start_node, "following-sibling::*") #finds all instances of the heading in the document
+      if (!is.null(end_node)) { 
+        idx <- which(vapply(siblings, identical, logical(1), y = end_node)) #
         if (length(idx) == 0) idx <- length(siblings) + 1
         siblings <- siblings[seq_len(idx - 1)]
       }

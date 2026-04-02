@@ -203,8 +203,8 @@ for (file in docx_files) {
   last <- as.numeric(length(nlist))
   
   # Define indices for histclimatic and disruptions sections
-  hist_indices <- c(1:15) # histclimatic sections
-  disr_indices <- c(16:last) # disruptions sections
+  hist_indices <- c(1:14, last) # histclimatic sections
+  disr_indices <- c(1:2, 15:(last-1)) # disruptions sections
   
   
   #Create hist table list
@@ -305,9 +305,8 @@ for(file in seq_along(results_disr)){
     # Populate the first few columns with results_hist data (assuming it applies to all rows for this file)
     df_disr[rownum, 1] <- results_hist[[file]][[1]]
     df_disr[rownum, 2] <- results_hist[[file]][[2]]
-    df_disr[rownum, 3] <- results_hist[[file]][[3]] #THE COLUMN GETS RE-WRITTEN
     
-    n_col <- 4 # Start filling from the 4th column
+    n_col <- 3 # Start filling from the 4th column
     
     # Extract elements from results_disr based on the indices in templist
     for(b in seq_along(templist)){

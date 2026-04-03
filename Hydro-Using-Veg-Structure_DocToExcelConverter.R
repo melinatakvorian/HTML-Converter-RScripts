@@ -325,7 +325,49 @@ for(i in 1:ncol(test)){
 
 df_disr <- df_disr[ , -empty_cols]
 
+#TRANSPOSE DATATABLES ----
 
+#create initial dataframe structure
+  scenario <- c("Historical", "Moderate Disruption", "Moderate Disruption", "High Disruption", "High Disruption")
+  period <- c("Historical", "Near Term", "Far Term", "Near Term", "Far Term")
+  
+  colnames <- c("SITENAME", "SITEID", "Scenario", "Period", "Minimum_SPEI", "Maximum_SPEI", 
+                "Dry_Variability", "Wet_Variability", "Dry_Events", "Wet_Events", 
+                "Dry_Change", "Wet_Change", "Installation_Summary", "Dry_Distribution_Text", 
+                "Wet_Distribution_Text", "Dry_Duration_Severity", "Wet_Duration_Severity", 
+                "References")
+  
+  #create dataframe
+    frame <- matrix(nrow = 5, ncol = length(colnames))
+    frame <- as.data.frame(frame)
+    colnames(frame) <- colnames
+    frame$Scenario <- scenario
+    frame$Period <- period
+  
+  ##IDEA: create mini-tables based on column names----
+  all_disr_names <- colnames(df_disr)
+  near_term <- all_disr_names[stringr::str_starts(all_disr_names,"Period: Near Term")]
+  far_term <- all_disr_names[stringr::str_starts(all_disr_names,"Period: Far Term")]
+  
+  df_near_term <- df_disr %>% 
+    select(all_of(near_term))
+  
+  df_far_term <- df_disr %>% 
+    select(all_of(far_term))
+  
+  leftovers <- df_disr %>% 
+    select(-c(all_of(near_term), all_of(far_term)))
+  
+  
+  ###start transposing data starting AFTER historical row----
+    chunk_frame2 <- 5:14 #the columns to fill in on the big dataframe
+    
+    # Fill rows 2-3 with data from df_near_term
+    frame2[2:3, chunk_frame2] <- df_near_term[1:2, ]
+    
+    # Fill rows 4-5 with data from df_far_term
+    frame2[4:5, chunk_frame2] <- df_far_term[1:2, ]
+  
 ##references hanging indent ----
 #add REFERENCES SECTION HANGING INDENT <p style=???padding-left:15px;text-indent:-15px;???> 
 for(i in 1:nrow(df_hist)){

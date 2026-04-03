@@ -331,7 +331,7 @@ df_disr <- df_disr[ , -empty_cols]
   scenario <- c("Historical", "Moderate Disruption", "Moderate Disruption", "High Disruption", "High Disruption")
   period <- c("Historical", "Near Term", "Far Term", "Near Term", "Far Term")
   
-  colnames <- c("SITENAME", "SITEID", "Scenario", "Period", "Minimum_SPEI", "Maximum_SPEI", 
+  colnames <- c("SITENAME", "SITEID", "Scenario", "Period","SPEI_Text", "Minimum_SPEI", "Maximum_SPEI", 
                 "Dry_Variability", "Wet_Variability", "Dry_Events", "Wet_Events", 
                 "Dry_Change", "Wet_Change", "Installation_Summary", "Dry_Distribution_Text", 
                 "Wet_Distribution_Text", "Dry_Duration_Severity", "Wet_Duration_Severity", 
@@ -344,6 +344,7 @@ df_disr <- df_disr[ , -empty_cols]
     frame$Scenario <- scenario
     frame$Period <- period
   
+    frame2 <- frame
   ##IDEA: create mini-tables based on column names----
   all_disr_names <- colnames(df_disr)
   near_term <- all_disr_names[stringr::str_starts(all_disr_names,"Period: Near Term")]
@@ -360,7 +361,7 @@ df_disr <- df_disr[ , -empty_cols]
   
   
   ###start transposing data starting AFTER historical row----
-    chunk_frame2 <- 5:14 #the columns to fill in on the big dataframe
+    chunk_frame2 <- 5:13 #the columns to fill in on the big dataframe
     
     # Fill rows 2-3 with data from df_near_term
     frame2[2:3, chunk_frame2] <- df_near_term[1:2, ]

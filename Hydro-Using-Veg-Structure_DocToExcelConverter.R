@@ -337,14 +337,6 @@ df_disr <- df_disr[ , -empty_cols]
                 "Wet_Distribution_Text", "Dry_Duration_Severity", "Wet_Duration_Severity", 
                 "References")
   
-  #create dataframe
-    frame <- matrix(nrow = 5, ncol = length(colnames))
-    frame <- as.data.frame(frame)
-    colnames(frame) <- colnames
-    frame$Scenario <- scenario
-    frame$Period <- period
-  
-    frame2 <- frame
   ##IDEA: create mini-tables based on column names----
   all_disr_names <- colnames(df_disr)
   near_term <- all_disr_names[stringr::str_starts(all_disr_names,"Period: Near Term")]
@@ -359,15 +351,40 @@ df_disr <- df_disr[ , -empty_cols]
   leftovers <- df_disr %>% 
     select(-c(all_of(near_term), all_of(far_term)))
   
+  #create dataframe
+    frame <- matrix(nrow = 5, ncol = length(colnames))
+    frame <- as.data.frame(frame)
+    colnames(frame) <- colnames
+    frame$Scenario <- scenario
+    frame$Period <- period
+  
+    frame2 <- frame
   
   ###start transposing data starting AFTER historical row----
     chunk_frame2 <- 5:13 #the columns to fill in on the big dataframe
+    dry_wet_text <- 15:18 #the columns with the text about dry and wet periods
+    hist_data <- c(5, 7:14)
+    references <- as.numeric(which(colnames(df_hist) == "References"))
+    inst_summ <- as.numeric(which(colnames(df_hist) == "Installation_Summary"))
+    
+    #Fill columns with repeated info
+    frame2$Installation_Summary <- df_hist[1,inst_summ]
+    frame2$SITENAME <- df_hist$SITENAME
+    frame2$SITEID <- df_hist$SITEID
+    
+    #Fill row 1 with historical data
+    frame2[1, 5:13] <- df_hist[1 , hist_data]
+    frame2[1, 19] <- df_hist[1, references]
     
     # Fill rows 2-3 with data from df_near_term
     frame2[2:3, chunk_frame2] <- df_near_term[1:2, ]
+    frame2[2:3, dry_wet_text] <- leftovers[1:2, 5:8]
+    
     
     # Fill rows 4-5 with data from df_far_term
     frame2[4:5, chunk_frame2] <- df_far_term[1:2, ]
+    frame2[4:5, dry_wet_text] <- leftovers[1:2, 5:8]
+    
   
 ##references hanging indent ----
 #add REFERENCES SECTION HANGING INDENT <p style=???padding-left:15px;text-indent:-15px;???> 

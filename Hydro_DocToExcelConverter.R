@@ -32,7 +32,7 @@ invisible(lapply(packages, library, character.only = TRUE))
       input_umbrella <- 
       "N:/RStor/CEMML/ClimateChange/1_USAFClimate/1_USAF_Natural_Resources/20_2_0004_RevisitingPhase1/" 
     #the specific folder inside the Document to HTML Table Converter where the input files are
-      input_specific_folder <- "_AirForceClimateViewerDev/Document to HTML Table Converter/FilesForTesting/Hydro_test" 
+      input_specific_folder <- "_AirForceClimateViewerDev/Document to HTML Table Converter/FilesForTesting/Hydro_test/newStructure/otherTests" 
   
   #the final file name will start with this and will get the date added
     project_name <- "chatgpt_test1" #Replace with whatever you want.

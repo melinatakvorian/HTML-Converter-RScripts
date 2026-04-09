@@ -32,10 +32,10 @@ invisible(lapply(packages, library, character.only = TRUE))
     input_umbrella <- 
       "N:/RStor/CEMML/ClimateChange/1_USAFClimate/1_USAF_Natural_Resources/20_2_0004_RevisitingPhase1/" 
     #the specific folder inside the Document to HTML Table Converter where the input files are
-    input_specific_folder <- "Beale AFB/WildlandFire/Word to HTML Conversion"
+    input_specific_folder <- "611 King Salmon/Climate/Word to HTML Conversion"
   
   #the final file name will start with this and will get the date added
-    project_name <- "BealeAFB_run1_WildlandFire" #Replace with whatever you want.
+    project_name <- "611-King-Salmon_Climate_run1" #Replace with whatever you want.
 
 #####NO MORE CHANGES --- -- -- -- --- - - -- -- - -  - - - - -  --- - - - - - - --- --- --- -- ---
 
@@ -150,6 +150,16 @@ for (i in seq_along(results)) {
 #Check for incorrect naming of the installation ID, correct it
 colnames(df)[colnames(df) == "Installation"] <- "SITENAME"
 colnames(df)[colnames(df) == "Site_Name"] <- "SITENAME"
+
+##references hanging indent ----
+#add REFERENCES SECTION HANGING INDENT <p style=???padding-left:15px;text-indent:-15px;???> 
+for(i in 1:nrow(df)){
+  df$References[i]
+  #replace each <p> to <p style=???padding-left:15px;text-indent:-15px;???>
+  temp_string <- df$References[i]
+  temp_string1 <- stringr::str_replace_all(temp_string, "<p>", '<p style="padding-left:15px;text-indent:-15px;">')
+  df$References[i] <- temp_string1
+}
 
 # Export final files ----
 out_dir <- input_dir

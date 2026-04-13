@@ -32,10 +32,10 @@ invisible(lapply(packages, library, character.only = TRUE))
 input_umbrella <- 
   "N:/RStor/CEMML/ClimateChange/1_USAFClimate/1_USAF_Natural_Resources/20_2_0004_RevisitingPhase1/" 
 #the specific folder inside the Document to HTML Table Converter where the input files are
-input_specific_folder <- "_AirForceClimateViewerDev/Document to HTML Table Converter/FilesForTesting/Hydro_test/New_structure" 
+input_specific_folder <- "RAF Alconbury_Molesworth/Hydrology/Word to HTML Conversion" 
 
 #the final file name will start with this and will get the date added
-project_name <- "NoSubheadings_VegStructure" #Replace with whatever you want.
+project_name <- "RAF Alconbury Molesworth_Hydrology" #Replace with whatever you want.
 
 #####NO MORE CHANGES --- -- -- -- --- - - -- -- - -  - - - - -  --- - - - - - - --- --- --- -- ---
 
@@ -400,14 +400,9 @@ for(i in 1:nrow(df_hist)){
 out_dir <- input_dir
 if (!dir.exists(out_dir)) dir.create(out_dir, recursive = TRUE)
 
-#historical file
-output_filename <- paste0(project_name, "_historical_HTML_formatted_", current_date, ".xlsx")
-write_xlsx(df_hist, file.path(out_dir, output_filename))
-message("Conversion complete. XLSX saved to: ", file.path(out_dir, output_filename))
-
-#disruptions group file
-output_filename <- paste0(project_name, "_disruptions_HTML_formatted", current_date, ".xlsx")
-write_xlsx(df_disr, file.path(out_dir, output_filename))
+#final file
+output_filename <- paste0(project_name, "_HTML_formatted_", current_date, ".xlsx")
+write_xlsx(frame2, file.path(out_dir, output_filename))
 message("Conversion complete. XLSX saved to: ", file.path(out_dir, output_filename))
 
 # clean environment so that things can run properly for the next run  

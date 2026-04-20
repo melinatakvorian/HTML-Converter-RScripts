@@ -35,7 +35,7 @@ input_umbrella <-
 input_specific_folder <- "RAF Alconbury_Molesworth/Hydrology/Word to HTML Conversion" 
 
 #the final file name will start with this and will get the date added
-project_name <- "RAF Alconbury Molesworth_Hydrology" #Replace with whatever you want.
+project_name <- "test-01" #Replace with whatever you want.
 
 #####NO MORE CHANGES --- -- -- -- --- - - -- -- - -  - - - - -  --- - - - - - - --- --- --- -- ---
 
@@ -197,8 +197,8 @@ for (file in docx_files) {
   last <- as.numeric(length(nlist))
   
   # Define indices for histclimatic and disruptions sections
-  hist_indices <- c(1:14, last) # histclimatic sections
-  disr_indices <- c(1:2, 15:(last-1)) # disruptions sections
+  hist_indices <- c(1:6, last) # histclimatic sections
+  disr_indices <- c(1:2, 7:(last-1)) # disruptions sections
   
   
   #Create hist table list
@@ -240,7 +240,7 @@ for (i in seq_along(results_hist)) {
 
 ##DISRUPTION SCENARIOS----
 
-#find the indices within the list that are new occurrences of 'disruptions Group Name'
+#find the indices within the list that are new occurrences of 'New_Scenario'
 num_files <- as.list(c(1:as.numeric(length(results_disr)))) #initialize list
 
 #create mini lists for each instance of new disruption scenario
@@ -331,10 +331,8 @@ df_disr <- df_disr[ , -empty_cols]
   scenario <- c("Historical", "Moderate Disruption", "Moderate Disruption", "High Disruption", "High Disruption")
   period <- c("Historical", "Near Term", "Far Term", "Near Term", "Far Term")
   
-  colnames <- c("SITENAME", "SITEID", "Scenario", "Period","SPEI_Text", "Minimum_SPEI", "Maximum_SPEI", 
-                "Dry_Variability", "Wet_Variability", "Dry_Events", "Wet_Events", 
-                "Dry_Change", "Wet_Change", "Installation_Summary", "Dry_Distribution_Text", 
-                "Wet_Distribution_Text", "Dry_Duration_Severity", "Wet_Duration_Severity", 
+  colnames <- c("SITENAME", "SITEID", "Scenario", "Period","SPEI_Text", "Installation_Summary", "Dry_Distribution_Text", 
+                "Wet_Distribution_Text", "Dry_Duration_Severity_Text", "Wet_Duration_Severity_Text", 
                 "References")
   
   ##IDEA: create mini-tables based on column names----
@@ -363,27 +361,29 @@ df_disr <- df_disr[ , -empty_cols]
   ###start transposing data starting AFTER historical row----
     chunk_frame2 <- 5:13 #the columns to fill in on the big dataframe
     dry_wet_text <- 15:18 #the columns with the text about dry and wet periods
-    hist_data <- c(5, 7:14)
-    references <- as.numeric(which(colnames(df_hist) == "References"))
     inst_summ <- as.numeric(which(colnames(df_hist) == "Installation_Summary"))
     
-    #Fill columns with repeated info
+    #Fill SITENAME, SITEID, Installation Summary
     frame2$Installation_Summary <- df_hist[1,inst_summ]
     frame2$SITENAME <- df_hist$SITENAME
     frame2$SITEID <- df_hist$SITEID
     
     #Fill row 1 with historical data
-    frame2[1, 5:13] <- df_hist[1 , hist_data]
-    frame2[1, 19] <- df_hist[1, references]
-    
-    # Fill rows 2-3 with data from df_near_term
-    frame2[2:3, chunk_frame2] <- df_near_term[1:2, ]
-    frame2[2:3, dry_wet_text] <- leftovers[1:2, 5:8]
+      #new
+      frame2$SPEI_Text[1] <- df_hist$`Period: Historical, SPEI_Text`[1]
+      frame2$References[1] <- df_hist$References[1]
     
     
-    # Fill rows 4-5 with data from df_far_term
-    frame2[4:5, chunk_frame2] <- df_far_term[1:2, ]
-    frame2[4:5, dry_wet_text] <- leftovers[1:2, 5:8]
+    # Fill rows 2,4 for NEAR TERM scenarios
+      frame2$SPEI_Text[[2]] <- df_near_term$`Period: Near Term, SPEI_Text`[1]
+      frame2$SPEI_Text[[4]] <- df_near_term$`Period: Near Term, SPEI_Text`[1]
+      frame2[c(2,4), 7:10] <- leftovers[1, 5:8]
+    
+    
+    # Fill rows 3,5 for FAR TERM scenarios
+      frame2$SPEI_Text[[3]] <- df_near_term$`Period: Near Term, SPEI_Text`[2]
+      frame2$SPEI_Text[[5]] <- df_near_term$`Period: Near Term, SPEI_Text`[2]
+      frame2[c(3,5), 7:10] <- leftovers[1, 5:8]
     
   
 ##references hanging indent ----

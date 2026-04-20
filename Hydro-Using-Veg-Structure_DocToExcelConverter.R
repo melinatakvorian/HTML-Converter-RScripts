@@ -369,22 +369,25 @@ df_disr <- df_disr[ , -empty_cols]
     frame2$SITEID <- df_hist$SITEID
     
     #Fill row 1 with historical data
-      #new
-      frame2$SPEI_Text[1] <- df_hist$`Period: Historical, SPEI_Text`[1]
-      frame2$References[1] <- df_hist$References[1]
+    frame2$SPEI_Text[1] <- df_hist$`Period: Historical, SPEI_Text`[1]
+    frame2$References[1] <- df_hist$References[1]
     
     
     # Fill rows 2,4 for NEAR TERM scenarios
-      frame2$SPEI_Text[[2]] <- df_near_term$`Period: Near Term, SPEI_Text`[1]
-      frame2$SPEI_Text[[4]] <- df_near_term$`Period: Near Term, SPEI_Text`[1]
-      frame2[c(2,4), 7:10] <- leftovers[1, 5:8]
+    frame2$SPEI_Text[[2]] <- df_near_term$`Period: Near Term, SPEI_Text`[1]
+    frame2$SPEI_Text[[4]] <- df_near_term$`Period: Near Term, SPEI_Text`[1]
+    frame2[c(2,4), 7:10] <- leftovers[1, 5:8]
     
     
     # Fill rows 3,5 for FAR TERM scenarios
-      frame2$SPEI_Text[[3]] <- df_near_term$`Period: Near Term, SPEI_Text`[2]
-      frame2$SPEI_Text[[5]] <- df_near_term$`Period: Near Term, SPEI_Text`[2]
-      frame2[c(3,5), 7:10] <- leftovers[1, 5:8]
+    frame2$SPEI_Text[[3]] <- df_near_term$`Period: Near Term, SPEI_Text`[2]
+    frame2$SPEI_Text[[5]] <- df_near_term$`Period: Near Term, SPEI_Text`[2]
+    frame2[c(3,5), 7:10] <- leftovers[1, 5:8]
     
+#add BLANK numeric columns----
+   new_cols <- c("Minimum_SPEI", "Maximum_SPEI", 
+                 "Dry_Variability", "Wet_Variability", "Dry_Events", "Wet_Events", 
+                 "Dry_Change", "Wet_Change") 
   
 ##references hanging indent ----
 #add REFERENCES SECTION HANGING INDENT <p style=???padding-left:15px;text-indent:-15px;???> 

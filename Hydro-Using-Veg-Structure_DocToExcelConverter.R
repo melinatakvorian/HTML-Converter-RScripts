@@ -234,7 +234,7 @@ for (i in seq_along(results_hist)) {
   for (col in all_headings_hist) {
     if (col %in% names(results_hist[[i]])) {
       df_hist[i, col] <- results_hist[[i]][[col]]
-    }else{df_hist[i, col] <- NA} #ChatGPT help
+    }else{df_hist[i, col] <- NA} 
   }
 }
 
@@ -359,8 +359,6 @@ df_disr <- df_disr[ , -empty_cols]
     frame2 <- frame
   
   ###start transposing data starting AFTER historical row----
-    chunk_frame2 <- 5:13 #the columns to fill in on the big dataframe
-    dry_wet_text <- 15:18 #the columns with the text about dry and wet periods
     inst_summ <- as.numeric(which(colnames(df_hist) == "Installation_Summary"))
     
     #Fill SITENAME, SITEID, Installation Summary
@@ -388,6 +386,12 @@ df_disr <- df_disr[ , -empty_cols]
    new_cols <- c("Minimum_SPEI", "Maximum_SPEI", 
                  "Dry_Variability", "Wet_Variability", "Dry_Events", "Wet_Events", 
                  "Dry_Change", "Wet_Change") 
+  
+  cols <- as.numeric(ncol(frame2))
+  cols_w_nos <- cols + 8
+  frame2[,c(cols:cols_w_nos)] <- ""
+  colnames(new_cols) <- frame2[,c(cols:cols_w_nos)]
+  
   
 ##references hanging indent ----
 #add REFERENCES SECTION HANGING INDENT <p style=???padding-left:15px;text-indent:-15px;???> 

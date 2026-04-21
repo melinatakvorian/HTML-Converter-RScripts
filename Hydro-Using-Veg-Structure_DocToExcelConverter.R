@@ -383,14 +383,23 @@ df_disr <- df_disr[ , -empty_cols]
     frame2[c(3,5), 7:10] <- leftovers[1, 5:8]
     
 #add BLANK numeric columns----
-   new_cols <- c("Minimum_SPEI", "Maximum_SPEI", 
-                 "Dry_Variability", "Wet_Variability", "Dry_Events", "Wet_Events", 
-                 "Dry_Change", "Wet_Change") 
   
-  cols <- as.numeric(ncol(frame2))
-  cols_w_nos <- cols + 8
+  cols <- as.numeric(ncol(frame2))+1
+  cols_w_nos <- cols + 7
   frame2[,c(cols:cols_w_nos)] <- ""
-  colnames(new_cols) <- frame2[,c(cols:cols_w_nos)]
+  
+  #numeric column names
+  new_cols <- c("Minimum_SPEI", "Maximum_SPEI", 
+                "Dry_Variability", "Wet_Variability", "Dry_Events", "Wet_Events", 
+                "Dry_Change", "Wet_Change", "")
+  
+  #assign names
+  colnames(frame2)[cols:cols_w_nos] <- new_cols
+  
+  #move columns to where Anthony wants them
+  frame2 <- frame2 %>% 
+    relocate(all_of(cols:cols_w_nos), .before = "Installation_Summary")
+    
   
   
 ##references hanging indent ----

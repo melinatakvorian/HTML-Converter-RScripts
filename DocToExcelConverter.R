@@ -32,10 +32,10 @@ invisible(lapply(packages, library, character.only = TRUE))
     input_umbrella <- 
       "N:/RStor/CEMML/ClimateChange/1_USAFClimate/1_USAF_Natural_Resources/20_2_0004_RevisitingPhase1/" 
     #the specific folder inside the Document to HTML Table Converter where the input files are
-    input_specific_folder <- "611 King Salmon/Climate/Word to HTML Conversion"
+    input_specific_folder <- "611 Kokee AFS/Vegetation_Habitats/Word to HTML Conversion"
   
   #the final file name will start with this and will get the date added
-    project_name <- "611-King-Salmon_Climate_run1" #Replace with whatever you want.
+    project_name <- "611-Kokee_Veg_01" #Replace with whatever you want.
 
 #####NO MORE CHANGES --- -- -- -- --- - - -- -- - -  - - - - -  --- - - - - - - --- --- --- -- ---
 

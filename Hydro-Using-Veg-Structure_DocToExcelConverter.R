@@ -32,10 +32,10 @@ invisible(lapply(packages, library, character.only = TRUE))
 input_umbrella <- 
   "N:/RStor/CEMML/ClimateChange/1_USAFClimate/1_USAF_Natural_Resources/20_2_0004_RevisitingPhase1/" 
 #the specific folder inside the Document to HTML Table Converter where the input files are
-input_specific_folder <- "_AirForceClimateViewerDev/Document to HTML Table Converter/FilesForTesting/Hydro_test/New_structure" 
+input_specific_folder <- "611 King Salmon/Hydrology/Word to HTML" 
 
 #the final file name will start with this and will get the date added
-project_name <- "NoSubheadings_VegStructure" #Replace with whatever you want.
+project_name <- "KingSalmon_hydro_02" #Replace with whatever you want.
 
 #####NO MORE CHANGES --- -- -- -- --- - - -- -- - -  - - - - -  --- - - - - - - --- --- --- -- ---
 
@@ -197,8 +197,8 @@ for (file in docx_files) {
   last <- as.numeric(length(nlist))
   
   # Define indices for histclimatic and disruptions sections
-  hist_indices <- c(1:14, last) # histclimatic sections
-  disr_indices <- c(1:2, 15:(last-1)) # disruptions sections
+  hist_indices <- c(1:6, last) # histclimatic sections
+  disr_indices <- c(1:2, 7:(last-1)) # disruptions sections
   
   
   #Create hist table list
@@ -234,13 +234,13 @@ for (i in seq_along(results_hist)) {
   for (col in all_headings_hist) {
     if (col %in% names(results_hist[[i]])) {
       df_hist[i, col] <- results_hist[[i]][[col]]
-    }else{df_hist[i, col] <- NA} #ChatGPT help
+    }else{df_hist[i, col] <- NA} 
   }
 }
 
 ##DISRUPTION SCENARIOS----
 
-#find the indices within the list that are new occurrences of 'disruptions Group Name'
+#find the indices within the list that are new occurrences of 'New_Scenario'
 num_files <- as.list(c(1:as.numeric(length(results_disr)))) #initialize list
 
 #create mini lists for each instance of new disruption scenario
@@ -331,13 +331,11 @@ df_disr <- df_disr[ , -empty_cols]
   scenario <- c("Historical", "Moderate Disruption", "Moderate Disruption", "High Disruption", "High Disruption")
   period <- c("Historical", "Near Term", "Far Term", "Near Term", "Far Term")
   
-  colnames <- c("SITENAME", "SITEID", "Scenario", "Period","SPEI_Text", "Minimum_SPEI", "Maximum_SPEI", 
-                "Dry_Variability", "Wet_Variability", "Dry_Events", "Wet_Events", 
-                "Dry_Change", "Wet_Change", "Installation_Summary", "Dry_Distribution_Text", 
-                "Wet_Distribution_Text", "Dry_Duration_Severity", "Wet_Duration_Severity", 
+  colnames <- c("SITENAME", "SITEID", "Scenario", "Period","SPEI_Text", "Installation_Summary", "Dry_Distribution_Text", 
+                "Wet_Distribution_Text", "Dry_Duration_Severity_Text", "Wet_Duration_Severity_Text", 
                 "References")
   
-  ##IDEA: create mini-tables based on column names----
+  ##Create mini-tables based on column names----
   all_disr_names <- colnames(df_disr)
   near_term <- all_disr_names[stringr::str_starts(all_disr_names,"Period: Near Term")]
   far_term <- all_disr_names[stringr::str_starts(all_disr_names,"Period: Far Term")]
@@ -361,53 +359,118 @@ df_disr <- df_disr[ , -empty_cols]
     frame2 <- frame
   
   ###start transposing data starting AFTER historical row----
-    chunk_frame2 <- 5:13 #the columns to fill in on the big dataframe
-    dry_wet_text <- 15:18 #the columns with the text about dry and wet periods
-    hist_data <- c(5, 7:14)
-    references <- as.numeric(which(colnames(df_hist) == "References"))
     inst_summ <- as.numeric(which(colnames(df_hist) == "Installation_Summary"))
     
-    #Fill columns with repeated info
+    #Fill SITENAME, SITEID, Installation Summary
     frame2$Installation_Summary <- df_hist[1,inst_summ]
     frame2$SITENAME <- df_hist$SITENAME
     frame2$SITEID <- df_hist$SITEID
     
     #Fill row 1 with historical data
-    frame2[1, 5:13] <- df_hist[1 , hist_data]
-    frame2[1, 19] <- df_hist[1, references]
-    
-    # Fill rows 2-3 with data from df_near_term
-    frame2[2:3, chunk_frame2] <- df_near_term[1:2, ]
-    frame2[2:3, dry_wet_text] <- leftovers[1:2, 5:8]
+    frame2$SPEI_Text[1] <- df_hist$`Period: Historical, SPEI_Text`[1]
+    frame2$References[1] <- df_hist$References[1]
     
     
-    # Fill rows 4-5 with data from df_far_term
-    frame2[4:5, chunk_frame2] <- df_far_term[1:2, ]
-    frame2[4:5, dry_wet_text] <- leftovers[1:2, 5:8]
+    # Fill rows 2,4 for NEAR TERM scenarios
+    frame2$SPEI_Text[[2]] <- df_near_term$`Period: Near Term, SPEI_Text`[1]
+    frame2$SPEI_Text[[4]] <- df_near_term$`Period: Near Term, SPEI_Text`[2]
+
+    
+    # Fill rows 3,5 for FAR TERM scenarios
+    frame2$SPEI_Text[[3]] <- df_far_term$`Period: Far Term, SPEI_Text`[1]
+    frame2$SPEI_Text[[5]] <- df_far_term$`Period: Far Term, SPEI_Text`[2]
+
+    
+    #Fill in the other rows based on disruption
+    frame2[c(4,5), 7:10] <- leftovers[2, 5:8] #high disruption
+    frame2[c(2,3), 7:10] <- leftovers[1, 5:8] #moderate disruption
+    
+#add BLANK numeric columns----
+  
+  cols <- as.numeric(ncol(frame2))+1
+  cols_w_nos <- cols + 7
+  frame2[,c(cols:cols_w_nos)] <- ""
+  
+  #numeric column names
+  new_cols <- c("Minimum_SPEI", "Maximum_SPEI", 
+                "Dry_Variability", "Wet_Variability", "Dry_Events", "Wet_Events", 
+                "Dry_Change", "Wet_Change", "")
+  
+  #assign names
+  colnames(frame2)[cols:cols_w_nos] <- new_cols
+  
+  #move columns to where Anthony wants them
+  frame2 <- frame2 %>% 
+    relocate(all_of(cols:cols_w_nos), .before = "Installation_Summary")
     
   
-##references hanging indent ----
-#add REFERENCES SECTION HANGING INDENT <p style=???padding-left:15px;text-indent:-15px;???> 
-for(i in 1:nrow(df_hist)){
-  df_hist$References[i]
-  #replace each <p> to <p style=???padding-left:15px;text-indent:-15px;???>
-  temp_string <- df_hist$References[i]
-  temp_string1 <- stringr::str_replace_all(temp_string, "<p>", '<p style="padding-left:15px;text-indent:-15px;">')
-  df_hist$References[i] <- temp_string1
-}
+  
+#ADDING INDENTS ----
+  #add REFERENCES SECTION HANGING INDENT
+  for(i in 1:nrow(frame2)){
+    frame2$References[i]
+    #replace each <p> to <p style=padding-left:15px;text-indent:-15px;>
+    temp_string <- frame2$References[i]
+    temp_string1 <- stringr::str_replace_all(temp_string, "<p>", '<p style="padding-left:15px;text-indent:-15px;">')
+    frame2$References[i] <- temp_string1
+  }
+  
+  #these are the sections that need the edits
+  #"SPEI_Text", "Dry_Distribution_Text", "Wet_Distribution_Text", "Dry_Duration_Severity_Text", "Wet_Duration_Severity_Text"
+    
+  numbblocks <- c(5, 15:18) #corresponds to the columns with text that we need broken up
+  
+    #add blank line after each paragraph
+    for(a in 1:length(numbblocks)){
+      col_num <- numbblocks[[a]]
+      for(b in 1:nrow(frame2)){
+        frame2[[col_num]][b]
+        #replace each </p> to </p> <br>
+        temp_string <- frame2[[col_num]][b]
+        temp_string1 <- stringr::str_replace_all(temp_string, "</p>", '</p> <br>')
+        frame2[[col_num]][b] <- temp_string1
+      }
+    }
+  
+    #add indent at the beginning of each non-bulleted paragraph
+    for(a in 1:length(numbblocks)){
+      col_num <- numbblocks[[a]]
+      for(b in 1:nrow(frame2)){
+        frame2[[col_num]][b]
+        #replace each <p> to <p style=text-indent:-15px;>
+        temp_string <- frame2[[col_num]][b]
+        temp_string1 <- stringr::str_replace_all(temp_string, "<p>", '<p style="text-indent:-15px;">')
+        frame2[[col_num]][b] <- temp_string1
+      }
+    }
+  
+    #add blank line after each bulleted paragraph
+    for(i in 1:nrow(frame2)){
+      frame2$Installation_Summary[i]
+      #replace each </p></li> to </p></li><br>
+      temp_string <- frame2$Installation_Summary[i]
+      temp_string1 <- stringr::str_replace_all(temp_string, "</p></li>", '</p></li><br>')
+      frame2$Installation_Summary[i] <- temp_string1
+    }
+  
+    #add blank line after the subheading in Installation Summary
+    for(i in 1:nrow(frame2)){
+      frame2$Installation_Summary[i]
+      #replace each <p> <ul> to </p> <ul> <br>
+      temp_string <- frame2$Installation_Summary[i]
+      temp_string1 <- stringr::str_replace_all(temp_string, "</p> <ul>", '</p> <ul> <br>')
+      frame2$Installation_Summary[i] <- temp_string1
+    }
+  
 
+    
 # Export final files ----
 out_dir <- input_dir
 if (!dir.exists(out_dir)) dir.create(out_dir, recursive = TRUE)
 
-#historical file
-output_filename <- paste0(project_name, "_historical_HTML_formatted_", current_date, ".xlsx")
-write_xlsx(df_hist, file.path(out_dir, output_filename))
-message("Conversion complete. XLSX saved to: ", file.path(out_dir, output_filename))
-
-#disruptions group file
-output_filename <- paste0(project_name, "_disruptions_HTML_formatted", current_date, ".xlsx")
-write_xlsx(df_disr, file.path(out_dir, output_filename))
+#final file
+output_filename <- paste0(project_name, "_HTML_formatted_", current_date, ".xlsx")
+write_xlsx(frame2, file.path(out_dir, output_filename))
 message("Conversion complete. XLSX saved to: ", file.path(out_dir, output_filename))
 
 # clean environment so that things can run properly for the next run  

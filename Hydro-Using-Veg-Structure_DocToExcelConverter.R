@@ -35,7 +35,7 @@ input_umbrella <-
 input_specific_folder <- "611 King Salmon/Hydrology/Word to HTML" 
 
 #the final file name will start with this and will get the date added
-project_name <- "KingSalmon_hydro" #Replace with whatever you want.
+project_name <- "KingSalmon_hydro_02" #Replace with whatever you want.
 
 #####NO MORE CHANGES --- -- -- -- --- - - -- -- - -  - - - - -  --- - - - - - - --- --- --- -- ---
 

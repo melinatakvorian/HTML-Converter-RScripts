@@ -378,8 +378,8 @@ df_disr <- df_disr[ , -empty_cols]
     
     
     # Fill rows 3,5 for FAR TERM scenarios
-    frame2$SPEI_Text[[3]] <- df_near_term$`Period: Near Term, SPEI_Text`[2]
-    frame2$SPEI_Text[[5]] <- df_near_term$`Period: Near Term, SPEI_Text`[2]
+    frame2$SPEI_Text[[3]] <- df_far_term$`Period: Far Term, SPEI_Text`[2]
+    frame2$SPEI_Text[[5]] <- df_far_term$`Period: Far Term, SPEI_Text`[2]
     frame2[c(3,5), 7:10] <- leftovers[1, 5:8]
     
 #add BLANK numeric columns----

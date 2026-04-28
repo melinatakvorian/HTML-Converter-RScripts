@@ -403,10 +403,10 @@ df_disr <- df_disr[ , -empty_cols]
   
   
 #ADDING INDENTS ----
-  #add REFERENCES SECTION HANGING INDENT <p style=???padding-left:15px;text-indent:-15px;???> 
+  #add REFERENCES SECTION HANGING INDENT
   for(i in 1:nrow(frame2)){
     frame2$References[i]
-    #replace each <p> to <p style=???padding-left:15px;text-indent:-15px;???>
+    #replace each <p> to <p style=padding-left:15px;text-indent:-15px;>
     temp_string <- frame2$References[i]
     temp_string1 <- stringr::str_replace_all(temp_string, "<p>", '<p style="padding-left:15px;text-indent:-15px;">')
     frame2$References[i] <- temp_string1
@@ -441,14 +441,23 @@ df_disr <- df_disr[ , -empty_cols]
       }
     }
   
-  #add blank line after each bulleted paragraph
-  for(i in 1:nrow(frame2)){
-    frame2$Installation_Summary[i]
-    #replace each </p></li> to </p></li><br>
-    temp_string <- frame2$Installation_Summary[i]
-    temp_string1 <- stringr::str_replace_all(temp_string, "</p></li>", '</p></li><br>')
-    frame2$Installation_Summary[i] <- temp_string1
-  }
+    #add blank line after each bulleted paragraph
+    for(i in 1:nrow(frame2)){
+      frame2$Installation_Summary[i]
+      #replace each </p></li> to </p></li><br>
+      temp_string <- frame2$Installation_Summary[i]
+      temp_string1 <- stringr::str_replace_all(temp_string, "</p></li>", '</p></li><br>')
+      frame2$Installation_Summary[i] <- temp_string1
+    }
+  
+    #add blank line after the subheading in Installation Summary
+    for(i in 1:nrow(frame2)){
+      frame2$Installation_Summary[i]
+      #replace each <p> <ul> to </p> <ul> <br>
+      temp_string <- frame2$Installation_Summary[i]
+      temp_string1 <- stringr::str_replace_all(temp_string, "</p> <ul>", '</p> <ul> <br>')
+      frame2$Installation_Summary[i] <- temp_string1
+    }
   
 
     

@@ -335,7 +335,7 @@ df_disr <- df_disr[ , -empty_cols]
                 "Wet_Distribution_Text", "Dry_Duration_Severity_Text", "Wet_Duration_Severity_Text", 
                 "References")
   
-  ##IDEA: create mini-tables based on column names----
+  ##Create mini-tables based on column names----
   all_disr_names <- colnames(df_disr)
   near_term <- all_disr_names[stringr::str_starts(all_disr_names,"Period: Near Term")]
   far_term <- all_disr_names[stringr::str_starts(all_disr_names,"Period: Far Term")]
@@ -373,14 +373,17 @@ df_disr <- df_disr[ , -empty_cols]
     
     # Fill rows 2,4 for NEAR TERM scenarios
     frame2$SPEI_Text[[2]] <- df_near_term$`Period: Near Term, SPEI_Text`[1]
-    frame2$SPEI_Text[[4]] <- df_near_term$`Period: Near Term, SPEI_Text`[1]
-    frame2[c(2,4), 7:10] <- leftovers[1, 5:8]
-    
+    frame2$SPEI_Text[[4]] <- df_near_term$`Period: Near Term, SPEI_Text`[2]
+
     
     # Fill rows 3,5 for FAR TERM scenarios
-    frame2$SPEI_Text[[3]] <- df_far_term$`Period: Far Term, SPEI_Text`[2]
+    frame2$SPEI_Text[[3]] <- df_far_term$`Period: Far Term, SPEI_Text`[1]
     frame2$SPEI_Text[[5]] <- df_far_term$`Period: Far Term, SPEI_Text`[2]
-    frame2[c(3,5), 7:10] <- leftovers[1, 5:8]
+
+    
+    #Fill in the other rows based on disruption
+    frame2[c(4,5), 7:10] <- leftovers[2, 5:8] #high disruption
+    frame2[c(2,3), 7:10] <- leftovers[1, 5:8] #moderate disruption
     
 #add BLANK numeric columns----
   

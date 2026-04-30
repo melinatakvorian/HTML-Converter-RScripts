@@ -30,19 +30,12 @@ invisible(lapply(packages, library, character.only = TRUE))
   #PAY ATTENTION TO THE DIRECTION OF THE SLASHES. THEY HAVE TO BE CHANGED TO FORWARD SLASHES, AS SHOWN BELOW
     #the broad folder structure
     input_umbrella <- 
-      "N:/RStor/CEMML/ClimateChange/1_USAFClimate/1_USAF_Natural_Resources/20_2_0004_RevisitingPhase1/" 
+      "N:/RStor/CEMML/ClimateChange/2_NavyClimate/Round2_Extremes_INRMP_integ/MidLant Region/" 
     #the specific folder inside the Document to HTML Table Converter where the input files are
-<<<<<<< HEAD
-    input_specific_folder <- "JB Elmendorf-Richardson/WildlandFire/Word to HTML Conversion"
+    input_specific_folder <- "NSA Norfolk/Climate/Word to HTML Conversion"
   
   #the final file name will start with this and will get the date added
-    project_name <- "JBER_Fire_01" #Replace with whatever you want.
-=======
-    input_specific_folder <- "611 Kokee AFS/Vegetation_Habitats/Word to HTML Conversion"
-  
-  #the final file name will start with this and will get the date added
-    project_name <- "611-Kokee_Veg_01" #Replace with whatever you want.
->>>>>>> 508ff9f864ed1bf3021799da9bf5c8a7ad80bc51
+    project_name <- "Norfolk_Weather" #Replace with whatever you want.
 
 #####NO MORE CHANGES --- -- -- -- --- - - -- -- - -  - - - - -  --- - - - - - - --- --- --- -- ---
 

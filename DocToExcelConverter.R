@@ -35,7 +35,7 @@ invisible(lapply(packages, library, character.only = TRUE))
     input_specific_folder <- "NSA Norfolk/Climate/Word to HTML Conversion"
   
   #the final file name will start with this and will get the date added
-    project_name <- "Norfolk_Weather" #Replace with whatever you want.
+    project_name <- "Norfolk_Climate" #Replace with whatever you want.
 
 #####NO MORE CHANGES --- -- -- -- --- - - -- -- - -  - - - - -  --- - - - - - - --- --- --- -- ---
 

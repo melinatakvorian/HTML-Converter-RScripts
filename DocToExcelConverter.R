@@ -32,10 +32,10 @@ invisible(lapply(packages, library, character.only = TRUE))
     input_umbrella <- 
       "N:/RStor/CEMML/ClimateChange/2_NavyClimate/Round2_Extremes_INRMP_integ/MidLant Region/" 
     #the specific folder inside the Document to HTML Table Converter where the input files are
-    input_specific_folder <- "NSA Norfolk/Climate/Word to HTML Conversion"
+    input_specific_folder <- "NSA Norfolk/WildlandFire/Word to HTML Conversion"
   
   #the final file name will start with this and will get the date added
-    project_name <- "Norfolk_Climate" #Replace with whatever you want.
+    project_name <- "Norfolk_Fire" #Replace with whatever you want.
 
 #####NO MORE CHANGES --- -- -- -- --- - - -- -- - -  - - - - -  --- - - - - - - --- --- --- -- ---
 
@@ -147,9 +147,6 @@ for (i in seq_along(results)) {
   }
 }
 
-#Check for incorrect naming of the installation ID, correct it
-colnames(df)[colnames(df) == "Installation"] <- "SITENAME"
-colnames(df)[colnames(df) == "Site_Name"] <- "SITENAME"
 
 ##references hanging indent ----
 #add REFERENCES SECTION HANGING INDENT <p style=???padding-left:15px;text-indent:-15px;???> 

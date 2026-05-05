@@ -12,7 +12,7 @@
 
 ## Install / load necessary packages ----
 
-  packages <- c("pandoc","xml2","rvest","writexl")
+  packages <- c("pandoc","xml2","rvest","writexl", "readxl")
   
   # Install packages not yet installed
   installed_packages <- packages %in% rownames(installed.packages())
@@ -32,15 +32,19 @@
       input_umbrella <- 
       "N:/RStor/CEMML/ClimateChange/1_USAFClimate/1_USAF_Natural_Resources/20_2_0004_RevisitingPhase1/" 
     #the specific folder inside the Document to HTML Table Converter where the input files are
-      input_specific_folder <- "Travis AFB/TerrestrialVegetation/Word to HTML conversion" 
+      input_specific_folder <- "611 Kokee AFS/TVegetation_Habitats/Word to HTML conversion" 
       
   #the final file name will start with this and will get the date added
-    project_name <- "TravisAFB_Veg_run3" #Replace with whatever you want.
+      subject <- "Veg"
+      installation <- "Kokee"
+      project_name <- paste0(subject, "_", installation) #Replace with whatever you want.
     
 #####NO MORE CHANGES --- -- -- -- --- - - -- -- - -  - - - - -  --- - - - - - - --- --- --- -- ---
 
   input_dir <-  paste0(input_umbrella, input_specific_folder) #Rename to your target directory. Outputs will appear here as well.
   current_date <- format(Sys.Date(), "%Y%m%d")  # e.g., "2025-09-24"
+  installation_info <- readxl::read_xlsx("N:/RStor/CEMML/ClimateChange/1_USAFClimate/1_USAF_Natural_Resources/20_2_0004_RevisitingPhase1/_AirForceClimateViewerDev/Document to HTML Table Converter/FilesForTesting/Installation_Info.xlsx")
+  
 
 #ERROR CATCH 1 ----
 
@@ -337,6 +341,19 @@ df_veg[, 'Exposure_Icon'] <- "Extreme Heat, Drought, Vector Borne Disease, Invas
       temp_string1 <- stringr::str_replace_all(temp_string, "<p>", '<p style="padding-left:15px;text-indent:-15px;">')
       df_bio$References[i] <- temp_string1
     }
+
+# add full SITENAME, SITEID, and INRMP ----
+  key <- match(installation, installation_info$ShortName)
+  
+  if(!is.na(key)){
+    df_bio[,"INRMP"] <- installation_info$INRMP[key]
+    df_bio[,"SITENAME"] <- installation_info$SITENAME[key]
+    df_bio[,"SITEID"] <- installation_info$SITEID[key]
+    
+    df_veg[,"INRMP"] <- installation_info$INRMP[key]
+    df_veg[,"SITENAME"] <- installation_info$SITENAME[key]
+    df_veg[,"SITEID"] <- installation_info$SITEID[key]
+  }else(print("No match found in installation database"))
 
 # Export final files ----
   out_dir <- input_dir

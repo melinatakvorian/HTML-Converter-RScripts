@@ -154,7 +154,6 @@ all_headings <- unique(unlist(lapply(results, names))) #THIS SHOULD BE 37, IF TH
   key <- match(installation, installation_info$ShortName)
   
   if(!is.na(key)){
-    df[,"INRMP"] <- installation_info$INRMP[key]
     df[,"SITENAME"] <- installation_info$SITENAME[key]
     df[,"SITEID"] <- installation_info$SITEID[key]
   }else(print("No match found in installation database"))

@@ -346,11 +346,9 @@ df_veg[, 'Exposure_Icon'] <- "Extreme Heat, Drought, Vector Borne Disease, Invas
   key <- match(installation, installation_info$ShortName)
   
   if(!is.na(key)){
-    df_bio[,"INRMP"] <- installation_info$INRMP[key]
     df_bio[,"SITENAME"] <- installation_info$SITENAME[key]
     df_bio[,"SITEID"] <- installation_info$SITEID[key]
     
-    df_veg[,"INRMP"] <- installation_info$INRMP[key]
     df_veg[,"SITENAME"] <- installation_info$SITENAME[key]
     df_veg[,"SITEID"] <- installation_info$SITEID[key]
   }else(print("No match found in installation database"))

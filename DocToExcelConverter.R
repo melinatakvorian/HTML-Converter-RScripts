@@ -12,7 +12,7 @@
 
 ## Install / load necessary packages ----
 
-packages <- c("pandoc","xml2","rvest","writexl", "stringr")
+packages <- c("pandoc","xml2","rvest","writexl", "stringr", "readxl")
 
 # Install packages not yet installed
 installed_packages <- packages %in% rownames(installed.packages())
@@ -35,12 +35,15 @@ invisible(lapply(packages, library, character.only = TRUE))
     input_specific_folder <- "NSA Norfolk/WildlandFire/Word to HTML Conversion"
   
   #the final file name will start with this and will get the date added
-    project_name <- "Norfolk_Fire" #Replace with whatever you want.
+    subject <- "Fire"
+    installation <- "Norfolk"
+    project_name <- paste0(subject, "_", installation) #Replace with whatever you want.
 
 #####NO MORE CHANGES --- -- -- -- --- - - -- -- - -  - - - - -  --- - - - - - - --- --- --- -- ---
 
-  input_dir <-  paste0(input_umbrella, input_specific_folder) #Rename to your target directory. Outputs will appear here as well.
+  input_dir <-  paste0(input_umbrella, input_specific_folder) #Outputs will appear here as well.
   current_date <- format(Sys.Date(), "%Y%m%d")  # e.g., "2025-09-24"
+  installation_info <- readxl::read_xlsx("N:/RStor/CEMML/ClimateChange/1_USAFClimate/1_USAF_Natural_Resources/20_2_0004_RevisitingPhase1/_AirForceClimateViewerDev/Document to HTML Table Converter/FilesForTesting/Installation_Info.xlsx")
 
 # ----- * Word->HTML function ----
 # takes Word document (input) and turns it into HTML file (output)
@@ -137,16 +140,26 @@ all_headings <- unique(unlist(lapply(results, names))) #THIS SHOULD BE 37, IF TH
 
 
 # Create dataframe and input HTML in proper sections ----
-df <- data.frame(matrix(NA_character_, length(results), length(all_headings)),
-                 stringsAsFactors = FALSE)
-colnames(df) <- all_headings
-rownames(df) <- names(results)
-for (i in seq_along(results)) {
-  for (col in names(results[[i]])) {
-    df[i, col] <- results[[i]][[col]]
+  df <- data.frame(matrix(NA_character_, length(results), length(all_headings)),
+                   stringsAsFactors = FALSE)
+  colnames(df) <- all_headings
+  rownames(df) <- names(results)
+  for (i in seq_along(results)) {
+    for (col in names(results[[i]])) {
+      df[i, col] <- results[[i]][[col]]
+    }
   }
-}
+  
+# add full SITENAME, SITEID, and INRMP ----
+  key <- match(installation, installation_info$ShortName)
+  
+  if(!is.na(key)){
+    df[,"INRMP"] <- installation_info$INRMP[key]
+    df[,"SITENAME"] <- installation_info$SITENAME[key]
+    df[,"SITEID"] <- installation_info$SITEID[key]
+  }else(print("No match found in installation database"))
 
+  
 
 ##references hanging indent ----
 #add REFERENCES SECTION HANGING INDENT <p style=???padding-left:15px;text-indent:-15px;???> 

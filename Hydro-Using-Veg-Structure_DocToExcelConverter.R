@@ -439,7 +439,7 @@ df_disr <- df_disr[ , -empty_cols]
         frame2[[col_num]][b]
         #replace each <p> to <p style=text-indent:-15px;>
         temp_string <- frame2[[col_num]][b]
-        temp_string1 <- stringr::str_replace_all(temp_string, "<p>", '<p style="text-indent:-15px;">')
+        temp_string1 <- stringr::str_replace_all(temp_string, "<p>", '<p style="text-indent:15px;">')
         frame2[[col_num]][b] <- temp_string1
       }
     }

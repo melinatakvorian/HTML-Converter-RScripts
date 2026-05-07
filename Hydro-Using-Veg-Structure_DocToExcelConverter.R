@@ -31,7 +31,7 @@ invisible(lapply(packages, library, character.only = TRUE))
 input_umbrella <- 
   "N:/RStor/CEMML/ClimateChange/1_USAFClimate/1_USAF_Natural_Resources/20_2_0004_RevisitingPhase1/" 
 #the specific folder inside the Document to HTML Table Converter where the input files are
-input_specific_folder <- "King Salmon Airport/Hydrology/Word to HTML" 
+input_specific_folder <- "King Salmon Airport/Hydrology/Test-Word to HTML" 
 
 #the final file name will start with this and will get the date added
 subject <- "Hydro"
@@ -437,7 +437,8 @@ test <- df_disr
     
     #temp_string1 <- stringr::str_replace_all(temp_string, "<p>", '<p style="padding-left:15px;text-indent:-15px;">')
     temp_string1 <- replace_all_except_last(temp_string, "<p>", '<p style=padding-left:15px;text-indent:-15px;>')
-    frame2$References[i] <- temp_string1
+    temp_string2 <- replace_all_except_last(temp_string1, "</p>", "</p> <br>")
+    frame2$References[i] <- temp_string2
   }
   
   #these are the sections that need the edits

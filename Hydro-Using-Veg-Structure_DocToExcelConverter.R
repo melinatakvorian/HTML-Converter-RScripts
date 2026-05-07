@@ -32,10 +32,10 @@ invisible(lapply(packages, library, character.only = TRUE))
 input_umbrella <- 
   "N:/RStor/CEMML/ClimateChange/1_USAFClimate/1_USAF_Natural_Resources/20_2_0004_RevisitingPhase1/" 
 #the specific folder inside the Document to HTML Table Converter where the input files are
-input_specific_folder <- "611 King Salmon/Hydrology/Word to HTML" 
+input_specific_folder <- "King Salmon Airport/Hydrology/Word to HTML" 
 
 #the final file name will start with this and will get the date added
-project_name <- "KingSalmon_hydro_02" #Replace with whatever you want.
+project_name <- "KingSalmon_hydro_03" #Replace with whatever you want.
 
 #####NO MORE CHANGES --- -- -- -- --- - - -- -- - -  - - - - -  --- - - - - - - --- --- --- -- ---
 
@@ -172,6 +172,24 @@ remove_end_blanks <- function(result_list){
   return(result_list)
 }
 
+# ----- *replace the last instance of a substring -----
+replace_all_except_last <- function(s, from, to) {
+  # Find the last occurrence of `from`
+  matches <- gregexpr(from, s, fixed = TRUE)[[1]]
+  
+  # No occurrences — return as-is
+  if (matches[1] == -1) return(s)
+  
+  last_pos <- tail(matches, 1)
+  last_len <- attr(matches, "match.length") |> tail(1)
+  
+  # Split into before and after (inclusive of) the last match
+  before <- substr(s, 1, last_pos - 1)
+  after  <- substr(s, last_pos, nchar(s))
+  
+  # Replace all occurrences in the prefix, leave the tail unchanged
+  paste0(gsub(from, to, before, fixed = TRUE), after)
+}
 
 # RUN ----
 
@@ -405,13 +423,14 @@ df_disr <- df_disr[ , -empty_cols]
     
   
   
-#ADDING INDENTS ----
+#ADDING INDENTS AND LINE BREAKS----
   #add REFERENCES SECTION HANGING INDENT
   for(i in 1:nrow(frame2)){
     frame2$References[i]
     #replace each <p> to <p style=padding-left:15px;text-indent:-15px;>
     temp_string <- frame2$References[i]
     temp_string1 <- stringr::str_replace_all(temp_string, "<p>", '<p style="padding-left:15px;text-indent:-15px;">')
+    replace_all_except_last(temp_string1, "<p>", "</p> <br>")
     frame2$References[i] <- temp_string1
   }
   
@@ -427,7 +446,8 @@ df_disr <- df_disr[ , -empty_cols]
         frame2[[col_num]][b]
         #replace each </p> to </p> <br>
         temp_string <- frame2[[col_num]][b]
-        temp_string1 <- stringr::str_replace_all(temp_string, "</p>", '</p> <br>')
+        temp_string1 <- stringr::str_replace_all(temp_string, "</p>", "</p> <br>")
+        replace_all_except_last(temp_string1, "<p>", "</p> <br>")
         frame2[[col_num]][b] <- temp_string1
       }
     }
@@ -449,7 +469,7 @@ df_disr <- df_disr[ , -empty_cols]
       frame2$Installation_Summary[i]
       #replace each </p></li> to </p></li><br>
       temp_string <- frame2$Installation_Summary[i]
-      temp_string1 <- stringr::str_replace_all(temp_string, "</p></li>", '</p></li><br>')
+      temp_string1 <- stringr::str_replace_all(temp_string, "</p></li>", "</p></li><br>")
       frame2$Installation_Summary[i] <- temp_string1
     }
   
@@ -458,7 +478,7 @@ df_disr <- df_disr[ , -empty_cols]
       frame2$Installation_Summary[i]
       #replace each <p> <ul> to </p> <ul> <br>
       temp_string <- frame2$Installation_Summary[i]
-      temp_string1 <- stringr::str_replace_all(temp_string, "</p> <ul>", '</p> <ul> <br>')
+      temp_string1 <- stringr::str_replace_all(temp_string, "</p> <ul>", "</p> <ul> <br>")
       frame2$Installation_Summary[i] <- temp_string1
     }
   

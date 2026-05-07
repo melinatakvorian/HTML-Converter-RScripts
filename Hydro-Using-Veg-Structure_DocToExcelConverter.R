@@ -12,8 +12,7 @@
 
 ## Install / load necessary packages ----
 
-packages <- c("pandoc","xml2","rvest","writexl")
-
+packages <- c("pandoc","xml2","rvest","writexl", "readxl","dplyr")
 # Install packages not yet installed
 installed_packages <- packages %in% rownames(installed.packages())
 if (any(installed_packages == FALSE)) {
@@ -32,7 +31,7 @@ invisible(lapply(packages, library, character.only = TRUE))
 input_umbrella <- 
   "N:/RStor/CEMML/ClimateChange/1_USAFClimate/1_USAF_Natural_Resources/20_2_0004_RevisitingPhase1/" 
 #the specific folder inside the Document to HTML Table Converter where the input files are
-input_specific_folder <- "King Salmon Airport/Hydrology/Word to HTML" 
+input_specific_folder <- "King Salmon Airport/Hydrology/Test-Word to HTML" 
 
 #the final file name will start with this and will get the date added
 subject <- "Hydro"
@@ -181,7 +180,7 @@ replace_all_except_last <- function(s, from, to) {
   matches <- gregexpr(from, s, fixed = TRUE)[[1]]
   
   # No occurrences — return as-is
-  if (matches[1] == -1) return(s)
+  if (matches[1] == -1){return(s)}
   
   last_pos <- tail(matches, 1)
   last_len <- attr(matches, "match.length") |> tail(1)
@@ -336,15 +335,15 @@ for(file in seq_along(results_disr)){
 
 ##Delete empty columns ----
 test <- df_disr
-empty_cols <- c()
-
-for(i in 1:ncol(test)){
-  if(all(is.na(test[[i]]))){
-    empty_cols[length(empty_cols)+1] <- i
-  }
-}
-
-df_disr <- df_disr[ , -empty_cols]
+# empty_cols <- c()
+# 
+# for(i in 1:ncol(test)){
+#   if(all(is.na(test[[i]]))){
+#     empty_cols[length(empty_cols)+1] <- i
+#   }
+# }
+# 
+# df_disr <- df_disr[ , -empty_cols]
 
 #TRANSPOSE DATATABLES ----
 
@@ -424,16 +423,20 @@ df_disr <- df_disr[ , -empty_cols]
   frame2 <- frame2 %>% 
     relocate(all_of(cols:cols_w_nos), .before = "Installation_Summary")
     
-  
+  frame3 <- frame2
   
 #ADDING INDENTS AND LINE BREAKS----
   #add REFERENCES SECTION HANGING INDENT
   for(i in 1:nrow(frame2)){
+    if(is.na(frame2$References[i])) next #skip NA rows
+    
     frame2$References[i]
+    
     #replace each <p> to <p style=padding-left:15px;text-indent:-15px;>
     temp_string <- frame2$References[i]
-    temp_string1 <- stringr::str_replace_all(temp_string, "<p>", '<p style="padding-left:15px;text-indent:-15px;">')
-    replace_all_except_last(temp_string1, "<p>", "</p> <br>")
+    
+    #temp_string1 <- stringr::str_replace_all(temp_string, "<p>", '<p style="padding-left:15px;text-indent:-15px;">')
+    temp_string1 <- replace_all_except_last(temp_string, "<p>", '<p style=padding-left:15px;text-indent:-15px;>')
     frame2$References[i] <- temp_string1
   }
   
@@ -446,11 +449,14 @@ df_disr <- df_disr[ , -empty_cols]
     for(a in 1:length(numbblocks)){
       col_num <- numbblocks[[a]]
       for(b in 1:nrow(frame2)){
-        frame2[[col_num]][b]
+        if(is.na(frame2[[col_num]][b])) next
+        
         #replace each </p> to </p> <br>
+        print(paste0("frame2","[[",col_num,"]][",b,"]"))
         temp_string <- frame2[[col_num]][b]
-        temp_string1 <- stringr::str_replace_all(temp_string, "</p>", "</p> <br>")
-        replace_all_except_last(temp_string1, "<p>", "</p> <br>")
+        
+        #temp_string1 <- stringr::str_replace_all(temp_string, "</p>", "</p> <br>")
+        temp_string1 <- replace_all_except_last(temp_string, "</p>", "</p> <br>")
         frame2[[col_num]][b] <- temp_string1
       }
     }
@@ -459,20 +465,25 @@ df_disr <- df_disr[ , -empty_cols]
     for(a in 1:length(numbblocks)){
       col_num <- numbblocks[[a]]
       for(b in 1:nrow(frame2)){
-        frame2[[col_num]][b]
+        
+        if(is.na(frame2[[col_num]][b])) next
+        
         #replace each <p> to <p style=text-indent:-15px;>
         temp_string <- frame2[[col_num]][b]
-        temp_string1 <- stringr::str_replace_all(temp_string, "<p>", '<p style="text-indent:15px;">')
+        temp_string1 <- stringr::str_replace_all(temp_string, "<p>", '<p style=text-indent:15px;>')
         frame2[[col_num]][b] <- temp_string1
       }
     }
   
     #add blank line after each bulleted paragraph
     for(i in 1:nrow(frame2)){
-      frame2$Installation_Summary[i]
+      if(is.na(frame2$Installation_Summary[i])) next
+      
       #replace each </p></li> to </p></li><br>
       temp_string <- frame2$Installation_Summary[i]
-      temp_string1 <- stringr::str_replace_all(temp_string, "</p></li>", "</p></li><br>")
+      
+      #temp_string1 <- stringr::str_replace_all(temp_string, "</p></li>", "</p></li><br>")
+      temp_string1 <- replace_all_except_last(temp_string, "</p></li>", "</p></li><br>")
       frame2$Installation_Summary[i] <- temp_string1
     }
   

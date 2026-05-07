@@ -31,7 +31,7 @@ invisible(lapply(packages, library, character.only = TRUE))
 input_umbrella <- 
   "N:/RStor/CEMML/ClimateChange/1_USAFClimate/1_USAF_Natural_Resources/20_2_0004_RevisitingPhase1/" 
 #the specific folder inside the Document to HTML Table Converter where the input files are
-input_specific_folder <- "King Salmon Airport/Hydrology/Test-Word to HTML" 
+input_specific_folder <- "King Salmon Airport/Hydrology/Word to HTML" 
 
 #the final file name will start with this and will get the date added
 subject <- "Hydro"
@@ -452,10 +452,7 @@ test <- df_disr
         if(is.na(frame2[[col_num]][b])) next
         
         #replace each </p> to </p> <br>
-        print(paste0("frame2","[[",col_num,"]][",b,"]"))
         temp_string <- frame2[[col_num]][b]
-        
-        #temp_string1 <- stringr::str_replace_all(temp_string, "</p>", "</p> <br>")
         temp_string1 <- replace_all_except_last(temp_string, "</p>", "</p> <br>")
         frame2[[col_num]][b] <- temp_string1
       }
@@ -481,8 +478,6 @@ test <- df_disr
       
       #replace each </p></li> to </p></li><br>
       temp_string <- frame2$Installation_Summary[i]
-      
-      #temp_string1 <- stringr::str_replace_all(temp_string, "</p></li>", "</p></li><br>")
       temp_string1 <- replace_all_except_last(temp_string, "</p></li>", "</p></li><br>")
       frame2$Installation_Summary[i] <- temp_string1
     }

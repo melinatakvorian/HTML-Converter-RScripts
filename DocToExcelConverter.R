@@ -150,7 +150,7 @@ all_headings <- unique(unlist(lapply(results, names))) #THIS SHOULD BE 37, IF TH
     }
   }
   
-# add full SITENAME, SITEID, and INRMP ----
+# add full SITENAME, SITEID ----
   key <- match(installation, installation_info$ShortName)
   
   if(!is.na(key)){

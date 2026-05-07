@@ -342,7 +342,7 @@ df_veg[, 'Exposure_Icon'] <- "Extreme Heat, Drought, Vector Borne Disease, Invas
       df_bio$References[i] <- temp_string1
     }
 
-# add full SITENAME, SITEID, and INRMP ----
+# add full SITENAME, SITEID ----
   key <- match(installation, installation_info$ShortName)
   
   if(!is.na(key)){

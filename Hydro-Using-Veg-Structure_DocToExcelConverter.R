@@ -35,12 +35,15 @@ input_umbrella <-
 input_specific_folder <- "King Salmon Airport/Hydrology/Word to HTML" 
 
 #the final file name will start with this and will get the date added
-project_name <- "KingSalmon_hydro_03" #Replace with whatever you want.
+subject <- "Hydro"
+installation <- "King Salmon"
+project_name <- paste0(subject, "_", installation) #Replace with whatever you want.
 
 #####NO MORE CHANGES --- -- -- -- --- - - -- -- - -  - - - - -  --- - - - - - - --- --- --- -- ---
 
 input_dir <-  paste0(input_umbrella, input_specific_folder) #Rename to your target directory. Outputs will appear here as well.
 current_date <- format(Sys.Date(), "%Y%m%d")  # e.g., "2025-09-24"
+installation_info <- readxl::read_xlsx("N:/RStor/CEMML/ClimateChange/1_USAFClimate/1_USAF_Natural_Resources/20_2_0004_RevisitingPhase1/_AirForceClimateViewerDev/Document to HTML Table Converter/FilesForTesting/Installation_Info.xlsx")
 
 #ERROR CATCH 1 ----
 
@@ -482,7 +485,13 @@ df_disr <- df_disr[ , -empty_cols]
       frame2$Installation_Summary[i] <- temp_string1
     }
   
-
+  # add full SITENAME, SITEID ----
+  key <- match(installation, installation_info$ShortName)
+  
+  if(!is.na(key)){
+    frame2[,"SITENAME"] <- installation_info$SITENAME[key]
+    frame2[,"SITEID"] <- installation_info$SITEID[key]
+  }else(print("No match found in installation database"))
     
 # Export final files ----
 out_dir <- input_dir

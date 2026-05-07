@@ -436,7 +436,7 @@ test <- df_disr
     temp_string <- frame2$References[i]
     
     #temp_string1 <- stringr::str_replace_all(temp_string, "<p>", '<p style="padding-left:15px;text-indent:-15px;">')
-    temp_string1 <- replace_all_except_last(temp_string, "<p>", '<p style=padding-left:15px;text-indent:-15px;>')
+    temp_string1 <- stringr::str_replace_all(temp_string, "<p>", '<p style=padding-left:15px;text-indent:-15px;>')
     temp_string2 <- replace_all_except_last(temp_string1, "</p>", "</p> <br>")
     frame2$References[i] <- temp_string2
   }

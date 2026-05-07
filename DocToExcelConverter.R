@@ -30,13 +30,13 @@ invisible(lapply(packages, library, character.only = TRUE))
   #PAY ATTENTION TO THE DIRECTION OF THE SLASHES. THEY HAVE TO BE CHANGED TO FORWARD SLASHES, AS SHOWN BELOW
     #the broad folder structure
     input_umbrella <- 
-      "N:/RStor/CEMML/ClimateChange/2_NavyClimate/Round2_Extremes_INRMP_integ/MidLant Region/" 
+      "N:/RStor/CEMML/ClimateChange/1_USAFClimate/1_USAF_Natural_Resources/20_2_0004_RevisitingPhase1/" 
     #the specific folder inside the Document to HTML Table Converter where the input files are
-    input_specific_folder <- "NSA Norfolk/WildlandFire/Word to HTML Conversion"
+    input_specific_folder <- "Kokee AFS/Hydrology/Word to HTML"
   
   #the final file name will start with this and will get the date added
-    subject <- "Fire"
-    installation <- "Norfolk"
+    subject <- "Hydro"
+    installation <- "Kokee"
     project_name <- paste0(subject, "_", installation) #Replace with whatever you want.
 
 #####NO MORE CHANGES --- -- -- -- --- - - -- -- - -  - - - - -  --- - - - - - - --- --- --- -- ---
@@ -119,6 +119,25 @@ remove_end_blanks <- function(result_list){
   return(result_list)
 }
 
+  # ----- *replace the last instance of a substring -----
+  replace_all_except_last <- function(s, from, to) {
+    # Find the last occurrence of `from`
+    matches <- gregexpr(from, s, fixed = TRUE)[[1]]
+    
+    # No occurrences — return as-is
+    if (matches[1] == -1){return(s)}
+    
+    last_pos <- tail(matches, 1)
+    last_len <- attr(matches, "match.length") |> tail(1)
+    
+    # Split into before and after (inclusive of) the last match
+    before <- substr(s, 1, last_pos - 1)
+    after  <- substr(s, last_pos, nchar(s))
+    
+    # Replace all occurrences in the prefix, leave the tail unchanged
+    paste0(gsub(from, to, before, fixed = TRUE), after)
+  }
+  
 # RUN ----
 docx_files <- list.files(input_dir, pattern = "\\.docx$", full.names = TRUE) #pull list of all files in folder
 docx_files <- docx_files[!grepl("^~\\$", basename(docx_files))]
@@ -166,9 +185,19 @@ for(i in 1:nrow(df)){
   df$References[i]
   #replace each <p> to <p style=???padding-left:15px;text-indent:-15px;???>
   temp_string <- df$References[i]
-  temp_string1 <- stringr::str_replace_all(temp_string, "<p>", '<p style="padding-left:15px;text-indent:-15px;">')
-  df$References[i] <- temp_string1
+  temp_string1 <- stringr::str_replace_all(temp_string, "<p>", '<p style=padding-left:15px;text-indent:-15px;>')
+  #temp_string2 <- replace_all_except_last(temp_string1, "</p>", "</p> <br>")
+  df$References[i] <- temp_string1 #change to temp_string2 if you are adding the line breaks
 }
+ 
+  #for Hydro Qualitative conversion 
+  # for(i in 1:nrow(df)){
+  #   df$Installation_Summary[i]
+  #   temp_string <- df$Installation_Summary[i]
+  #   temp_string1 <- stringr::str_replace_all(temp_string, "</p> <ul>", "</p> <ul> <br>")
+  #   temp_string2 <- replace_all_except_last(temp_string1, "</p>", "</p> <br>")
+  #   df$Installation_Summary[i] <- temp_string2 #change to temp_string2 if you are adding the line breaks
+  # }
 
 # Export final files ----
 out_dir <- input_dir

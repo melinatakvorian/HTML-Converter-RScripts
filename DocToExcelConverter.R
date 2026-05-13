@@ -32,11 +32,11 @@ invisible(lapply(packages, library, character.only = TRUE))
     input_umbrella <- 
       "N:/RStor/CEMML/ClimateChange/1_USAFClimate/1_USAF_Natural_Resources/20_2_0004_RevisitingPhase1/" 
     #the specific folder inside the Document to HTML Table Converter where the input files are
-    input_specific_folder <- "Kokee AFS/Hydrology/Word to HTML"
+    input_specific_folder <- "Eielson AFB/TEVA/Word to HTML Conversion - Copy"
   
   #the final file name will start with this and will get the date added
-    subject <- "Hydro"
-    installation <- "Kokee"
+    subject <- "Wildlife"
+    installation <- "Eielson"
     project_name <- paste0(subject, "_", installation) #Replace with whatever you want.
 
 #####NO MORE CHANGES --- -- -- -- --- - - -- -- - -  - - - - -  --- - - - - - - --- --- --- -- ---
@@ -183,7 +183,7 @@ all_headings <- unique(unlist(lapply(results, names)))
 #add REFERENCES SECTION HANGING INDENT <p style=???padding-left:15px;text-indent:-15px;???> 
 for(i in 1:nrow(df)){
   df$References[i]
-  #replace each <p> to <p style=???padding-left:15px;text-indent:-15px;???>
+  #replace each <p> to <p style=padding-left:15px;text-indent:-15px;>
   temp_string <- df$References[i]
   temp_string1 <- stringr::str_replace_all(temp_string, "<p>", '<p style=padding-left:15px;text-indent:-15px;>')
   #temp_string2 <- replace_all_except_last(temp_string1, "</p>", "</p> <br>")

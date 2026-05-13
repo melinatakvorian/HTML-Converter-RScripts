@@ -34,13 +34,13 @@ invisible(lapply(packages, library, character.only = TRUE))
   #NAVY
   input_umbrella <- "N:/RStor/CEMML/ClimateChange/2_NavyClimate/Round2_Extremes_INRMP_integ/"
   
-#the specific folder inside the Document to HTML Table Converter where the input files are
-input_specific_folder <- "MidLant Region/WPNSTA Yorktown/Hydrology/HTML converter" 
-
-#the final file name will start with this and will get the date added
-subject <- "Hydro"
-installation <- "Yorktown"
-project_name <- paste0(subject, "_", installation) #Replace with whatever you want.
+  #the specific folder inside the Document to HTML Table Converter where the input files are
+  input_specific_folder <- "MidLant Region/WPNSTA Yorktown/Hydrology/HTML converter" 
+  
+  #the final file name will start with this and will get the date added
+  subject <- "Hydro"
+  installation <- "Yorktown"
+  project_name <- paste0(subject, "_", installation) #Replace with whatever you want.
 
 #####NO MORE CHANGES --- -- -- -- --- - - -- -- - -  - - - - -  --- - - - - - - --- --- --- -- ---
 
@@ -421,7 +421,7 @@ test <- df_disr
                 "Dry_Change", "Wet_Change", "")
   
   #assign names
-  colnames(frame2)[cols:cols_w_nos] <- new_cols
+  colnames(frame2)[cols:cols_w_nos] <- new_cols #this one errors, don't worry about it
   
   #move columns to where Anthony wants them
   frame2 <- frame2 %>% 

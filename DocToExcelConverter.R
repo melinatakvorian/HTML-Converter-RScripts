@@ -155,7 +155,7 @@ for (file in docx_files) { #for each file, convert it to HTML, Identify its sect
 results <- remove_end_blanks(results)
 
 #unfold the results list to be able to create a dataframe
-all_headings <- unique(unlist(lapply(results, names))) #THIS SHOULD BE 37, IF THE LOOP ABOVE WORKED
+all_headings <- unique(unlist(lapply(results, names)))
 
 
 # Create dataframe and input HTML in proper sections ----

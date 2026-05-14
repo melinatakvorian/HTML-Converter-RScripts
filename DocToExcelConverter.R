@@ -30,13 +30,13 @@ invisible(lapply(packages, library, character.only = TRUE))
   #PAY ATTENTION TO THE DIRECTION OF THE SLASHES. THEY HAVE TO BE CHANGED TO FORWARD SLASHES, AS SHOWN BELOW
     #the broad folder structure
     input_umbrella <- 
-      "N:/RStor/CEMML/ClimateChange/1_USAFClimate/1_USAF_Natural_Resources/20_2_0004_RevisitingPhase1/" 
+      "N:/RStor/CEMML/ClimateChange/2_NavyClimate/Round2_Extremes_INRMP_integ/MidLant Region/" 
     #the specific folder inside the Document to HTML Table Converter where the input files are
-    input_specific_folder <- "Eielson AFB/TEVA/Word to HTML Conversion - Copy"
+    input_specific_folder <- "NSA Cutler/Coastal_Habitats"
   
   #the final file name will start with this and will get the date added
-    subject <- "Wildlife"
-    installation <- "Eielson"
+    subject <- "Coastal Habitats"
+    installation <- "Cutler"
     project_name <- paste0(subject, "_", installation) #Replace with whatever you want.
 
 #####NO MORE CHANGES --- -- -- -- --- - - -- -- - -  - - - - -  --- - - - - - - --- --- --- -- ---
@@ -189,6 +189,20 @@ for(i in 1:nrow(df)){
   #temp_string2 <- replace_all_except_last(temp_string1, "</p>", "</p> <br>")
   df$References[i] <- temp_string1 #change to temp_string2 if you are adding the line breaks
 }
+  
+numbblocks <- c(4:6) # Change to the columns we need breaks in
+    #add blank line after each paragraph
+    for(a in 1:length(numbblocks)){
+      col_num <- numbblocks[[a]]
+      for(b in 1:nrow(df)){
+        if(is.na(df[[col_num]][b])) next
+
+        #replace each </p> to </p> <br>
+        temp_string <- df[[col_num]][b]
+        temp_string1 <- replace_all_except_last(temp_string, "</p>", "</p> <br>")
+        df[[col_num]][b] <- temp_string1
+      }
+    }
  
   #for Hydro Qualitative conversion 
   # for(i in 1:nrow(df)){

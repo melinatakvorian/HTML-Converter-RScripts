@@ -32,11 +32,11 @@
       input_umbrella <- 
       "N:/RStor/CEMML/ClimateChange/1_USAFClimate/1_USAF_Natural_Resources/20_2_0004_RevisitingPhase1/" 
     #the specific folder inside the Document to HTML Table Converter where the input files are
-      input_specific_folder <- "611 Kokee AFS/TVegetation_Habitats/Word to HTML conversion" 
+      input_specific_folder <- "Beale AFB/TerrestrialVegetation/Word to HTML conversion" 
       
   #the final file name will start with this and will get the date added
       subject <- "Veg"
-      installation <- "Kokee"
+      installation <- "Beale"
       project_name <- paste0(subject, "_", installation) #Replace with whatever you want.
     
 #####NO MORE CHANGES --- -- -- -- --- - - -- -- - -  - - - - -  --- - - - - - - --- --- --- -- ---
@@ -107,11 +107,12 @@
       # Insert a space between concatenated HTML nodes
       content_html <- paste(as.character(siblings), collapse = " ")
       sections[[i]] <- content_html
-        print(content_html)
+        #print(content_html)
     }
     
     # Assign section titles as names to the list elements
     names(sections) <- sapply(headings[section_indices], xml_text)
+    sections
     
   }
   
@@ -140,7 +141,7 @@
       # Insert a space between concatenated HTML nodes
       content_html <- paste(as.character(siblings), collapse = " ")
       sections[[i]] <- content_html
-      print(content_html)
+      #print(content_html)
     }
     
     # Assign section titles as names to the list elements
@@ -300,7 +301,7 @@
           templist <- mylist[[file]][[a]]
           
           # Populate the first few columns with results_bio data (assuming it applies to all rows for this file)
-          df_veg[rownum, 1] <- results_bio[[file]][[1]]
+          df_veg[rownum, 1] <- results_bio[[file]][[1]] #subscript out of bounds
           df_veg[rownum, 2] <- results_bio[[file]][[2]]
           df_veg[rownum, 3] <- results_bio[[file]][[3]] #THE COLUMN GETS RE-WRITTEN
           

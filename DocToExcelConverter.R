@@ -45,6 +45,22 @@ invisible(lapply(packages, library, character.only = TRUE))
   current_date <- format(Sys.Date(), "%Y%m%d")  # e.g., "2025-09-24"
   installation_info <- readxl::read_xlsx("N:/RStor/CEMML/ClimateChange/1_USAFClimate/1_USAF_Natural_Resources/20_2_0004_RevisitingPhase1/_AirForceClimateViewerDev/Document to HTML Table Converter/FilesForTesting/Installation_Info.xlsx")
 
+#ERROR CATCH 1 open files ----
+  
+  filenames <- list.files(input_dir) #create list of files in the folder
+  openfiles <- list()
+  
+  for(file in 1:length(filenames)){ #check that there are no open files
+    if(startsWith(filenames[file], "~")){
+      openfiles[length(openfiles)+1] <- filenames[file]
+    }else next
+  } 
+  
+  if(!length(openfiles)==0){
+    stop("The following document(s) is open on a computer. This script cannot run unless all files are closed.\n 
+           Open files are listed below: \n", openfiles)
+  }
+  
 # ----- * Word->HTML function ----
 # takes Word document (input) and turns it into HTML file (output)
 

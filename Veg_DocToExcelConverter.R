@@ -146,7 +146,7 @@
     
     # Assign section titles as names to the list elements
     names(sections) <- sapply(headings[section_indices], xml_text)
-    sections
+    sections 
     
   }
 # ----- *removing spaces after headings function -----

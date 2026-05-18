@@ -30,17 +30,17 @@ invisible(lapply(packages, library, character.only = TRUE))
   #PAY ATTENTION TO THE DIRECTION OF THE SLASHES. THEY HAVE TO BE CHANGED TO FORWARD SLASHES, AS SHOWN BELOW
     #the broad folder structure
     #AIR FORCE  
-    input_umbrella <- "N:/RStor/CEMML/ClimateChange/1_USAFClimate/1_USAF_Natural_Resources/20_2_0004_RevisitingPhase1/" 
+    #input_umbrella <- "N:/RStor/CEMML/ClimateChange/1_USAFClimate/1_USAF_Natural_Resources/20_2_0004_RevisitingPhase1/" 
     
     #NAVY
-    #input_umbrella <- "N:/RStor/CEMML/ClimateChange/2_NavyClimate/Round2_Extremes_INRMP_integ/"
+    input_umbrella <- "N:/RStor/CEMML/ClimateChange/2_NavyClimate/Round2_Extremes_INRMP_integ/MidLant Region/"
 
     #the specific folder inside the Document to HTML Table Converter where the input files are
-    input_specific_folder <- "Kokee AFS/Climate/Word to HTML Conversion"
+    input_specific_folder <- "WPNSTA Yorktown/Climate/Word to HTML Conversion"
   
   #the final file name will start with this and will get the date added
     subject <- "Weather"
-    installation <- "Kokee"
+    installation <- "Yorktown"
     project_name <- paste0(subject, "_", installation) #Replace with whatever you want.
 
 #####NO MORE CHANGES --- -- -- -- --- - - -- -- - -  - - - - -  --- - - - - - - --- --- --- -- ---

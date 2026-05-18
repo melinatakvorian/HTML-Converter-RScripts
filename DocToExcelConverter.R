@@ -210,7 +210,8 @@ for(i in 1:nrow(df)){
   df$References[i] <- temp_string1 #change to temp_string2 if you are adding the line breaks
 }
   
-numbblocks <- c(4:6) # Change to the columns we need breaks in
+##line breaks [manually input columns] ----
+numbblocks <- c(3:20) # Change to the columns we need breaks in
     #add blank line after each paragraph
     for(a in 1:length(numbblocks)){
       col_num <- numbblocks[[a]]

@@ -39,8 +39,8 @@ invisible(lapply(packages, library, character.only = TRUE))
     input_specific_folder <- "Kokee AFS/Climate/Word to HTML Conversion"
   
   #the final file name will start with this and will get the date added
-    subject <- "Coastal Habitats"
-    installation <- "Cutler"
+    subject <- "Weather"
+    installation <- "Kokee"
     project_name <- paste0(subject, "_", installation) #Replace with whatever you want.
 
 #####NO MORE CHANGES --- -- -- -- --- - - -- -- - -  - - - - -  --- - - - - - - --- --- --- -- ---

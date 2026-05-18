@@ -1,6 +1,6 @@
 # Dashboard Word to Excel Converter v1.0
 # CSU/CEMML - Trevor Lee Even, Ph.D.; Melina Takvorian, melina.takvorian@colostate.edu
-# Date: 2025.11.14
+# Date: 2026.05.15
 
 
 # Converts .docx files in input_dir into dashboard-ready xlsx files.
@@ -29,10 +29,14 @@ invisible(lapply(packages, library, character.only = TRUE))
 
   #PAY ATTENTION TO THE DIRECTION OF THE SLASHES. THEY HAVE TO BE CHANGED TO FORWARD SLASHES, AS SHOWN BELOW
     #the broad folder structure
-    input_umbrella <- 
-      "N:/RStor/CEMML/ClimateChange/2_NavyClimate/Round2_Extremes_INRMP_integ/MidLant Region/" 
+    #AIR FORCE  
+    input_umbrella <- "N:/RStor/CEMML/ClimateChange/1_USAFClimate/1_USAF_Natural_Resources/20_2_0004_RevisitingPhase1/" 
+    
+    #NAVY
+    #input_umbrella <- "N:/RStor/CEMML/ClimateChange/2_NavyClimate/Round2_Extremes_INRMP_integ/"
+
     #the specific folder inside the Document to HTML Table Converter where the input files are
-    input_specific_folder <- "NSA Cutler/Coastal_Habitats"
+    input_specific_folder <- "Kokee AFS/Climate/Word to HTML Conversion"
   
   #the final file name will start with this and will get the date added
     subject <- "Coastal Habitats"

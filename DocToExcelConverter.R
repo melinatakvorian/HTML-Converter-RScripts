@@ -139,7 +139,7 @@ remove_end_blanks <- function(result_list){
   return(result_list)
 }
 
-  # ----- *replace the last instance of a substring -----
+  # ----- * replace the last instance of a substring -----
   replace_all_except_last <- function(s, from, to) {
     # Find the last occurrence of `from`
     matches <- gregexpr(from, s, fixed = TRUE)[[1]]
@@ -157,6 +157,8 @@ remove_end_blanks <- function(result_list){
     # Replace all occurrences in the prefix, leave the tail unchanged
     paste0(gsub(from, to, before, fixed = TRUE), after)
   }
+  
+
   
 # RUN ----
 docx_files <- list.files(input_dir, pattern = "\\.docx$", full.names = TRUE) #pull list of all files in folder

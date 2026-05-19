@@ -49,7 +49,7 @@ invisible(lapply(packages, library, character.only = TRUE))
   current_date <- format(Sys.Date(), "%Y%m%d")  # e.g., "2025-09-24"
   installation_info <- readxl::read_xlsx("N:/RStor/CEMML/ClimateChange/1_USAFClimate/1_USAF_Natural_Resources/20_2_0004_RevisitingPhase1/_AirForceClimateViewerDev/Document to HTML Table Converter/FilesForTesting/Installation_Info.xlsx")
 
-#ERROR CATCH 1 open files ----
+#ERROR CATCH: open files ----
   
   filenames <- list.files(input_dir) #create list of files in the folder
   openfiles <- list()
@@ -112,7 +112,7 @@ parse_html_sections <- function(html_doc) {
 }
 
 # ----- * removing spaces after headings function -----
-#if sections[i] ends with " ", remove it
+#if results[i] ends with " ", remove it
 remove_end_blanks <- function(result_list){
   
   for(i in 1:length(result_list)){
@@ -139,9 +139,9 @@ remove_end_blanks <- function(result_list){
   return(result_list)
 }
   
-  # ----- * remove '\r\n' from heading names -----
-  #if sections[i] includes '\r\n', remove it
-  clean_headings <- function(result_list){
+# ----- * remove '\r\n' from heading names -----
+  #if results[i] includes '\r\n', remove it
+  remove_accidental_return <- function(result_list){
     
     for(i in 1:length(result_list)){
       templist <- result_list[[i]]
@@ -196,7 +196,7 @@ for (file in docx_files) { #for each file, convert it to HTML, Identify its sect
 
 #QAQC heading names for trailing spaces and line breaks
 results <- remove_end_blanks(results)
-results <- clean_headings(results)
+results <- remove_accidental_return(results)
 
 #unfold the results list to be able to create a dataframe
 all_headings <- unique(unlist(lapply(results, names)))
@@ -224,7 +224,7 @@ all_headings <- unique(unlist(lapply(results, names)))
   
 
 ##references hanging indent ----
-#add REFERENCES SECTION HANGING INDENT <p style=???padding-left:15px;text-indent:-15px;???> 
+#add REFERENCES SECTION HANGING INDENT <p style=padding-left:15px;text-indent:-15px;> 
 for(i in 1:nrow(df)){
   df$References[i]
   #replace each <p> to <p style=padding-left:15px;text-indent:-15px;>
@@ -235,7 +235,7 @@ for(i in 1:nrow(df)){
 }
   
 ##line breaks [manually input columns] ----
-numbblocks <- c(3:20) # Change to the columns we need breaks in
+numbblocks <- c(3:20) # Change to the columns that need line breaks between paragraphs
     #add blank line after each paragraph
     for(a in 1:length(numbblocks)){
       col_num <- numbblocks[[a]]

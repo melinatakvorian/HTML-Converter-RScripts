@@ -133,7 +133,7 @@
       
       end_node <- if (i < length(section_indices)) headings[[section_indices[i + 1]]] else NULL
       #end_node <- if (i < length(section_indices)) headings[[i + 1]] else NULL
-      #print(headings[section_indices[i + 1]])
+        #print(headings[section_indices[i + 1]])
       
       siblings <- xml2::xml_find_all(start_node, "following-sibling::*") #finds all instances of the heading in the document
       if (!is.null(end_node)) { 
@@ -266,7 +266,7 @@
     #use the indices to create smaller lists as keys to sections of Veg Groups in the document
       #initialize objects
       total_rows <- 0
-      mylist <- vector("list", length(results_veg))
+      split_sections <- vector("list", length(results_veg))
   
       #create mini lists, assign data to them
       for(file in seq_along(results_veg)){ #for each heading
@@ -282,13 +282,13 @@
             
             total_rows <- total_rows + length(num_pair) #sum all iterations to see how long the df should be
             
-            mylist[[file]][[length(mylist[[file]])+1]] <- num_pair #create a nested list with each index within a veg group section
+            split_sections[[file]][[length(split_sections[[file]])+1]] <- num_pair #create a nested list with each index within a veg group section
             
           }else{ #case for the last instance of new veg group
             num_pair <- c(num_files[[file]][[i]]:(length(results_veg[[file]])-1))
             total_rows <- total_rows + length(num_pair) #sum all iterations to see how long the df should be
             
-            mylist[[file]][[length(mylist[[file]])+1]] <- num_pair
+            split_sections[[file]][[length(split_sections[[file]])+1]] <- num_pair
           }
         }
       }
@@ -300,9 +300,9 @@
       rownum <- 1
       
       for(file in seq_along(results_veg)){
-        for(a in seq_along(mylist[[file]])){
-          # Extract the current list of indices from mylist
-          templist <- mylist[[file]][[a]]
+        for(a in seq_along(split_sections[[file]])){
+          # Extract the current list of indices from split_sections
+          templist <- split_sections[[file]][[a]]
           
           # Populate the first few columns with results_bio data (assuming it applies to all rows for this file)
           df_veg[rownum, 1] <- results_bio[[file]][[1]] #subscript out of bounds

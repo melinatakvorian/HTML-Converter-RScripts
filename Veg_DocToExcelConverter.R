@@ -36,12 +36,12 @@
       
   #the final file name will start with this and will get the date added
       subject <- "Veg"
-      installation <- "Beale"
-      project_name <- paste0(subject, "_", installation) #Replace with whatever you want.
+      installation <- "Beale" #this should match the ShortName in the installation_info document
+      project_name <- paste0(subject, "_", installation)
     
 #####NO MORE CHANGES --- -- -- -- --- - - -- -- - -  - - - - -  --- - - - - - - --- --- --- -- ---
 
-  input_dir <-  paste0(input_umbrella, input_specific_folder) #Rename to your target directory. Outputs will appear here as well.
+  input_dir <-  paste0(input_umbrella, input_specific_folder) 
   current_date <- format(Sys.Date(), "%Y%m%d")  # e.g., "2025-09-24"
   installation_info <- readxl::read_xlsx("N:/RStor/CEMML/ClimateChange/1_USAFClimate/1_USAF_Natural_Resources/20_2_0004_RevisitingPhase1/_AirForceClimateViewerDev/Document to HTML Table Converter/FilesForTesting/Installation_Info.xlsx")
   

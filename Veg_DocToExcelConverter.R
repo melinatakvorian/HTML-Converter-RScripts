@@ -342,9 +342,9 @@ df_veg[, 'Exposure_Icon'] <- "Extreme Heat, Drought, Vector Borne Disease, Invas
     for(i in 1:nrow(df_bio)){
       df_bio$References[i]
       #replace each <p> to <p style=padding-left:15px;text-indent:-15px;>
-      temp_string <- df_bio$References[i]
-      temp_string1 <- stringr::str_replace_all(temp_string, "<p>", "<p style=padding-left:15px;text-indent:-15px;>")
-      df_bio$References[i] <- temp_string1
+      temp_string1 <- df_bio$References[i]
+      temp_string2 <- stringr::str_replace_all(temp_string1, "<p>", "<p style=padding-left:15px;text-indent:-15px;>")
+      df_bio$References[i] <- temp_string2
     }
 
 # add full SITENAME, SITEID ----

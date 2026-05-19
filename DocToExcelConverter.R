@@ -36,7 +36,7 @@ invisible(lapply(packages, library, character.only = TRUE))
     #input_umbrella <- "N:/RStor/CEMML/ClimateChange/2_NavyClimate/Round2_Extremes_INRMP_integ/MidLant Region/"
 
     #the specific folder inside the Document to HTML Table Converter where the input files are
-    input_specific_folder <- "Eielson AFB/TEVA/Word to HTML Conversion - Copy"
+    input_specific_folder <- "Eielson AFB/TEVA/Word to HTML Conversion"
   
   #the final file name will start with this and will get the date added
     subject <- "Wildlife"
@@ -111,7 +111,7 @@ parse_html_sections <- function(html_doc) {
   lapply(sections, `[[`, "content")
 }
 
-# ----- * #removing spaces after headings function -----
+# ----- * removing spaces after headings function -----
 #if sections[i] ends with " ", remove it
 remove_end_blanks <- function(result_list){
   
@@ -138,8 +138,31 @@ remove_end_blanks <- function(result_list){
   }
   return(result_list)
 }
+  
+  # ----- * remove '\r\n' from heading names -----
+  #if sections[i] includes '\r\n', remove it
+  clean_headings <- function(result_list){
+    
+    for(i in 1:length(result_list)){
+      templist <- result_list[[i]]
+      
+      for(heading in 1:length(templist)){
+        if(stringr::str_detect(names(templist)[heading], "\\r\\n")){
+          
+          #replace "\r\n" with nothing
+          headingWithProblem <- names(templist)[heading] #save heading to local object
+          
+          newHeading <- stringr::str_replace_all(headingWithProblem, "\\r\\n", " ")
+          
+          names(result_list[[i]])[heading] <- newHeading
+          print(names(result_list[[i]][heading]))
+        }else next
+      }
+    }
+    return(result_list)
+  }
 
-  # ----- *replace the last instance of a substring -----
+  # ----- * replace the last instance of a substring -----
   replace_all_except_last <- function(s, from, to) {
     # Find the last occurrence of `from`
     matches <- gregexpr(from, s, fixed = TRUE)[[1]]
@@ -171,8 +194,9 @@ for (file in docx_files) { #for each file, convert it to HTML, Identify its sect
   results[[basename(file)]] <- sections
 }
 
-#remove trailing spaces from headings
+#QAQC heading names for trailing spaces and line breaks
 results <- remove_end_blanks(results)
+results <- clean_headings(results)
 
 #unfold the results list to be able to create a dataframe
 all_headings <- unique(unlist(lapply(results, names)))

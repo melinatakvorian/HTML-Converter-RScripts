@@ -65,7 +65,7 @@ if(!length(openfiles)==0){
 }
 
 
-# ----- *Word->HTML function ----
+# ----- * Word->HTML function ----
 # takes Word document (input) and turns it into HTML file (output)
 convert_docx_to_html_full <- function(docx_file, filepath) {
   #html_file <- tempfile(fileext = ".html")
@@ -83,7 +83,7 @@ convert_docx_to_html_full <- function(docx_file, filepath) {
 }
 
 
-# ----- *HTML->pieces function ----
+# ----- * HTML->pieces function ----
 #reads HTML file (input) and separate sections for building table later
 parse_html_sections_hist <- function(html_doc, section_indices) {
   #identify all headings
@@ -151,7 +151,7 @@ parse_html_sections_disr <- function(html_doc, section_indices) {
   sections
   
 }
-# ----- *removing spaces after headings function -----
+# ----- * removing spaces after headings function -----
 #if sections[i] ends with " ", remove it
 remove_end_blanks <- function(result_list){
   
@@ -178,7 +178,7 @@ remove_end_blanks <- function(result_list){
   return(result_list)
 }
 
-# ----- *replace the last instance of a substring -----
+# ----- * replace the last instance of a substring -----
 replace_all_except_last <- function(s, from, to) {
   # Find the last occurrence of `from`
   matches <- gregexpr(from, s, fixed = TRUE)[[1]]
@@ -195,6 +195,29 @@ replace_all_except_last <- function(s, from, to) {
   
   # Replace all occurrences in the prefix, leave the tail unchanged
   paste0(gsub(from, to, before, fixed = TRUE), after)
+}
+
+# ----- * remove '\r\n' from heading names -----
+#if results[i] includes '\r\n', remove it
+remove_accidental_return <- function(result_list){
+  
+  for(i in 1:length(result_list)){
+    templist <- result_list[[i]]
+    
+    for(heading in 1:length(templist)){
+      if(stringr::str_detect(names(templist)[heading], "\\r\\n")){
+        
+        #replace "\r\n" with nothing
+        headingWithProblem <- names(templist)[heading] #save heading to local object
+        
+        newHeading <- stringr::str_replace_all(headingWithProblem, "\\r\\n", " ")
+        
+        names(result_list[[i]])[heading] <- newHeading
+        print(names(result_list[[i]][heading]))
+      }else next
+    }
+  }
+  return(result_list)
 }
 
 # RUN ----
@@ -239,6 +262,9 @@ for (file in docx_files) {
 #remove blank spaces after headings that could cause additional headers accidentally
 results_hist <- remove_end_blanks(results_hist)
 results_disr <- remove_end_blanks(results_disr)
+
+results_disr <- remove_accidental_return(results_disr)
+results_hist <- remove_accidental_return(results_hist)
 
 
 #unfold the results list to be able to create a dataframe

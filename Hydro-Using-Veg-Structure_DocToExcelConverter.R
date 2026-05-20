@@ -48,7 +48,7 @@ input_dir <-  paste0(input_umbrella, input_specific_folder) #Rename to your targ
 current_date <- format(Sys.Date(), "%Y%m%d")  # e.g., "2025-09-24"
 installation_info <- readxl::read_xlsx("N:/RStor/CEMML/ClimateChange/1_USAFClimate/1_USAF_Natural_Resources/20_2_0004_RevisitingPhase1/_AirForceClimateViewerDev/Document to HTML Table Converter/FilesForTesting/Installation_Info.xlsx")
 
-#ERROR CATCH 1 ----
+#ERROR CATCH 1: open file ----
 
 filenames <- list.files(input_dir) #create list of files in the folder
 openfiles <- list()
@@ -274,7 +274,7 @@ all_headings_disr <- append(all_headings_disr, unique(unlist(lapply(results_disr
 
 # Create dataframe and input HTML in proper sections ----
 
-##hist----
+##historic scenario ----
 df_hist <- data.frame(matrix(NA_character_, length(results_hist), length(all_headings_hist)),
                      stringsAsFactors = FALSE)
 colnames(df_hist) <- all_headings_hist
@@ -363,18 +363,6 @@ for(file in seq_along(results_disr)){
   }
 }
 
-##Delete empty columns ----
-test <- df_disr
-# empty_cols <- c()
-# 
-# for(i in 1:ncol(test)){
-#   if(all(is.na(test[[i]]))){
-#     empty_cols[length(empty_cols)+1] <- i
-#   }
-# }
-# 
-# df_disr <- df_disr[ , -empty_cols]
-
 #TRANSPOSE DATATABLES ----
 
 #create initial dataframe structure
@@ -400,46 +388,46 @@ test <- df_disr
     select(-c(all_of(near_term), all_of(far_term)))
   
   #create dataframe
-    frame <- matrix(nrow = 5, ncol = length(colnames))
-    frame <- as.data.frame(frame)
-    colnames(frame) <- colnames
-    frame$Scenario <- scenario
-    frame$Period <- period
+    all_scenarios_df <- matrix(nrow = 5, ncol = length(colnames))
+    all_scenarios_df <- as.data.frame(all_scenarios_df)
+    colnames(all_scenarios_df) <- colnames
+    all_scenarios_df$Scenario <- scenario
+    all_scenarios_df$Period <- period
   
-    frame2 <- frame
+    all_scenarios_df2 <- all_scenarios_df
   
   ###start transposing data starting AFTER historical row----
     inst_summ <- as.numeric(which(colnames(df_hist) == "Installation_Summary"))
     
     #Fill SITENAME, SITEID, Installation Summary
-    frame2$Installation_Summary <- df_hist[1,inst_summ]
-    frame2$SITENAME <- df_hist$SITENAME
-    frame2$SITEID <- df_hist$SITEID
+    all_scenarios_df2$Installation_Summary <- df_hist[1,inst_summ]
+    all_scenarios_df2$SITENAME <- df_hist$SITENAME
+    all_scenarios_df2$SITEID <- df_hist$SITEID
     
     #Fill row 1 with historical data
-    frame2$SPEI_Text[1] <- df_hist$`Period: Historical, SPEI_Text`[1]
-    frame2$References[1] <- df_hist$References[1]
+    all_scenarios_df2$SPEI_Text[1] <- df_hist$`Period: Historical, SPEI_Text`[1]
+    all_scenarios_df2$References[1] <- df_hist$References[1]
     
     
     # Fill rows 2,4 for NEAR TERM scenarios
-    frame2$SPEI_Text[[2]] <- df_near_term$`Period: Near Term, SPEI_Text`[1]
-    frame2$SPEI_Text[[4]] <- df_near_term$`Period: Near Term, SPEI_Text`[2]
+    all_scenarios_df2$SPEI_Text[[2]] <- df_near_term$`Period: Near Term, SPEI_Text`[1]
+    all_scenarios_df2$SPEI_Text[[4]] <- df_near_term$`Period: Near Term, SPEI_Text`[2]
 
     
     # Fill rows 3,5 for FAR TERM scenarios
-    frame2$SPEI_Text[[3]] <- df_far_term$`Period: Far Term, SPEI_Text`[1]
-    frame2$SPEI_Text[[5]] <- df_far_term$`Period: Far Term, SPEI_Text`[2]
+    all_scenarios_df2$SPEI_Text[[3]] <- df_far_term$`Period: Far Term, SPEI_Text`[1]
+    all_scenarios_df2$SPEI_Text[[5]] <- df_far_term$`Period: Far Term, SPEI_Text`[2]
 
     
     #Fill in the other rows based on disruption
-    frame2[c(4,5), 7:10] <- leftovers[2, 5:8] #high disruption
-    frame2[c(2,3), 7:10] <- leftovers[1, 5:8] #moderate disruption
+    all_scenarios_df2[c(4,5), 7:10] <- leftovers[2, 5:8] #high disruption
+    all_scenarios_df2[c(2,3), 7:10] <- leftovers[1, 5:8] #moderate disruption
     
 #add BLANK numeric columns----
   
-  cols <- as.numeric(ncol(frame2))+1
+  cols <- as.numeric(ncol(all_scenarios_df2))+1
   cols_w_nos <- cols + 7
-  frame2[,c(cols:cols_w_nos)] <- ""
+  all_scenarios_df2[,c(cols:cols_w_nos)] <- ""
   
   #numeric column names
   new_cols <- c("Minimum_SPEI", "Maximum_SPEI", 
@@ -447,28 +435,28 @@ test <- df_disr
                 "Dry_Change", "Wet_Change", "")
   
   #assign names
-  colnames(frame2)[cols:cols_w_nos] <- new_cols #this one errors, don't worry about it
+  colnames(all_scenarios_df2)[cols:cols_w_nos] <- new_cols #this one errors, don't worry about it
   
   #move columns to where Anthony wants them
-  frame2 <- frame2 %>% 
+  all_scenarios_df2 <- all_scenarios_df2 %>% 
     relocate(all_of(cols:cols_w_nos), .before = "Installation_Summary")
     
-  frame3 <- frame2
+  all_scenarios_df3 <- all_scenarios_df2
   
 #ADDING INDENTS AND LINE BREAKS----
   #add REFERENCES SECTION HANGING INDENT
-  for(i in 1:nrow(frame2)){
-    if(is.na(frame2$References[i])) next #skip NA rows
+  for(i in 1:nrow(all_scenarios_df3)){
+    if(is.na(all_scenarios_df3$References[i])) next #skip NA rows
     
-    frame2$References[i]
+    all_scenarios_df3$References[i]
     
     #replace each <p> to <p style=padding-left:15px;text-indent:-15px;>
-    temp_string <- frame2$References[i]
+    temp_string <- all_scenarios_df3$References[i]
     
     #temp_string1 <- stringr::str_replace_all(temp_string, "<p>", '<p style="padding-left:15px;text-indent:-15px;">')
     temp_string1 <- stringr::str_replace_all(temp_string, "<p>", '<p style=padding-left:15px;text-indent:-15px;>')
     temp_string2 <- replace_all_except_last(temp_string1, "</p>", "</p> <br>")
-    frame2$References[i] <- temp_string2
+    all_scenarios_df3$References[i] <- temp_string2
   }
   
   #these are the sections that need the edits
@@ -479,55 +467,55 @@ test <- df_disr
     #add blank line after each paragraph
     for(a in 1:length(numbblocks)){
       col_num <- numbblocks[[a]]
-      for(b in 1:nrow(frame2)){
-        if(is.na(frame2[[col_num]][b])) next
+      for(b in 1:nrow(all_scenarios_df3)){
+        if(is.na(all_scenarios_df3[[col_num]][b])) next
         
         #replace each </p> to </p> <br>
-        temp_string <- frame2[[col_num]][b]
+        temp_string <- all_scenarios_df3[[col_num]][b]
         temp_string1 <- replace_all_except_last(temp_string, "</p>", "</p> <br>")
-        frame2[[col_num]][b] <- temp_string1
+        all_scenarios_df3[[col_num]][b] <- temp_string1
       }
     }
   
     #add indent at the beginning of each non-bulleted paragraph
     for(a in 1:length(numbblocks)){
       col_num <- numbblocks[[a]]
-      for(b in 1:nrow(frame2)){
+      for(b in 1:nrow(all_scenarios_df3)){
         
-        if(is.na(frame2[[col_num]][b])) next
+        if(is.na(all_scenarios_df3[[col_num]][b])) next
         
         #replace each <p> to <p style=text-indent:-15px;>
-        temp_string <- frame2[[col_num]][b]
+        temp_string <- all_scenarios_df3[[col_num]][b]
         temp_string1 <- stringr::str_replace_all(temp_string, "<p>", '<p style=text-indent:15px;>')
-        frame2[[col_num]][b] <- temp_string1
+        all_scenarios_df3[[col_num]][b] <- temp_string1
       }
     }
   
     #add blank line after each bulleted paragraph
-    for(i in 1:nrow(frame2)){
-      if(is.na(frame2$Installation_Summary[i])) next
+    for(i in 1:nrow(all_scenarios_df3)){
+      if(is.na(all_scenarios_df3$Installation_Summary[i])) next
       
       #replace each </p></li> to </p></li><br>
-      temp_string <- frame2$Installation_Summary[i]
+      temp_string <- all_scenarios_df3$Installation_Summary[i]
       temp_string1 <- replace_all_except_last(temp_string, "</p></li>", "</p></li><br>")
-      frame2$Installation_Summary[i] <- temp_string1
+      all_scenarios_df3$Installation_Summary[i] <- temp_string1
     }
   
     #add blank line after the subheading in Installation Summary
-    for(i in 1:nrow(frame2)){
-      frame2$Installation_Summary[i]
+    for(i in 1:nrow(all_scenarios_df3)){
+      all_scenarios_df3$Installation_Summary[i]
       #replace each <p> <ul> to </p> <ul> <br>
-      temp_string <- frame2$Installation_Summary[i]
+      temp_string <- all_scenarios_df3$Installation_Summary[i]
       temp_string1 <- stringr::str_replace_all(temp_string, "</p> <ul>", "</p> <ul> <br>")
-      frame2$Installation_Summary[i] <- temp_string1
+      all_scenarios_df3$Installation_Summary[i] <- temp_string1
     }
   
   # add full SITENAME, SITEID ----
   key <- match(installation, installation_info$ShortName)
   
   if(!is.na(key)){
-    frame2[,"SITENAME"] <- installation_info$SITENAME[key]
-    frame2[,"SITEID"] <- installation_info$SITEID[key]
+    all_scenarios_df3[,"SITENAME"] <- installation_info$SITENAME[key]
+    all_scenarios_df3[,"SITEID"] <- installation_info$SITEID[key]
   }else(print("No match found in installation database"))
     
 # Export final files ----
@@ -536,7 +524,7 @@ if (!dir.exists(out_dir)) dir.create(out_dir, recursive = TRUE)
 
 #final file
 output_filename <- paste0(project_name, "_HTML_formatted_", current_date, ".xlsx")
-write_xlsx(frame2, file.path(out_dir, output_filename))
+write_xlsx(all_scenarios_df3, file.path(out_dir, output_filename))
 message("Conversion complete. XLSX saved to: ", file.path(out_dir, output_filename))
 
 # clean environment so that things can run properly for the next run  

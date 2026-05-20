@@ -274,7 +274,7 @@ all_headings_disr <- append(all_headings_disr, unique(unlist(lapply(results_disr
 
 # Create dataframe and input HTML in proper sections ----
 
-##historic scenario ----
+##organize historic scenario ----
 df_hist <- data.frame(matrix(NA_character_, length(results_hist), length(all_headings_hist)),
                      stringsAsFactors = FALSE)
 colnames(df_hist) <- all_headings_hist
@@ -288,7 +288,7 @@ for (i in seq_along(results_hist)) {
   }
 }
 
-##DISRUPTION SCENARIOS----
+##identify disruption scenarios----
 
 #find the indices within the list that are new occurrences of 'New_Scenario'
 num_files <- as.list(c(1:as.numeric(length(results_disr)))) #initialize list
@@ -443,74 +443,76 @@ for(file in seq_along(results_disr)){
     
   all_scenarios_df3 <- all_scenarios_df2
   
-#ADDING INDENTS AND LINE BREAKS----
-  #add REFERENCES SECTION HANGING INDENT
-  for(i in 1:nrow(all_scenarios_df3)){
-    if(is.na(all_scenarios_df3$References[i])) next #skip NA rows
-    
-    all_scenarios_df3$References[i]
-    
-    #replace each <p> to <p style=padding-left:15px;text-indent:-15px;>
-    temp_string <- all_scenarios_df3$References[i]
-    
-    #temp_string1 <- stringr::str_replace_all(temp_string, "<p>", '<p style="padding-left:15px;text-indent:-15px;">')
-    temp_string1 <- stringr::str_replace_all(temp_string, "<p>", '<p style=padding-left:15px;text-indent:-15px;>')
-    temp_string2 <- replace_all_except_last(temp_string1, "</p>", "</p> <br>")
-    all_scenarios_df3$References[i] <- temp_string2
-  }
-  
-  #these are the sections that need the edits
-  #"SPEI_Text", "Dry_Distribution_Text", "Wet_Distribution_Text", "Dry_Duration_Severity_Text", "Wet_Duration_Severity_Text"
-    
-  numbblocks <- c(5, 15:18) #corresponds to the columns with text that we need broken up
-  
-    #add blank line after each paragraph
-    for(a in 1:length(numbblocks)){
-      col_num <- numbblocks[[a]]
-      for(b in 1:nrow(all_scenarios_df3)){
-        if(is.na(all_scenarios_df3[[col_num]][b])) next
-        
-        #replace each </p> to </p> <br>
-        temp_string <- all_scenarios_df3[[col_num]][b]
-        temp_string1 <- replace_all_except_last(temp_string, "</p>", "</p> <br>")
-        all_scenarios_df3[[col_num]][b] <- temp_string1
-      }
-    }
-  
-    #add indent at the beginning of each non-bulleted paragraph
-    for(a in 1:length(numbblocks)){
-      col_num <- numbblocks[[a]]
-      for(b in 1:nrow(all_scenarios_df3)){
-        
-        if(is.na(all_scenarios_df3[[col_num]][b])) next
-        
-        #replace each <p> to <p style=text-indent:-15px;>
-        temp_string <- all_scenarios_df3[[col_num]][b]
-        temp_string1 <- stringr::str_replace_all(temp_string, "<p>", '<p style=text-indent:15px;>')
-        all_scenarios_df3[[col_num]][b] <- temp_string1
-      }
-    }
-  
-    #add blank line after each bulleted paragraph
+#Formatting indents and line breaks ----
+  ##add hanging indent to references section ----
     for(i in 1:nrow(all_scenarios_df3)){
-      if(is.na(all_scenarios_df3$Installation_Summary[i])) next
+      if(is.na(all_scenarios_df3$References[i])) next #skip NA rows
       
-      #replace each </p></li> to </p></li><br>
-      temp_string <- all_scenarios_df3$Installation_Summary[i]
-      temp_string1 <- replace_all_except_last(temp_string, "</p></li>", "</p></li><br>")
-      all_scenarios_df3$Installation_Summary[i] <- temp_string1
+      all_scenarios_df3$References[i]
+      
+      #replace each <p> to <p style=padding-left:15px;text-indent:-15px;>
+      temp_string <- all_scenarios_df3$References[i]
+      
+      #temp_string1 <- stringr::str_replace_all(temp_string, "<p>", '<p style="padding-left:15px;text-indent:-15px;">')
+      temp_string1 <- stringr::str_replace_all(temp_string, "<p>", '<p style=padding-left:15px;text-indent:-15px;>')
+      temp_string2 <- replace_all_except_last(temp_string1, "</p>", "</p> <br>")
+      all_scenarios_df3$References[i] <- temp_string2
     }
   
-    #add blank line after the subheading in Installation Summary
-    for(i in 1:nrow(all_scenarios_df3)){
-      all_scenarios_df3$Installation_Summary[i]
-      #replace each <p> <ul> to </p> <ul> <br>
-      temp_string <- all_scenarios_df3$Installation_Summary[i]
-      temp_string1 <- stringr::str_replace_all(temp_string, "</p> <ul>", "</p> <ul> <br>")
-      all_scenarios_df3$Installation_Summary[i] <- temp_string1
-    }
+  ##add line breaks to '_Text' columns ----
   
-  # add full SITENAME, SITEID ----
+    #these are the sections that need the line breaks after each paragraph:
+      #"SPEI_Text", "Dry_Distribution_Text", "Wet_Distribution_Text", 
+      #"Dry_Duration_Severity_Text", "Wet_Duration_Severity_Text"
+    
+    numbblocks <- c(5, 15:18) #corresponds to the columns with text that we need broken up
+
+      for(a in 1:length(numbblocks)){
+        col_num <- numbblocks[[a]]
+        for(b in 1:nrow(all_scenarios_df3)){
+          if(is.na(all_scenarios_df3[[col_num]][b])) next
+          
+          #replace each </p> to </p> <br>
+          temp_string <- all_scenarios_df3[[col_num]][b]
+          temp_string1 <- replace_all_except_last(temp_string, "</p>", "</p> <br>")
+          all_scenarios_df3[[col_num]][b] <- temp_string1
+        }
+      }
+  
+    ##add indent at the beginning of each non-bulleted paragraph ----
+      for(a in 1:length(numbblocks)){
+        col_num <- numbblocks[[a]]
+        for(b in 1:nrow(all_scenarios_df3)){
+          
+          if(is.na(all_scenarios_df3[[col_num]][b])) next
+          
+          #replace each <p> to <p style=text-indent:-15px;>
+          temp_string <- all_scenarios_df3[[col_num]][b]
+          temp_string1 <- stringr::str_replace_all(temp_string, "<p>", '<p style=text-indent:15px;>')
+          all_scenarios_df3[[col_num]][b] <- temp_string1
+        }
+      }
+    
+    ##add blank line after each bulleted paragraph ----
+      for(i in 1:nrow(all_scenarios_df3)){
+        if(is.na(all_scenarios_df3$Installation_Summary[i])) next
+        
+        #replace each </p></li> to </p></li><br>
+        temp_string <- all_scenarios_df3$Installation_Summary[i]
+        temp_string1 <- replace_all_except_last(temp_string, "</p></li>", "</p></li><br>")
+        all_scenarios_df3$Installation_Summary[i] <- temp_string1
+      }
+  
+    ##add blank line after the subheading in Installation Summary ----
+      for(i in 1:nrow(all_scenarios_df3)){
+        all_scenarios_df3$Installation_Summary[i]
+        #replace each <p> <ul> to </p> <ul> <br>
+        temp_string <- all_scenarios_df3$Installation_Summary[i]
+        temp_string1 <- stringr::str_replace_all(temp_string, "</p> <ul>", "</p> <ul> <br>")
+        all_scenarios_df3$Installation_Summary[i] <- temp_string1
+      }
+  
+# add full SITENAME, SITEID ----
   key <- match(installation, installation_info$ShortName)
   
   if(!is.na(key)){
@@ -519,13 +521,13 @@ for(file in seq_along(results_disr)){
   }else(print("No match found in installation database"))
     
 # Export final files ----
-out_dir <- input_dir
-if (!dir.exists(out_dir)) dir.create(out_dir, recursive = TRUE)
-
-#final file
-output_filename <- paste0(project_name, "_HTML_formatted_", current_date, ".xlsx")
-write_xlsx(all_scenarios_df3, file.path(out_dir, output_filename))
-message("Conversion complete. XLSX saved to: ", file.path(out_dir, output_filename))
+  out_dir <- input_dir
+  if (!dir.exists(out_dir)) dir.create(out_dir, recursive = TRUE)
+  
+  #final file
+  output_filename <- paste0(project_name, "_HTML_formatted_", current_date, ".xlsx")
+  write_xlsx(all_scenarios_df3, file.path(out_dir, output_filename))
+  message("Conversion complete. XLSX saved to: ", file.path(out_dir, output_filename))
 
 # clean environment so that things can run properly for the next run  
 #rm(list = ls()) 

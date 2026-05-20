@@ -50,7 +50,7 @@
   installation_info <- readxl::read_xlsx("N:/RStor/CEMML/ClimateChange/1_USAFClimate/1_USAF_Natural_Resources/20_2_0004_RevisitingPhase1/_AirForceClimateViewerDev/Document to HTML Table Converter/FilesForTesting/Installation_Info.xlsx")
   
 
-#ERROR CATCH 1 ----
+#ERROR CATCH: open files ----
 
   filenames <- list.files(input_dir) #create list of files in the folder
   openfiles <- list()
@@ -67,7 +67,7 @@
   }
 
 
-# ----- *Word->HTML function ----
+# ----- * Word->HTML function ----
 # takes Word document (input) and turns it into HTML file (output)
   convert_docx_to_html_full <- function(docx_file, filepath) {
     #html_file <- tempfile(fileext = ".html")
@@ -85,7 +85,7 @@
   }
 
 
-# ----- *HTML->pieces function ----
+# ----- * HTML->pieces function ----
 #reads HTML file (input) and separate sections for building table later
   parse_html_sections_bio <- function(html_doc, section_indices) {
     #identify all headings
@@ -153,7 +153,7 @@
     sections 
     
   }
-# ----- *removing spaces after headings function -----
+# ----- * removing spaces after headings function -----
 #if sections[i] ends with " ", remove it
   remove_end_blanks <- function(result_list){
   
@@ -173,6 +173,29 @@
           #print(headingNoSpace)
   
           names(result_list[[i]])[heading] <- headingNoSpace
+          print(names(result_list[[i]][heading]))
+        }else next
+      }
+    }
+    return(result_list)
+  }
+
+# ----- * remove '\r\n' from heading names -----
+  #if results[i] includes '\r\n', remove it
+  remove_accidental_return <- function(result_list){
+    
+    for(i in 1:length(result_list)){
+      templist <- result_list[[i]]
+      
+      for(heading in 1:length(templist)){
+        if(stringr::str_detect(names(templist)[heading], "\\r\\n")){
+          
+          #replace "\r\n" with nothing
+          headingWithProblem <- names(templist)[heading] #save heading to local object
+          
+          newHeading <- stringr::str_replace_all(headingWithProblem, "\\r\\n", " ")
+          
+          names(result_list[[i]])[heading] <- newHeading
           print(names(result_list[[i]][heading]))
         }else next
       }
@@ -223,6 +246,7 @@
 #remove blank spaces after headings that could cause additional headers accidentally
   results_bio <- remove_end_blanks(results_bio)
   results_veg <- remove_end_blanks(results_veg)
+  results_veg <- remove_accidental_return(results_veg)
 
 
 #unfold the results list to be able to create a dataframe
@@ -329,6 +353,8 @@
     for(i in 1:ncol(test)){
       if(all(is.na(test[[i]]))){
         empty_cols[length(empty_cols)+1] <- i
+      }else if(all(test[[i]] == "")){
+        empty_cols[length(empty_cols)+1] <- i
       }
     }
       
@@ -338,7 +364,7 @@
 df_veg[, 'Exposure_Icon'] <- "Extreme Heat, Drought, Vector Borne Disease, Invasive Species, Seasonal Timing, Fire/Flooding"
 
   ##references hanging indent ----
-    #add REFERENCES SECTION HANGING INDENT <p style=???padding-left:15px;text-indent:-15px;???> 
+    #add REFERENCES SECTION HANGING INDENT <p style=padding-left:15px;text-indent:-15px;> 
     for(i in 1:nrow(df_bio)){
       df_bio$References[i]
       #replace each <p> to <p style=padding-left:15px;text-indent:-15px;>

@@ -35,11 +35,11 @@ invisible(lapply(packages, library, character.only = TRUE))
   input_umbrella <- "N:/RStor/CEMML/ClimateChange/2_NavyClimate/Round2_Extremes_INRMP_integ/"
   
   #the specific folder inside the Document to HTML Table Converter where the input files are
-  input_specific_folder <- "MidLant Region/WPNSTA Yorktown/Hydrology/HTML converter" 
+  input_specific_folder <- "Southeast Region/NSA Panama City/Hydrology/Word to HTML" 
   
   #the final file name will start with this and will get the date added
   subject <- "Hydro"
-  installation <- "Yorktown"
+  installation <- "Panama City"
   project_name <- paste0(subject, "_", installation) #Replace with whatever you want.
 
 #####NO MORE CHANGES --- -- -- -- --- - - -- -- - -  - - - - -  --- - - - - - - --- --- --- -- ---
@@ -244,8 +244,8 @@ for (file in docx_files) {
   last <- as.numeric(length(nlist))
   
   # Define indices for histclimatic and disruptions sections
-  hist_indices <- c(1:6, last) # histclimatic sections
-  disr_indices <- c(1:2, 7:(last-1)) # disruptions sections
+    hist_indices <- c(1:6, last) # histclimatic sections
+    disr_indices <- c(1:2, 7:(last-1)) # disruptions sections
   
   
   #Create hist table list
@@ -518,7 +518,7 @@ for(file in seq_along(results_disr)){
   if(!is.na(key)){
     all_scenarios_df3[,"SITENAME"] <- installation_info$SITENAME[key]
     all_scenarios_df3[,"SITEID"] <- installation_info$SITEID[key]
-  }else(print("No match found in installation database"))
+  }else(print("No match found in installation database")) #update to specify whether SITENAME or SITEID is missing
     
 # Export final files ----
   out_dir <- input_dir

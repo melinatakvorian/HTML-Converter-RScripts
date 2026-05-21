@@ -162,6 +162,7 @@ remove_end_blanks <- function(result_list){
     return(result_list)
   }
 
+  #testing FIXED MEGA DISASTER PROBLEM
   # ----- * replace the last instance of a substring -----
   replace_all_except_last <- function(s, from, to) {
     # Find the last occurrence of `from`

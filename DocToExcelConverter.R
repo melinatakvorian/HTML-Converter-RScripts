@@ -36,7 +36,7 @@ invisible(lapply(packages, library, character.only = TRUE))
     #input_umbrella <- "N:/RStor/CEMML/ClimateChange/2_NavyClimate/Round2_Extremes_INRMP_integ/MidLant Region/"
 
     #the specific folder inside the Document to HTML Table Converter where the input files are
-    input_installation_folder <- "Kokee AFS" #corresponds to shortName on the installation_info.xlsx
+    input_installation_folder <- "BMGR E_W" #corresponds to FolderName on the installation_info.xlsx
     input_SME_folder <- "/Climate/Word to HTML Conversion"
   
   #the final file name will start with this and will get the date added
@@ -217,49 +217,87 @@ all_headings <- unique(unlist(lapply(results, names)))
   }
   
 # add full SITENAME, SITEID ----
-  key <- match(input_installation_folder, installation_info$FolderName)
+ ##identify what the SITENAME, SITEID situation is ----
+  installation_names <- installation_info$FolderName
+  matched_sitenames <- installation_info$SITENAME[installation_names == input_installation_folder]
+  unique_sitenames <- unique(df$SITENAME)
   
-  if(!is.na(key)){
-    df[,"SITENAME"] <- installation_info$SITENAME[key]
-    df[,"SITEID"] <- installation_info$SITEID[key]
-  }else(print("No match found in installation database"))
-
+  if(length(matched_sitenames)>1){
+    cat("There are multiple zones being analyzed within this run.\nThese are all the zones used across documents in the input directory: \n")
+    print(unique_sitenames)
+    cat("\nThis is what the correct SITENAMES are, according to installation_info:\n")
+    print(matched_sitenames)
+  }else if(length(matched_sitenames) == 1){
+    print("there is one match for SITENAME. This will be used to assign SITENAME and SITEID:")
+    unique_sitenames
+  }else{
+      print("An unknown error has occured. The SITENAME matches are:")
+      unique_sitenames}
   
-
-##references hanging indent ----
-#add REFERENCES SECTION HANGING INDENT <p style=padding-left:15px;text-indent:-15px;> 
-for(i in 1:nrow(df)){
-  df$References[i]
-  #replace each <p> to <p style=padding-left:15px;text-indent:-15px;>
-  temp_string <- df$References[i]
-  temp_string1 <- stringr::str_replace_all(temp_string, "<p>", '<p style=padding-left:15px;text-indent:-15px;>')
-  #temp_string2 <- replace_all_except_last(temp_string1, "</p>", "</p> <br>")
-  df$References[i] <- temp_string1 #change to temp_string2 if you are adding the line breaks
-}
+  ##now correct STIENAME and SITEID as needed ----
+  installation_key <- installation_info %>% 
+    filter(FolderName == input_installation_folder)
   
-##line breaks [manually input columns] ----
-numbblocks <- c(3:20) # Change to the columns that need line breaks between paragraphs
-    #add blank line after each paragraph
-    for(a in 1:length(numbblocks)){
-      col_num <- numbblocks[[a]]
-      for(b in 1:nrow(df)){
-        if(is.na(df[[col_num]][b])) next
-
-        #replace each </p> to </p> <br>
-        temp_string <- df[[col_num]][b]
-        temp_string1 <- replace_all_except_last(temp_string, "</p>", "</p> <br>")
-        df[[col_num]][b] <- temp_string1
+    #the format for this is:
+    #SITENAME == "what is currently the sitename" ~ "what the sitename should be"
+      df2 <- df %>% mutate(SITENAME = case_when(
+          SITENAME == unique_sitenames[1] ~ installation_key$SITENAME[3],
+          SITENAME == unique_sitenames[2] ~ installation_key$SITENAME[1],
+          SITENAME == unique_sitenames[3] ~ installation_key$SITENAME[1],
+          SITENAME == unique_sitenames[4] ~ installation_key$SITENAME[2],
+          SITENAME == unique_sitenames[5] ~ installation_key$SITENAME[2]
+            )
+          )
+      
+    #the format for this is:
+    #SITEID == "what is currently the siteid" ~ "what the siteid should be"
+      matched_siteids <- installation_info$SITEID[installation_names == input_installation_folder]
+      unique_siteids <- unique(df$SITEID)
+    
+      df2 <- df %>% mutate(SITEID = case_when(
+        SITEID == unique_siteids[1] ~ installation_key$SITEID[3],
+        SITEID == unique_siteids[3] ~ installation_key$SITEID[1],
+        SITEID == unique_siteids[4] ~ installation_key$SITEID[1],
+        SITEID == unique_siteids[2] ~ installation_key$SITEID[2],
+        SITEID == unique_siteids[2] ~ installation_key$SITEID[2]
+      )
+      )
+  
+#Formatting things ----  
+  ##references hanging indent ----
+  #add REFERENCES SECTION HANGING INDENT <p style=padding-left:15px;text-indent:-15px;> 
+  for(i in 1:nrow(df2)){
+    df2$References[i]
+    #replace each <p> to <p style=padding-left:15px;text-indent:-15px;>
+    temp_string <- df2$References[i]
+    temp_string1 <- stringr::str_replace_all(temp_string, "<p>", '<p style=padding-left:15px;text-indent:-15px;>')
+    #temp_string2 <- replace_all_except_last(temp_string1, "</p>", "</p> <br>")
+    df2$References[i] <- temp_string1 #change to temp_string2 if you are adding the line breaks
+  }
+    
+  ##line breaks [manually input columns] ----
+  numbblocks <- c(3:20) # Change to the columns that need line breaks between paragraphs
+      #add blank line after each paragraph
+      for(a in 1:length(numbblocks)){
+        col_num <- numbblocks[[a]]
+        for(b in 1:nrow(df2)){
+          if(is.na(df2[[col_num]][b])) next
+  
+          #replace each </p> to </p> <br>
+          temp_string <- df2[[col_num]][b]
+          temp_string1 <- replace_all_except_last(temp_string, "</p>", "</p> <br>")
+          df2[[col_num]][b] <- temp_string1
+        }
       }
-    }
- 
-  #for Hydro Qualitative conversion 
-  # for(i in 1:nrow(df)){
-  #   df$Installation_Summary[i]
-  #   temp_string <- df$Installation_Summary[i]
-  #   temp_string1 <- stringr::str_replace_all(temp_string, "</p> <ul>", "</p> <ul> <br>")
-  #   temp_string2 <- replace_all_except_last(temp_string1, "</p>", "</p> <br>")
-  #   df$Installation_Summary[i] <- temp_string2 #change to temp_string2 if you are adding the line breaks
-  # }
+   
+    #for Hydro Qualitative conversion 
+    # for(i in 1:nrow(df2)){
+    #   df2$Installation_Summary[i]
+    #   temp_string <- df2$Installation_Summary[i]
+    #   temp_string1 <- stringr::str_replace_all(temp_string, "</p> <ul>", "</p> <ul> <br>")
+    #   temp_string2 <- replace_all_except_last(temp_string1, "</p>", "</p> <br>")
+    #   df2$Installation_Summary[i] <- temp_string2 #change to temp_string2 if you are adding the line breaks
+    # }
 
 # Export final files ----
   ##export excel to 3ViewerPackages folder ----
@@ -270,7 +308,7 @@ numbblocks <- c(3:20) # Change to the columns that need line breaks between para
     if (!dir.exists(out_dir)) dir.create(out_dir, recursive = TRUE)
     
     output_filename <- paste0(project_name, "_HTML_formatted_", current_date, ".xlsx")
-    write_xlsx(df, file.path(out_dir, output_filename)) #create file and save to 3ViewerPackages folder
+    write_xlsx(df2, file.path(out_dir, output_filename)) #create file and save to 3ViewerPackages folder
     message("Conversion complete. XLSX saved to: ", file.path(out_dir, output_filename))
 
   ##create shortcut to Word to HTML folder ----

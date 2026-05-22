@@ -34,18 +34,18 @@
     
     #NAVY
     #input_umbrella <- "N:/RStor/CEMML/ClimateChange/2_NavyClimate/Round2_Extremes_INRMP_integ/MidLant Region/"
-
+    
     #the specific folder inside the Document to HTML Table Converter where the input files are
-      input_specific_folder <- "Beale AFB/TerrestrialVegetation/Word to HTML conversion" 
-      
-  #the final file name will start with this and will get the date added
-      subject <- "Veg"
-      installation <- "Beale" #this should match the ShortName in the installation_info document
-      project_name <- paste0(subject, "_", installation)
+    input_installation_folder <- "Beale AFB" #corresponds to shortName on the installation_info.xlsx
+    input_SME_folder <- "/TerrestrialVegetation/Word to HTML Conversion"
+    
+    #the final file name will start with this and will get the date added
+    subject <- "Veg"
+    project_name <- paste0(subject, "_", input_installation_folder) 
     
 #####NO MORE CHANGES --- -- -- -- --- - - -- -- - -  - - - - -  --- - - - - - - --- --- --- -- ---
 
-  input_dir <-  paste0(input_umbrella, input_specific_folder) 
+  input_dir <-  paste0(input_umbrella, input_installation_folder, input_SME_folder) 
   current_date <- format(Sys.Date(), "%Y%m%d")  # e.g., "2025-09-24"
   installation_info <- readxl::read_xlsx("N:/RStor/CEMML/ClimateChange/1_USAFClimate/1_USAF_Natural_Resources/20_2_0004_RevisitingPhase1/_AirForceClimateViewerDev/Document to HTML Table Converter/FilesForTesting/Installation_Info.xlsx")
   
@@ -374,7 +374,7 @@ df_veg[, 'Exposure_Icon'] <- "Extreme Heat, Drought, Vector Borne Disease, Invas
     }
 
 # add full SITENAME, SITEID ----
-  key <- match(installation, installation_info$ShortName)
+  key <- match(input_installation_folder, installation_info$FolderName)
   
   if(!is.na(key)){
     df_bio[,"SITENAME"] <- installation_info$SITENAME[key]
@@ -385,18 +385,47 @@ df_veg[, 'Exposure_Icon'] <- "Extreme Heat, Drought, Vector Borne Disease, Invas
   }else(print("No match found in installation database"))
 
 # Export final files ----
-  out_dir <- input_dir
-  if (!dir.exists(out_dir)) dir.create(out_dir, recursive = TRUE)
+  ##export excel to 3ViewerPackages folder ----
+    out_dir <- paste0(input_umbrella, input_installation_folder, "/3ViewerPackages/HTML_excels") 
+    # ******** NOTE THAT THE FOLDER STRUCTURE MUST MATCH WHAT IS ABOVE ^^^ EXACTLY.  **********
+    # CHANGE out_dir AS NEEDED IF THERE ARE ANY DIFFERENCES IN THE LOCATION YOU WANT TO SAVE TO.
+    
+    if (!dir.exists(out_dir)) dir.create(out_dir, recursive = TRUE)
   
-  #bioclimatics file
-  output_filename <- paste0(project_name, "_Bioclimatics_HTML_formatted_", current_date, ".xlsx")
-  write_xlsx(df_bio, file.path(out_dir, output_filename))
-  message("Conversion complete. XLSX saved to: ", file.path(out_dir, output_filename))
-  
-  #vegetation group file
-  output_filename <- paste0(project_name, "_Vegetation_HTML_formatted", current_date, ".xlsx")
-  write_xlsx(df_veg, file.path(out_dir, output_filename))
-  message("Conversion complete. XLSX saved to: ", file.path(out_dir, output_filename))
+    #bioclimatics file
+    output_filename_bio <- paste0(project_name, "_Bioclimatics_HTML_formatted_", current_date, ".xlsx")
+    write_xlsx(df_bio, file.path(out_dir, output_filename_bio)) #create file and save to 3ViewerPackages folder
+    message("Conversion complete. XLSX saved to: ", file.path(out_dir, output_filename_bio))
+    
+    #vegetation group file
+    output_filename_veg <- paste0(project_name, "_Vegetation_HTML_formatted", current_date, ".xlsx")
+    write_xlsx(df_veg, file.path(out_dir, output_filename_veg)) #create file and save to 3ViewerPackages folder
+    message("Conversion complete. XLSX saved to: ", file.path(out_dir, output_filename_veg))
+    
+  ##create shortcut to Word to HTML folder ----
+    #bioclimatics shortcut
+    out_full_path_bio <- file.path(out_dir, output_filename_bio) #save the path to the excel in 3ViewerPackages
+    output_filelink_bio <- paste0(project_name, "_Bioclimatics_HTML_formatted_", current_date, ".lnk") #create shortcut name
+    shortcut_location_bio <- file.path(input_dir, output_filelink_bio) #save the path to the future shortcut
+    
+    shell(paste0( #create shortcut to Word to HTML Conversion folder (this uses the Windows power shell)
+      'powershell -ExecutionPolicy Bypass -Command "$ws = New-Object -ComObject WScript.Shell; ',
+      '$s = $ws.CreateShortcut(\'', shortcut_location_bio, '\'); ',
+      '$s.TargetPath = \'', out_full_path_bio, '\'; ',
+      '$s.Save()"'
+    )) 
+    
+    #vegetation shortcut
+    out_full_path_veg <- file.path(out_dir, output_filename_veg) #save the path to the excel in 3ViewerPackages
+    output_filelink_veg <- paste0(project_name, "_Vegetation_HTML_formatted_", current_date, ".lnk") #create shortcut name
+    shortcut_location_veg <- file.path(input_dir, output_filelink_veg) #save the path to the future shortcut
+    
+    shell(paste0( #create shortcut to Word to HTML Conversion folder (this uses the Windows power shell)
+      'powershell -ExecutionPolicy Bypass -Command "$ws = New-Object -ComObject WScript.Shell; ',
+      '$s = $ws.CreateShortcut(\'', shortcut_location_veg, '\'); ',
+      '$s.TargetPath = \'', out_full_path_veg, '\'; ',
+      '$s.Save()"'
+    )) 
 
 # clean environment so that things can run properly for the next run  
 #rm(list = ls()) 

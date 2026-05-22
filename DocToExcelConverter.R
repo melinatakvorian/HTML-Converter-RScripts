@@ -41,8 +41,7 @@ invisible(lapply(packages, library, character.only = TRUE))
   
   #the final file name will start with this and will get the date added
     subject <- "Weather"
-    #installation <- "Kokee" 
-    project_name <- paste0(subject, "_", input_installation_folder) #Replace with whatever you want.
+    project_name <- paste0(subject, "_", input_installation_folder) 
 
 #####NO MORE CHANGES --- -- -- -- --- - - -- -- - -  - - - - -  --- - - - - - - --- --- --- -- ---
 

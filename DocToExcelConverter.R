@@ -263,7 +263,7 @@ numbblocks <- c(3:20) # Change to the columns that need line breaks between para
 
 # Export final files ----
   ##export excel to 3ViewerPackages folder ----
-    out_dir <- paste0(input_umbrella, input_installation_folder, "/3Viewer Packages/HTML excels") 
+    out_dir <- paste0(input_umbrella, input_installation_folder, "/3ViewerPackages/HTML excels") 
     # ******** NOTE THAT THE FOLDER STRUCTURE MUST MATCH WHAT IS ABOVE ^^^ EXACTLY.  **********
     # CHANGE out_dir AS NEEDED IF THERE ARE ANY DIFFERENCES IN THE LOCATION YOU WANT TO SAVE TO.
     

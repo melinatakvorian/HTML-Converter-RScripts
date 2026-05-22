@@ -36,11 +36,11 @@ invisible(lapply(packages, library, character.only = TRUE))
     #input_umbrella <- "N:/RStor/CEMML/ClimateChange/2_NavyClimate/Round2_Extremes_INRMP_integ/MidLant Region/"
 
     #the specific folder inside the Document to HTML Table Converter where the input files are
-    input_installation_folder <- "Kokee AFS" #corresponds to shortName on the installation_info.xlsx
-    input_SME_folder <- "/Climate/Word to HTML Conversion"
+    input_installation_folder <- "King Salmon Airport" #corresponds to shortName on the installation_info.xlsx
+    input_SME_folder <- "/Vegetation_Habitats/Word to HTML Conversion"
   
   #the final file name will start with this and will get the date added
-    subject <- "Weather"
+    subject <- "Vegetation_Habitats"
     project_name <- paste0(subject, "_", input_installation_folder) 
 
 #####NO MORE CHANGES --- -- -- -- --- - - -- -- - -  - - - - -  --- - - - - - - --- --- --- -- ---
@@ -263,7 +263,7 @@ numbblocks <- c(3:20) # Change to the columns that need line breaks between para
 
 # Export final files ----
   ##export excel to 3ViewerPackages folder ----
-    out_dir <- paste0(input_umbrella, input_installation_folder, "/3ViewerPackages/HTML excels") 
+    out_dir <- paste0(input_umbrella, input_installation_folder, "/3Viewer Packages/HTML excels") 
     # ******** NOTE THAT THE FOLDER STRUCTURE MUST MATCH WHAT IS ABOVE ^^^ EXACTLY.  **********
     # CHANGE out_dir AS NEEDED IF THERE ARE ANY DIFFERENCES IN THE LOCATION YOU WANT TO SAVE TO.
     

@@ -36,16 +36,17 @@ invisible(lapply(packages, library, character.only = TRUE))
     #input_umbrella <- "N:/RStor/CEMML/ClimateChange/2_NavyClimate/Round2_Extremes_INRMP_integ/MidLant Region/"
 
     #the specific folder inside the Document to HTML Table Converter where the input files are
-    input_specific_folder <- "Kokee AFS/Climate/Word to HTML Conversion"
+    input_installation_folder <- "Kokee AFS" #corresponds to shortName on the installation_info.xlsx
+    input_SME_folder <- "/Climate/Word to HTML Conversion"
   
   #the final file name will start with this and will get the date added
     subject <- "Weather"
-    installation <- "Kokee" #corresponds to shortName on the installation_info.xlsx
-    project_name <- paste0(subject, "_", installation) #Replace with whatever you want.
+    #installation <- "Kokee" 
+    project_name <- paste0(subject, "_", input_installation_folder) #Replace with whatever you want.
 
 #####NO MORE CHANGES --- -- -- -- --- - - -- -- - -  - - - - -  --- - - - - - - --- --- --- -- ---
 
-  input_dir <-  paste0(input_umbrella, input_specific_folder) #Outputs will appear here as well.
+  input_dir <-  paste0(input_umbrella, input_installation_folder, input_SME_folder)
   current_date <- format(Sys.Date(), "%Y%m%d")  # e.g., "2025-09-24"
   installation_info <- readxl::read_xlsx("N:/RStor/CEMML/ClimateChange/1_USAFClimate/1_USAF_Natural_Resources/20_2_0004_RevisitingPhase1/_AirForceClimateViewerDev/Document to HTML Table Converter/FilesForTesting/Installation_Info.xlsx")
 
@@ -217,7 +218,7 @@ all_headings <- unique(unlist(lapply(results, names)))
   }
   
 # add full SITENAME, SITEID ----
-  key <- match(installation, installation_info$ShortName)
+  key <- match(input_installation_folder, installation_info$FolderName)
   
   if(!is.na(key)){
     df[,"SITENAME"] <- installation_info$SITENAME[key]
@@ -262,12 +263,29 @@ numbblocks <- c(3:20) # Change to the columns that need line breaks between para
   # }
 
 # Export final files ----
-out_dir <- input_dir
-if (!dir.exists(out_dir)) dir.create(out_dir, recursive = TRUE)
+  ##export excel to 3ViewerPackages folder ----
+    out_dir <- paste0(input_umbrella, input_installation_folder, "/3ViewerPackages/HTML excels") 
+    # ******** NOTE THAT THE FOLDER STRUCTURE MUST MATCH WHAT IS ABOVE ^^^ EXACTLY.  **********
+    # CHANGE out_dir AS NEEDED IF THERE ARE ANY DIFFERENCES IN THE LOCATION YOU WANT TO SAVE TO.
+    
+    if (!dir.exists(out_dir)) dir.create(out_dir, recursive = TRUE)
+    
+    output_filename <- paste0(project_name, "_HTML_formatted_", current_date, ".xlsx")
+    write_xlsx(df, file.path(out_dir, output_filename)) #create file and save to 3ViewerPackages folder
+    message("Conversion complete. XLSX saved to: ", file.path(out_dir, output_filename))
 
-output_filename <- paste0(project_name, "_HTML_formatted_", current_date, ".xlsx")
-write_xlsx(df, file.path(out_dir, output_filename))
-message("Conversion complete. XLSX saved to: ", file.path(out_dir, output_filename))
+  ##create shortcut to Word to HTML folder ----
+    out_full_path <- file.path(out_dir, output_filename) #save the path to the excel in 3ViewerPackages
+    output_filelink <- paste0(project_name, "_HTML_formatted_", current_date, ".lnk") #create shortcut name
+    shortcut_location <- file.path(input_dir, output_filelink) #save the path to the future shortcut
+  
+    shell(paste0( #create shortcut to Word to HTML Conversion folder (this uses the Windows power shell)
+      'powershell -ExecutionPolicy Bypass -Command "$ws = New-Object -ComObject WScript.Shell; ',
+      '$s = $ws.CreateShortcut(\'', shortcut_location, '\'); ',
+      '$s.TargetPath = \'', out_full_path, '\'; ',
+      '$s.Save()"'
+    )) 
+
 
 # clean environment, so that things can run properly for the next run  
   #rm(list = ls()) 

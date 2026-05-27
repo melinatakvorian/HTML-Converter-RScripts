@@ -30,17 +30,17 @@ invisible(lapply(packages, library, character.only = TRUE))
   #PAY ATTENTION TO THE DIRECTION OF THE SLASHES. THEY HAVE TO BE CHANGED TO FORWARD SLASHES, AS SHOWN BELOW
     #the broad folder structure
     #AIR FORCE  
-    input_umbrella <- "N:/RStor/CEMML/ClimateChange/1_USAFClimate/1_USAF_Natural_Resources/20_2_0004_RevisitingPhase1/" 
+    #input_umbrella <- "N:/RStor/CEMML/ClimateChange/1_USAFClimate/1_USAF_Natural_Resources/20_2_0004_RevisitingPhase1/" 
     
     #NAVY
-    #input_umbrella <- "N:/RStor/CEMML/ClimateChange/2_NavyClimate/Round2_Extremes_INRMP_integ/MidLant Region/"
+    input_umbrella <- "N:/RStor/CEMML/ClimateChange/2_NavyClimate/Round2_Extremes_INRMP_integ/MidLant Region/"
 
     #the specific folder inside the Document to HTML Table Converter where the input files are
-    input_installation_folder <- "King Salmon Airport" #corresponds to shortName on the installation_info.xlsx
-    input_SME_folder <- "/Vegetation_Habitats/Word to HTML Conversion"
+    input_installation_folder <- "WPNSTA Yorktown" #corresponds to shortName on the installation_info.xlsx
+    input_SME_folder <- "/SLR"
   
   #the final file name will start with this and will get the date added
-    subject <- "Vegetation_Habitats"
+    subject <- "SLR"
     project_name <- paste0(subject, "_", input_installation_folder) 
 
 #####NO MORE CHANGES --- -- -- -- --- - - -- -- - -  - - - - -  --- - - - - - - --- --- --- -- ---
@@ -162,7 +162,7 @@ remove_end_blanks <- function(result_list){
     return(result_list)
   }
 
-  #testing FIXED MEGA DISASTER PROBLEM
+
   # ----- * replace the last instance of a substring -----
   replace_all_except_last <- function(s, from, to) {
     # Find the last occurrence of `from`
@@ -263,7 +263,7 @@ numbblocks <- c(3:20) # Change to the columns that need line breaks between para
 
 # Export final files ----
   ##export excel to 3ViewerPackages folder ----
-    out_dir <- paste0(input_umbrella, input_installation_folder, "/3ViewerPackages/HTML excels") 
+    out_dir <- paste0(input_umbrella, input_installation_folder, "/3ViewerPackages/HTML_excels") 
     # ******** NOTE THAT THE FOLDER STRUCTURE MUST MATCH WHAT IS ABOVE ^^^ EXACTLY.  **********
     # CHANGE out_dir AS NEEDED IF THERE ARE ANY DIFFERENCES IN THE LOCATION YOU WANT TO SAVE TO.
     

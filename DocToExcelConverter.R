@@ -37,10 +37,10 @@ invisible(lapply(packages, library, character.only = TRUE))
 
     #the specific folder inside the Document to HTML Table Converter where the input files are
     input_installation_folder <- "WPNSTA Yorktown" #corresponds to shortName on the installation_info.xlsx
-    input_SME_folder <- "/SLR"
+    input_SME_folder <- "/Coastal_Habitats/Word to HTML Conversion"
   
   #the final file name will start with this and will get the date added
-    subject <- "SLR"
+    subject <- "Coastal Habitats"
     project_name <- paste0(subject, "_", input_installation_folder) 
 
 #####NO MORE CHANGES --- -- -- -- --- - - -- -- - -  - - - - -  --- - - - - - - --- --- --- -- ---

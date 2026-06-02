@@ -36,7 +36,7 @@ invisible(lapply(packages, library, character.only = TRUE))
     input_umbrella <- "N:/RStor/CEMML/ClimateChange/2_NavyClimate/Round2_Extremes_INRMP_integ/MidLant Region/"
 
     #the specific folder inside the Document to HTML Table Converter where the input files are
-    input_installation_folder <- "WPNSTA Yorktown" #corresponds to shortName on the installation_info.xlsx
+    input_installation_folder <- "NSA Cutler" #corresponds to shortName on the installation_info.xlsx
     input_SME_folder <- "/WildlandFire/Word to HTML Conversion"
   
   #the final file name will start with this and will get the date added

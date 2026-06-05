@@ -36,13 +36,8 @@ invisible(lapply(packages, library, character.only = TRUE))
     # input_umbrella <- "N:/RStor/CEMML/ClimateChange/2_NavyClimate/Round2_Extremes_INRMP_integ/Southeast Region/"
 
     #the specific folder inside the Document to HTML Table Converter where the input files are
-<<<<<<< HEAD
-    input_installation_folder <- "Kokee AFS" #corresponds to shortName on the installation_info.xlsx
-    input_SME_folder <- "/Hydrology/Word to HTML Conversion"
-=======
     input_installation_folder <- "Cold Bay LRRS" #corresponds to shortName on the installation_info.xlsx
     input_SME_folder <- "/Climate/Word to HTML Conversion"
->>>>>>> 82945a63a1d96d943568078715f3ef7e55f5f858
   
   #the final file name will start with this and will get the date added
     subject <- "Hydrology"

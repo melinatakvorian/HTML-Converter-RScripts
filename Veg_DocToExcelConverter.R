@@ -30,13 +30,13 @@
   #PAY ATTENTION TO THE DIRECTION OF THE SLASHES. THEY HAVE TO BE CHANGED TO FORWARD SLASHES, AS SHOWN BELOW
     #the broad folder structure
     #AIR FORCE  
-    input_umbrella <- "N:/RStor/CEMML/ClimateChange/1_USAFClimate/1_USAF_Natural_Resources/20_2_0004_RevisitingPhase1/" 
+    #input_umbrella <- "N:/RStor/CEMML/ClimateChange/1_USAFClimate/1_USAF_Natural_Resources/20_2_0004_RevisitingPhase1/" 
     
     #NAVY
-    #input_umbrella <- "N:/RStor/CEMML/ClimateChange/2_NavyClimate/Round2_Extremes_INRMP_integ/MidLant Region/"
+    input_umbrella <- "N:/RStor/CEMML/ClimateChange/2_NavyClimate/Round2_Extremes_INRMP_integ/MidLant Region/"
     
     #the specific folder inside the Document to HTML Table Converter where the input files are
-    input_installation_folder <- "Beale AFB" #corresponds to shortName on the installation_info.xlsx
+    input_installation_folder <- "NS Norfolk" #corresponds to shortName on the installation_info.xlsx
     input_SME_folder <- "/TerrestrialVegetation/Word to HTML Conversion"
     
     #the final file name will start with this and will get the date added
@@ -228,8 +228,8 @@
       last <- as.numeric(length(nlist))
       
       # Define indices for bioclimatic and vegetation sections
-      bio_indices <- c(1:5, last) # Bioclimatic sections
-      veg_indices <- c(1:3, 6:(last - 1)) # Vegetation sections
+      bio_indices <- c(1:8, last) # Bioclimatic sections
+      veg_indices <- c(1:3, 9:(last - 1)) # Vegetation sections
       
       
       #Create BIO table list
@@ -377,10 +377,10 @@ df_veg[, 'Exposure_Icon'] <- "Extreme Heat, Drought, Vector Borne Disease, Invas
   key <- match(input_installation_folder, installation_info$FolderName)
   
   if(!is.na(key)){
-    df_bio[,"SITENAME"] <- installation_info$SITENAME[key]
+    df_bio[,"SITENAME"] <- installation_info$`SITENAME/InstallationNames`[key]
     df_bio[,"SITEID"] <- installation_info$SITEID[key]
     
-    df_veg[,"SITENAME"] <- installation_info$SITENAME[key]
+    df_veg[,"SITENAME"] <- installation_info$`SITENAME/InstallationNames`[key]
     df_veg[,"SITEID"] <- installation_info$SITEID[key]
   }else(print("No match found in installation database"))
 

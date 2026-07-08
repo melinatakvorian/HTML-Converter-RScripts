@@ -47,7 +47,7 @@ invisible(lapply(packages, library, character.only = TRUE))
 
   input_dir <-  paste0(input_umbrella, input_installation_folder, input_SME_folder)
   current_date <- format(Sys.Date(), "%Y%m%d")  # e.g., "2025-09-24"
-  installation_info <- readxl::read_xlsx("N:/RStor/CEMML/ClimateChange/Document Standards/Templates/TEMPLATES_SME_Word_Docs/Installation_IDs.xlsx")
+  installation_info <- readxl::read_xlsx("Installation_IDs.xlsx")
 
 #ERROR CATCH: open files ----
   

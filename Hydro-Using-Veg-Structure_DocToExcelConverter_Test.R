@@ -31,14 +31,14 @@ invisible(lapply(packages, library, character.only = TRUE))
  
 # ----TEXT FOR YOU TO CHANGE-----------
   # Select which installation folder you're working in
-  input_installation_folder <- "NAVSTA Mayport"
+  input_installation_folder <- "Cold Bay LRRS"
 
   # Write if working on AF (AIR FORCE) or Navy (NAVY):
-  inst_sheet = "NAVY"
-  # inst_sheet = "AIR FORCE"
+  # inst_sheet = "NAVY"
+  inst_sheet = "AIR FORCE"
 
   # If Navy, select which region
-  navy_region = "Southeast Region"
+  # navy_region = "Southeast Region"
   
   # Select which analysis you're doing (shouldn't need to change)
   input_SME_folder <- "/Hydrology/Word to HTML" 
@@ -546,7 +546,7 @@ for(file in seq_along(results_disr)){
   siteid_string1 <- stringr::str_replace_all(siteid_string1, "</p>", '')
   all_scenarios_df3$SITEID <- siteid_string1 
   
-  SITENAME <- installation_info$InstallationNames[installation_info$SITEID == all_scenarios_df3$SITEID[1]]
+  SITENAME <- installation_info[installation_info$SITEID == all_scenarios_df3$SITEID[1], 2]
   
   if(!is.na(SITENAME)){
     all_scenarios_df3[,"SITENAME"] <- SITENAME

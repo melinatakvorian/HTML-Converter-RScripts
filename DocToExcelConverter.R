@@ -27,21 +27,29 @@ invisible(lapply(packages, library, character.only = TRUE))
 
 #####CHANGE AS DIRECTED BELOW --- -- -- -- --- - - -- -- - -  - - - - -  --- - - - - - - --- --- --- -- ---
 
-  #PAY ATTENTION TO THE DIRECTION OF THE SLASHES. THEY HAVE TO BE CHANGED TO FORWARD SLASHES, AS SHOWN BELOW
-    #the broad folder structure
-    #AIR FORCE  
-    #input_umbrella <- "N:/RStor/CEMML/ClimateChange/1_USAFClimate/1_USAF_Natural_Resources/20_2_0004_RevisitingPhase1/"
-    
-    #NAVY
-    input_umbrella <- "N:/RStor/CEMML/ClimateChange/2_NavyClimate/Round2_Extremes_INRMP_integ/MidLant Region/"
+# ----TEXT FOR YOU TO CHANGE-----------
+# Select which installation folder you're working in
+input_installation_folder <- "Cold Bay LRRS"
 
-    #the specific folder inside the Document to HTML Table Converter where the input files are
-    input_installation_folder <- "NSA Cutler" #corresponds to shortName on the installation_info.xlsx
-    input_SME_folder <- "/Climate/Word to HTML Conversion"
-  
-  #the final file name will start with this and will get the date added
-    subject <- "Climate"
-    project_name <- paste0(subject, "_", input_installation_folder) 
+# Write if working on AF (AIR FORCE) or Navy (NAVY):
+# inst_sheet = "NAVY"
+inst_sheet = "AIR FORCE"
+
+# If Navy, select which region
+# navy_region = "Southeast Region"
+
+# Select which analysis you're doing and the name of the file folder
+#PAY ATTENTION TO THE DIRECTION OF THE SLASHES. THEY HAVE TO BE CHANGED TO FORWARD SLASHES, AS SHOWN BELOW
+input_SME_folder <- "/Hydrology/Word to HTML" 
+
+#the final file name will start with this and will get the date added
+subject <- "Hydro"
+project_name <- paste0(subject, "_", input_installation_folder)
+
+# this will select which base to select your data from
+ifelse(inst_sheet == "AIR FORCE",
+       input_umbrella <- "N:/RStor/CEMML/ClimateChange/1_USAFClimate/1_USAF_Natural_Resources/20_2_0004_RevisitingPhase1/",
+       input_umbrella <- paste0("N:/RStor/CEMML/ClimateChange/2_NavyClimate/Round2_Extremes_INRMP_integ/", navy_region, "/"))
 
 #####NO MORE CHANGES --- -- -- -- --- - - -- -- - -  - - - - -  --- - - - - - - --- --- --- -- ---
 

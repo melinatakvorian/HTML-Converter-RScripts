@@ -12,7 +12,7 @@
 
 ## Install / load necessary packages ----
 
-packages <- c("pandoc","xml2","rvest","writexl", "stringr", "readxl")
+packages <- c("pandoc","xml2","rvest","writexl", "stringr", "readxl", "dpylr")
 
 # Install packages not yet installed
 installed_packages <- packages %in% rownames(installed.packages())
@@ -36,18 +36,18 @@ invisible(lapply(packages, library, character.only = TRUE))
     input_umbrella <- "N:/RStor/CEMML/ClimateChange/2_NavyClimate/Round2_Extremes_INRMP_integ/MidLant Region/"
 
     #the specific folder inside the Document to HTML Table Converter where the input files are
-    input_installation_folder <- "NSA Cutler" #corresponds to shortName on the installation_info.xlsx
-    input_SME_folder <- "/Climate/Word to HTML Conversion"
+    input_installation_folder <- "NS Norfolk" #corresponds to shortName on the installation_info.xlsx
+    input_SME_folder <- "/T&E/Word to HTML Conversion"
   
   #the final file name will start with this and will get the date added
-    subject <- "Climate"
+    subject <- "TEVA"
     project_name <- paste0(subject, "_", input_installation_folder) 
 
 #####NO MORE CHANGES --- -- -- -- --- - - -- -- - -  - - - - -  --- - - - - - - --- --- --- -- ---
 
   input_dir <-  paste0(input_umbrella, input_installation_folder, input_SME_folder)
   current_date <- format(Sys.Date(), "%Y%m%d")  # e.g., "2025-09-24"
-  installation_info <- readxl::read_xlsx("Installation_IDs.xlsx")
+  installation_info <- readxl::read_xlsx("Installation_IDs.xlsx", sheet=2)
 
 #ERROR CATCH: open files ----
   
@@ -216,26 +216,69 @@ all_headings <- unique(unlist(lapply(results, names)))
     }
   }
   
-# add full SITENAME, SITEID ----
-  key <- match(input_installation_folder, installation_info$FolderName)
   
-  if(!is.na(key)){
-    df[,"SITENAME"] <- installation_info$SITENAME[key]
-    df[,"SITEID"] <- installation_info$SITEID[key]
-  }else(print("No match found in installation database"))
-
+  # add full SITENAME, SITEID ----
+  siteid_string <- df$SITEID[1]
+  siteid_string1 <- stringr::str_replace_all(siteid_string, "<p>", '')
+  siteid_string1 <- stringr::str_replace_all(siteid_string1, "</p>", '')
+  df$SITEID[1] <- siteid_string1 
+  
+  SITENAME <- installation_info$InstallationNames[installation_info$SITEID == df$SITEID[1]]
+  
+  df[,"SITENAME"] <- SITENAME
   
 
 ##references hanging indent ----
-#add REFERENCES SECTION HANGING INDENT <p style=padding-left:15px;text-indent:-15px;> 
-for(i in 1:nrow(df)){
-  df$References[i]
-  #replace each <p> to <p style=padding-left:15px;text-indent:-15px;>
-  temp_string <- df$References[i]
-  temp_string1 <- stringr::str_replace_all(temp_string, "<p>", '<p style=padding-left:15px;text-indent:-15px;>')
-  #temp_string2 <- replace_all_except_last(temp_string1, "</p>", "</p> <br>")
-  df$References[i] <- temp_string1 #change to temp_string2 if you are adding the line breaks
-}
+  #add REFERENCES SECTION HANGING INDENT <p style=padding-left:15px;text-indent:-15px;> 
+  for(i in 1:nrow(df)){
+    df$`References and Credits`[i]
+    #replace each <p> to <p style=padding-left:15px;text-indent:-15px;>
+    temp_string <- df$`References and Credits`[i]
+    temp_string1 <- stringr::str_replace_all(temp_string, "<p>", '<p style=padding-left:15px;text-indent:-15px;>')
+    #temp_string2 <- replace_all_except_last(temp_string1, "</p>", "</p> <br>")
+    df$`References and Credits`[i] <- temp_string1 #change to temp_string2 if you are adding the line breaks
+  }
+  
+#assign Hex codes and Numeric values to Vuln, -----
+  #VulnerabilityResult
+  #this one is different from the rest!!
+
+    #need to get rid of paragraph notation to be able to do this  
+    #repeat this for VulnerabilityResult, Confidence, NE_Level, OE_Level, S_Level, AC_Level
+      test <- df
+      test$VulnerabilityResult <- stringr::str_replace_all(test$VulnerabilityResult, "<p>", '')
+      test$VulnerabilityResult <- stringr::str_replace_all(test$VulnerabilityResult, "</p>", '')
+  
+    #Vuln#
+      test <- test %>% 
+        mutate('Vuln#' = case_when(
+          VulnerabilityResult == "VERY HIGH" ~ 4,
+          VulnerabilityResult == "HIGH" ~ 3,
+          VulnerabilityResult == "MODERATE" ~ 2,
+          VulnerabilityResult == "LOW" ~ 1,
+          TRUE ~ 1
+        ))
+  
+  
+    #VulnColor
+      #NOT WORKING
+      test <- test %>% 
+        mutate(VulnColor = case_when(
+          VulnerabilityResult == "VERY HIGH" ~ "#d42004",
+          VulnerabilityResult == "HIGH" ~ "#f49e0b",
+          VulnerabilityResult == "MODERATE" ~ "#f2e750",
+          VulnerabilityResult == "LOW" ~ "#b2e109",
+          TRUE ~ "none"
+        ))
+  
+  #NE_Level
+  
+  #OT_Text
+  
+  #S_Text
+  
+  #AC_Text
+  #this one is different from the rest!!
   
 ##line breaks [manually input columns] ----
 numbblocks <- c(3:20) # Change to the columns that need line breaks between paragraphs

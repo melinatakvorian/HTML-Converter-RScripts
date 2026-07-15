@@ -38,10 +38,10 @@ invisible(lapply(packages, library, character.only = TRUE))
     #the specific folder inside the Document to HTML Table Converter where the input files are
     input_installation_folder <- "NS Norfolk" #corresponds to shortName on the installation_info.xlsx
     installation_type <- "Navy" #"Air Force"
-    input_SME_folder <- "/T&E/Word to HTML Conversion"
+    input_SME_folder <- "/F&W/Word to HTML Conversion"
   
   #the final file name will start with this and will get the date added
-    subject <- "TEVA"
+    subject <- "FWVA"
     project_name <- paste0(subject, "_", input_installation_folder) 
 
 #####NO MORE CHANGES --- -- -- -- --- - - -- -- - -  - - - - -  --- - - - - - - --- --- --- -- ---
@@ -248,11 +248,17 @@ all_headings <- unique(unlist(lapply(results, names)))
   }
   
   #run
-  cols_to_change <- c("CommonName", "ScientificName", "SppID#", "Federal Status:", 
-                       "State Status:", "Other Status:", "Presence:", "Breeding Status:", 
-                      "1st_Habitat", "2nd_Habitat", "3rd_Habitat", "4th_Habitat", 
-                      "VulnerabilityResult", "Confidence", "NE_Level", "OE_Level",
-                      "S_Level", "AC_Level")
+  #TEVAs
+    # cols_to_change <- c("CommonName", "ScientificName", "SppID#", "Federal Status:", 
+    #                      "State Status:", "Other Status:", "Presence:", "Breeding Status:", 
+    #                     "1st_Habitat", "2nd_Habitat", "3rd_Habitat", "4th_Habitat", 
+    #                     "VulnerabilityResult", "Confidence", "NE_Level", "OE_Level",
+    #                     "S_Level", "AC_Level")
+  #FWVAs
+    cols_to_change <- c("HabitatCommunity", "HabitatCommID#", 
+                        "1st_Habitat", "2nd_Habitat", "3rd_Habitat", "4th_Habitat", 
+                        "VulnerabilityResult", "E_Level",
+                        "S_Level", "AC_Level")
   
   df <- p_be_gone(df, cols_to_change)
   
@@ -267,7 +273,18 @@ all_headings <- unique(unlist(lapply(results, names)))
     df$`References and Credits`[i] <- temp_string1 #change to temp_string2 if you are adding the line breaks
   }
   
+  #add REFERENCES SECTION HANGING INDENT <p style=padding-left:15px;text-indent:-15px;> 
+  for(i in 1:nrow(df)){
+    df$`References`[i]
+    #replace each <p> to <p style=padding-left:15px;text-indent:-15px;>
+    temp_string <- df$`References`[i]
+    temp_string1 <- stringr::str_replace_all(temp_string, "<p>", '<p style=padding-left:15px;text-indent:-15px;>')
+    #temp_string2 <- replace_all_except_last(temp_string1, "</p>", "</p> <br>")
+    df$`References`[i] <- temp_string1 #change to temp_string2 if you are adding the line breaks
+  }
+  
 #assign Hex codes and Numeric values to columns that need it -----
+  ##TEVAs ----
     #need to get rid of paragraph notation to be able to do this  
     #repeat this for VulnerabilityResult, Confidence, NE_Level, OE_Level, S_Level, AC_Level
   
@@ -339,6 +356,59 @@ all_headings <- unique(unlist(lapply(results, names)))
           TRUE ~ "none"
         )) %>% relocate(AC_Color, .after = AC_Level)
   
+  ##FWVAs ----
+      #repeat this for VulnerabilityResult, E_Level, S_Level, AC_Level
+      
+      #Vuln#
+      df <- df %>% 
+        mutate('Vuln#' = case_when(
+          VulnerabilityResult == "VERY HIGH" ~ 4,
+          VulnerabilityResult == "HIGH" ~ 3,
+          VulnerabilityResult == "MODERATE" ~ 2,
+          VulnerabilityResult == "LOW" ~ 1,
+          TRUE ~ 1
+        )) %>% relocate('Vuln#', .after = VulnerabilityResult)
+      
+      #VulnColor
+      df <- df %>% 
+        mutate(VulnColor = case_when(
+          VulnerabilityResult == "VERY HIGH" ~ "#d42004",
+          VulnerabilityResult == "HIGH" ~ "#f49e0b",
+          VulnerabilityResult == "MODERATE" ~ "#f2e750",
+          VulnerabilityResult == "LOW" ~ "#b2e109",
+          TRUE ~ "none"
+        )) %>% relocate(VulnColor, .after = VulnerabilityResult)
+      
+      #E_Level
+      df <- df %>% 
+        mutate(E_Color = case_when(
+          E_Level == "High" ~ "#f49e0b",
+          E_Level == "Moderate" ~ "#f2e750",
+          E_Level == "Low" ~ "#b2e109",
+          TRUE ~ "none"
+        )) %>% relocate(E_Color, .after = E_Level)
+      
+      
+      #S_Level
+      df <- df %>% 
+        mutate(S_Color = case_when(
+          S_Level == "High" ~ "#f49e0b",
+          S_Level == "Moderate" ~ "#f2e750",
+          S_Level == "Low" ~ "#b2e109",
+          TRUE ~ "none"
+        )) %>% relocate(S_Color, .after = S_Level)
+      
+      
+      #AC_Level
+      df <- df %>% 
+        mutate(AC_Color = case_when(
+          AC_Level == "High" ~ "#f49e0b",
+          AC_Level == "Moderate" ~ "#f2e750",
+          AC_Level == "Low" ~ "#b2e109",
+          TRUE ~ "none"
+        )) %>% relocate(AC_Color, .after = AC_Level)
+      
+      
 # ##line breaks ----
 # numbblocks <- c(3:20) # Change to the columns that need line breaks between paragraphs
 #     #add blank line after each paragraph

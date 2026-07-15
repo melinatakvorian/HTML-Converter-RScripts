@@ -223,12 +223,13 @@ all_headings <- unique(unlist(lapply(results, names)))
     }
   }
   
+  df$SITEID <- 1
   
 # add full SITENAME, SITEID ----
 
   siteid_string <- df$SITEID[1]
 
-  df$SITEID[1] <- siteid_string1 
+  df$SITEID[1] <- siteid_string
   
   SITENAME <- installation_info$InstallationNames[installation_info$SITEID == df$SITEID[1]]
   
@@ -236,8 +237,29 @@ all_headings <- unique(unlist(lapply(results, names)))
   
   
 # remove paragraph notation from columns ----
-  
+  p_be_gone <-  function(df, columns){
+    for(col in columns){
+      if (!col %in% colnames(df)) {
+        warning(paste("Column not found, skipping:", col))
+        next
+      }
+        #remove paragrpah notation
+        df[[col]] <- stringr::str_replace_all(df[[col]], "<p>", '')
+        df[[col]] <- stringr::str_replace_all(df[[col]], "</p>", '')
 
+    }
+    return(df)
+  }
+  
+  #run
+  cols_to_change <- c("CommonName", "ScientificName", "SppID#", "Federal Status:", 
+                       "State Status:", "Other Status:", "Presence:", "Breeding Status:", 
+                      "1st_Habitat", "2nd_Habitat", "3rd_Habitat", "4th_Habitat", 
+                      "VulnerabilityResult", "Confidence", "NE_Level", "OE_Level",
+                      "S_Level", "AC_Level")
+  
+  df <- p_be_gone(df, cols_to_change)
+  
 ##references hanging indent ----
   #add REFERENCES SECTION HANGING INDENT <p style=padding-left:15px;text-indent:-15px;> 
   for(i in 1:nrow(df)){

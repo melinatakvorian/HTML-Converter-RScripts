@@ -249,20 +249,21 @@ all_headings <- unique(unlist(lapply(results, names)))
   
   #run
   #TEVAs
-    # cols_to_change <- c("CommonName", "ScientificName", "SppID#", "Federal Status:", 
-    #                      "State Status:", "Other Status:", "Presence:", "Breeding Status:", 
-    #                     "1st_Habitat", "2nd_Habitat", "3rd_Habitat", "4th_Habitat", 
-    #                     "VulnerabilityResult", "Confidence", "NE_Level", "OE_Level",
-    #                     "S_Level", "AC_Level")
-  #FWVAs
-    cols_to_change <- c("HabitatCommunity", "HabitatCommID#", 
-                        "1st_Habitat", "2nd_Habitat", "3rd_Habitat", "4th_Habitat", 
-                        "VulnerabilityResult", "E_Level",
+    cols_to_change <- c("CommonName", "ScientificName", "SppID#", "Federal Status:",
+                         "State Status:", "Other Status:", "Presence:", "Breeding Status:",
+                        "1st_Habitat", "2nd_Habitat", "3rd_Habitat", "4th_Habitat",
+                        "VulnerabilityResult", "Confidence", "NE_Level", "OE_Level",
                         "S_Level", "AC_Level")
+  #FWVAs
+    # cols_to_change <- c("HabitatCommunity", "HabitatCommID#", 
+    #                     "1st_Habitat", "2nd_Habitat", "3rd_Habitat", "4th_Habitat", 
+    #                     "VulnerabilityResult", "E_Level",
+    #                     "S_Level", "AC_Level")
   
   df <- p_be_gone(df, cols_to_change)
   
 #references hanging indent ----
+  ##TEVA ----
   #add REFERENCES SECTION HANGING INDENT <p style=padding-left:15px;text-indent:-15px;> 
   for(i in 1:nrow(df)){
     df$`References and Credits`[i]
@@ -273,6 +274,7 @@ all_headings <- unique(unlist(lapply(results, names)))
     df$`References and Credits`[i] <- temp_string1 #change to temp_string2 if you are adding the line breaks
   }
   
+  ##FWVA ----
   #add REFERENCES SECTION HANGING INDENT <p style=padding-left:15px;text-indent:-15px;> 
   for(i in 1:nrow(df)){
     df$`References`[i]

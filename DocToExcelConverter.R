@@ -227,23 +227,19 @@ all_headings <- unique(unlist(lapply(results, names)))
   
 # add full SITENAME, SITEID ----
 
-  siteid_string <- df$SITEID[1]
-
-  df$SITEID[1] <- siteid_string
-  
   SITENAME <- installation_info$InstallationNames[installation_info$SITEID == df$SITEID[1]]
   
   df[,"SITENAME"] <- SITENAME
   
   
-# remove paragraph notation from columns ----
+# remove paragraph notation ----
   p_be_gone <-  function(df, columns){
     for(col in columns){
       if (!col %in% colnames(df)) {
         warning(paste("Column not found, skipping:", col))
         next
       }
-        #remove paragrpah notation
+        #remove paragraph notation
         df[[col]] <- stringr::str_replace_all(df[[col]], "<p>", '')
         df[[col]] <- stringr::str_replace_all(df[[col]], "</p>", '')
 
@@ -260,7 +256,7 @@ all_headings <- unique(unlist(lapply(results, names)))
   
   df <- p_be_gone(df, cols_to_change)
   
-##references hanging indent ----
+#references hanging indent ----
   #add REFERENCES SECTION HANGING INDENT <p style=padding-left:15px;text-indent:-15px;> 
   for(i in 1:nrow(df)){
     df$`References and Credits`[i]
@@ -271,70 +267,93 @@ all_headings <- unique(unlist(lapply(results, names)))
     df$`References and Credits`[i] <- temp_string1 #change to temp_string2 if you are adding the line breaks
   }
   
-#assign Hex codes and Numeric values to Vuln, -----
-  #VulnerabilityResult
-  #this one is different from the rest!!
-
+#assign Hex codes and Numeric values to columns that need it -----
     #need to get rid of paragraph notation to be able to do this  
     #repeat this for VulnerabilityResult, Confidence, NE_Level, OE_Level, S_Level, AC_Level
-      test <- df
-      test$VulnerabilityResult <- stringr::str_replace_all(test$VulnerabilityResult, "<p>", '')
-      test$VulnerabilityResult <- stringr::str_replace_all(test$VulnerabilityResult, "</p>", '')
   
     #Vuln#
-      test <- test %>% 
+      df <- df %>% 
         mutate('Vuln#' = case_when(
           VulnerabilityResult == "VERY HIGH" ~ 4,
           VulnerabilityResult == "HIGH" ~ 3,
           VulnerabilityResult == "MODERATE" ~ 2,
           VulnerabilityResult == "LOW" ~ 1,
           TRUE ~ 1
-        ))
+        )) %>% relocate('Vuln#', .after = VulnerabilityResult)
+        
   
   
     #VulnColor
-      #NOT WORKING
-      test <- test %>% 
+      df <- df %>% 
         mutate(VulnColor = case_when(
           VulnerabilityResult == "VERY HIGH" ~ "#d42004",
           VulnerabilityResult == "HIGH" ~ "#f49e0b",
           VulnerabilityResult == "MODERATE" ~ "#f2e750",
           VulnerabilityResult == "LOW" ~ "#b2e109",
           TRUE ~ "none"
-        ))
+        )) %>% relocate(VulnColor, .after = VulnerabilityResult)
+      
+  #Confidence
+      df <- df %>% 
+        mutate('Conf#' = case_when(
+          Confidence == "HIGH" ~ 3,
+          Confidence == "MODERATE" ~ 2,
+          Confidence == "LOW" ~ 1,
+          TRUE ~ 1
+        )) %>% relocate('Conf#', .after = Confidence)
   
   #NE_Level
+      df <- df %>% 
+        mutate(NE_Color = case_when(
+          NE_Level == "High" ~ "#f49e0b",
+          NE_Level == "Moderate" ~ "#f2e750",
+          NE_Level == "Low" ~ "#b2e109",
+          TRUE ~ "none"
+        )) %>% relocate(NE_Color, .after = NE_Level)
+      
+  #OT_Level
+      df <- df %>% 
+        mutate(OE_Color = case_when(
+          OE_Level == "High" ~ "#f49e0b",
+          OE_Level == "Moderate" ~ "#f2e750",
+          OE_Level == "Low" ~ "#b2e109",
+          TRUE ~ "none"
+        )) %>% relocate(OE_Color, .after = OE_Level)
   
-  #OT_Text
-  
-  #S_Text
+  #S_Level
+      df <- df %>% 
+        mutate(S_Color = case_when(
+          S_Level == "High" ~ "#f49e0b",
+          S_Level == "Moderate" ~ "#f2e750",
+          S_Level == "Low" ~ "#b2e109",
+          TRUE ~ "none"
+        )) %>% relocate(S_Color, .after = S_Level)
   
   #AC_Text
   #this one is different from the rest!!
+      df <- df %>% 
+        mutate(AC_Color = case_when(
+          AC_Level == "High" ~ "#b2e109",
+          AC_Level == "Moderate" ~ "#f2e750",
+          AC_Level == "Low" ~ "#f49e0b",
+          TRUE ~ "none"
+        )) %>% relocate(AC_Color, .after = AC_Level)
   
-##line breaks [manually input columns] ----
-numbblocks <- c(3:20) # Change to the columns that need line breaks between paragraphs
-    #add blank line after each paragraph
-    for(a in 1:length(numbblocks)){
-      col_num <- numbblocks[[a]]
-      for(b in 1:nrow(df)){
-        if(is.na(df[[col_num]][b])) next
+# ##line breaks ----
+# numbblocks <- c(3:20) # Change to the columns that need line breaks between paragraphs
+#     #add blank line after each paragraph
+#     for(a in 1:length(numbblocks)){
+#       col_num <- numbblocks[[a]]
+#       for(b in 1:nrow(df)){
+#         if(is.na(df[[col_num]][b])) next
+# 
+#         #replace each </p> to </p> <br>
+#         temp_string <- df[[col_num]][b]
+#         temp_string1 <- replace_all_except_last(temp_string, "</p>", "</p> <br>")
+#         df[[col_num]][b] <- temp_string1
+#       }
+#     }
 
-        #replace each </p> to </p> <br>
-        temp_string <- df[[col_num]][b]
-        temp_string1 <- replace_all_except_last(temp_string, "</p>", "</p> <br>")
-        df[[col_num]][b] <- temp_string1
-      }
-    }
- 
-  #for Hydro Qualitative conversion 
-  # for(i in 1:nrow(df)){
-  #   df$Installation_Summary[i]
-  #   temp_string <- df$Installation_Summary[i]
-  #   temp_string1 <- stringr::str_replace_all(temp_string, "</p> <ul>", "</p> <ul> <br>")
-  #   temp_string2 <- replace_all_except_last(temp_string1, "</p>", "</p> <br>")
-  #   df$Installation_Summary[i] <- temp_string2 #change to temp_string2 if you are adding the line breaks
-  # }
 
 # Export final files ----
   ##export excel to 3ViewerPackages folder ----

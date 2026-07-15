@@ -232,7 +232,7 @@ all_headings <- unique(unlist(lapply(results, names)))
   df[,"SITENAME"] <- SITENAME
   
   
-# remove paragraph notation ----
+# * remove paragraph notation ----
   p_be_gone <-  function(df, columns){
     for(col in columns){
       if (!col %in% colnames(df)) {
@@ -283,7 +283,7 @@ all_headings <- unique(unlist(lapply(results, names)))
     df$`References`[i] <- temp_string1 #change to temp_string2 if you are adding the line breaks
   }
   
-#assign Hex codes and Numeric values to columns that need it -----
+# * assign Hex codes and Numeric values to columns that need it -----
   hex_codes <- function(df, report_type){
     if(report_type == "TEVA"){
       ##TEVAs
@@ -415,7 +415,7 @@ all_headings <- unique(unlist(lapply(results, names)))
   df <- hex_codes(df, "FWVA") #TEVA?
       
 
-#add Habitat_Icon columns ----
+# * add Habitat_Icon columns ----
   habitat_icons <- function(df){
     df[,'1st_Habitat_Icon'] <- ""
     df[,'2nd_Habitat_Icon'] <- ""

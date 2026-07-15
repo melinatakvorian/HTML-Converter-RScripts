@@ -284,11 +284,12 @@ all_headings <- unique(unlist(lapply(results, names)))
   }
   
 #assign Hex codes and Numeric values to columns that need it -----
-  ##TEVAs ----
-    #need to get rid of paragraph notation to be able to do this  
-    #repeat this for VulnerabilityResult, Confidence, NE_Level, OE_Level, S_Level, AC_Level
-  
-    #Vuln#
+  hex_codes <- function(df, report_type){
+    if(report_type == "TEVA"){
+      ##TEVAs
+      #repeat this for VulnerabilityResult, Confidence, NE_Level, OE_Level, S_Level, AC_Level
+      
+      #Vuln#
       df <- df %>% 
         mutate('Vuln#' = case_when(
           VulnerabilityResult == "VERY HIGH" ~ 4,
@@ -297,10 +298,10 @@ all_headings <- unique(unlist(lapply(results, names)))
           VulnerabilityResult == "LOW" ~ 1,
           TRUE ~ 1
         )) %>% relocate('Vuln#', .after = VulnerabilityResult)
-        
-  
-  
-    #VulnColor
+      
+      
+      
+      #VulnColor
       df <- df %>% 
         mutate(VulnColor = case_when(
           VulnerabilityResult == "VERY HIGH" ~ "#d42004",
@@ -310,7 +311,7 @@ all_headings <- unique(unlist(lapply(results, names)))
           TRUE ~ "none"
         )) %>% relocate(VulnColor, .after = VulnerabilityResult)
       
-  #Confidence
+      #Confidence
       df <- df %>% 
         mutate('Conf#' = case_when(
           Confidence == "HIGH" ~ 3,
@@ -318,8 +319,8 @@ all_headings <- unique(unlist(lapply(results, names)))
           Confidence == "LOW" ~ 1,
           TRUE ~ 1
         )) %>% relocate('Conf#', .after = Confidence)
-  
-  #NE_Level
+      
+      #NE_Level
       df <- df %>% 
         mutate(NE_Color = case_when(
           NE_Level == "High" ~ "#f49e0b",
@@ -328,7 +329,7 @@ all_headings <- unique(unlist(lapply(results, names)))
           TRUE ~ "none"
         )) %>% relocate(NE_Color, .after = NE_Level)
       
-  #OT_Level
+      #OT_Level
       df <- df %>% 
         mutate(OE_Color = case_when(
           OE_Level == "High" ~ "#f49e0b",
@@ -336,8 +337,8 @@ all_headings <- unique(unlist(lapply(results, names)))
           OE_Level == "Low" ~ "#b2e109",
           TRUE ~ "none"
         )) %>% relocate(OE_Color, .after = OE_Level)
-  
-  #S_Level
+      
+      #S_Level
       df <- df %>% 
         mutate(S_Color = case_when(
           S_Level == "High" ~ "#f49e0b",
@@ -345,9 +346,9 @@ all_headings <- unique(unlist(lapply(results, names)))
           S_Level == "Low" ~ "#b2e109",
           TRUE ~ "none"
         )) %>% relocate(S_Color, .after = S_Level)
-  
-  #AC_Text
-  #this one is different from the rest!!
+      
+      #AC_Text
+      #this one is different from the rest!!
       df <- df %>% 
         mutate(AC_Color = case_when(
           AC_Level == "High" ~ "#b2e109",
@@ -355,8 +356,8 @@ all_headings <- unique(unlist(lapply(results, names)))
           AC_Level == "Low" ~ "#f49e0b",
           TRUE ~ "none"
         )) %>% relocate(AC_Color, .after = AC_Level)
-  
-  ##FWVAs ----
+    }else if(report_type == "FWVA"){
+      ##FWVAs
       #repeat this for VulnerabilityResult, E_Level, S_Level, AC_Level
       
       #Vuln#
@@ -377,7 +378,7 @@ all_headings <- unique(unlist(lapply(results, names)))
           VulnerabilityResult == "MODERATE" ~ "#f2e750",
           VulnerabilityResult == "LOW" ~ "#b2e109",
           TRUE ~ "none"
-        )) %>% relocate(VulnColor, .after = VulnerabilityResult)
+        )) %>% relocate(VulnColor, .after = 'Vuln#')
       
       #E_Level
       df <- df %>% 
@@ -407,6 +408,11 @@ all_headings <- unique(unlist(lapply(results, names)))
           AC_Level == "Low" ~ "#b2e109",
           TRUE ~ "none"
         )) %>% relocate(AC_Color, .after = AC_Level)
+    }
+  }
+  
+  #CHANGE THIS TO TEVA IF YOU ARE DOING A TEVA CONVERSION
+  df <- hex_codes(df, "FWVA") #TEVA?
       
 
 #add Habitat_Icon columns ----

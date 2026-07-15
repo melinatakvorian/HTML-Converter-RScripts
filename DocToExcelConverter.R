@@ -12,7 +12,7 @@
 
 ## Install / load necessary packages ----
 
-packages <- c("pandoc","xml2","rvest","writexl", "stringr", "readxl", "dpylr")
+packages <- c("pandoc","xml2","rvest","writexl", "stringr", "readxl", "dplyr")
 
 # Install packages not yet installed
 installed_packages <- packages %in% rownames(installed.packages())
@@ -37,6 +37,7 @@ invisible(lapply(packages, library, character.only = TRUE))
 
     #the specific folder inside the Document to HTML Table Converter where the input files are
     input_installation_folder <- "NS Norfolk" #corresponds to shortName on the installation_info.xlsx
+    installation_type <- "Navy" #"Air Force"
     input_SME_folder <- "/T&E/Word to HTML Conversion"
   
   #the final file name will start with this and will get the date added
@@ -47,7 +48,13 @@ invisible(lapply(packages, library, character.only = TRUE))
 
   input_dir <-  paste0(input_umbrella, input_installation_folder, input_SME_folder)
   current_date <- format(Sys.Date(), "%Y%m%d")  # e.g., "2025-09-24"
-  installation_info <- readxl::read_xlsx("Installation_IDs.xlsx", sheet=2)
+  
+  if(installation_type == "Navy"){
+    installation_info <- readxl::read_xlsx("Installation_IDs.xlsx", sheet=2) 
+  }else if(installation_type == "Air Force"){
+    installation_info <- readxl::read_xlsx("Installation_IDs.xlsx", sheet=1) 
+  }
+
 
 #ERROR CATCH: open files ----
   
@@ -217,15 +224,18 @@ all_headings <- unique(unlist(lapply(results, names)))
   }
   
   
-  # add full SITENAME, SITEID ----
+# add full SITENAME, SITEID ----
+
   siteid_string <- df$SITEID[1]
-  siteid_string1 <- stringr::str_replace_all(siteid_string, "<p>", '')
-  siteid_string1 <- stringr::str_replace_all(siteid_string1, "</p>", '')
+
   df$SITEID[1] <- siteid_string1 
   
   SITENAME <- installation_info$InstallationNames[installation_info$SITEID == df$SITEID[1]]
   
   df[,"SITENAME"] <- SITENAME
+  
+  
+# remove paragraph notation from columns ----
   
 
 ##references hanging indent ----

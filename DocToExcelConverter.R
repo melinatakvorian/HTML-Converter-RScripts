@@ -408,6 +408,16 @@ all_headings <- unique(unlist(lapply(results, names)))
           TRUE ~ "none"
         )) %>% relocate(AC_Color, .after = AC_Level)
       
+#add Habitat_Icon columns ----
+      df[,'1st_Habitat_Icon'] <- ""
+      df[,'2nd_Habitat_Icon'] <- ""
+      df[,'3rd_Habitat_Icon'] <- ""
+      df[,'4th_Habitat_Icon'] <- ""
+      df <- df %>% 
+        relocate('1st_Habitat_Icon', .after = `1st_Habitat`) %>% 
+        relocate('2nd_Habitat_Icon', .after = `2nd_Habitat`) %>% 
+        relocate('3rd_Habitat_Icon', .after = `3rd_Habitat`) %>%
+        relocate('4th_Habitat_Icon', .after = `4th_Habitat`)
       
 # ##line breaks ----
 # numbblocks <- c(3:20) # Change to the columns that need line breaks between paragraphs

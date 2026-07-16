@@ -36,7 +36,7 @@ invisible(lapply(packages, library, character.only = TRUE))
     #input_umbrella <- "N:/RStor/CEMML/ClimateChange/2_NavyClimate/Round2_Extremes_INRMP_integ/MidLant Region/"
 
     #the specific folder inside the Document to HTML Table Converter where the input files are
-    input_installation_folder <- "JB Elmendorf-Richardson" #corresponds to shortName on the installation_info.xlsx 
+    input_installation_folder <- "Eielson AFB" #corresponds to shortName on the installation_info.xlsx 
     installation_type <- "Air Force" #"Navy"
     input_SME_folder <- "/TEVA/Word to HTML Conversion"
   
@@ -49,13 +49,7 @@ invisible(lapply(packages, library, character.only = TRUE))
   input_dir <-  paste0(input_umbrella, input_installation_folder, input_SME_folder)
   current_date <- format(Sys.Date(), "%Y%m%d")  # e.g., "2025-09-24"
   
-  if(installation_type == "Navy"){
-    installation_info <- readxl::read_xlsx("Installation_IDs.xlsx", sheet=2)
-    SITENAME <- installation_info$InstallationNames[installation_info$SITEID == df$SITEID[1]]
-  }else if(installation_type == "Air Force"){
-    installation_info <- readxl::read_xlsx("Installation_IDs.xlsx", sheet=1)
-    SITENAME <- installation_info$SITENAME[installation_info$SITEID == df$SITEID[1]]
-  }
+
 
 
 #ERROR CATCH: open files ----
@@ -243,6 +237,10 @@ all_headings <- unique(unlist(lapply(results, names)))
     return(df)
   }
   
+  #REMOVE ITALICS FROM SCIENTIFIC NAMES ----
+  df$ScientificName <- stringr::str_replace_all(df$ScientificName, "<em>", '')
+  df$ScientificName <- stringr::str_replace_all(df$ScientificName, "</em>", '')
+  
   #run
   #TEVAs
     cols_to_change <- c("SITEID", "CommonName", "ScientificName", "SppID#", "Federal Status:",
@@ -261,7 +259,13 @@ all_headings <- unique(unlist(lapply(results, names)))
   
   # add full SITENAME, SITEID ----
   
-
+  if(installation_type == "Navy"){
+    installation_info <- readxl::read_xlsx("Installation_IDs.xlsx", sheet=2)
+    SITENAME <- installation_info$InstallationNames[installation_info$SITEID == df$SITEID[1]]
+  }else if(installation_type == "Air Force"){
+    installation_info <- readxl::read_xlsx("Installation_IDs.xlsx", sheet=1)
+    SITENAME <- installation_info$SITENAME[installation_info$SITEID == df$SITEID[1]]
+  }
   
   df[,"SITENAME"] <- SITENAME
   df <- df %>% relocate(SITENAME, .after = SITEID)

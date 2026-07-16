@@ -50,9 +50,11 @@ invisible(lapply(packages, library, character.only = TRUE))
   current_date <- format(Sys.Date(), "%Y%m%d")  # e.g., "2025-09-24"
   
   if(installation_type == "Navy"){
-    installation_info <- readxl::read_xlsx("Installation_IDs.xlsx", sheet=2) 
+    installation_info <- readxl::read_xlsx("Installation_IDs.xlsx", sheet=2)
+    SITENAME <- installation_info$InstallationNames[installation_info$SITEID == df$SITEID[1]]
   }else if(installation_type == "Air Force"){
-    installation_info <- readxl::read_xlsx("Installation_IDs.xlsx", sheet=1) 
+    installation_info <- readxl::read_xlsx("Installation_IDs.xlsx", sheet=1)
+    SITENAME <- installation_info$SITENAME[installation_info$SITEID == df$SITEID[1]]
   }
 
 
@@ -259,7 +261,7 @@ all_headings <- unique(unlist(lapply(results, names)))
   
   # add full SITENAME, SITEID ----
   
-  SITENAME <- installation_info$SITENAME[installation_info$SITEID == df$SITEID[1]] #change based on AF or Navy
+
   
   df[,"SITENAME"] <- SITENAME
   df <- df %>% relocate(SITENAME, .after = SITEID)

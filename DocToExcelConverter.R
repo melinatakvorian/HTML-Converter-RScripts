@@ -36,12 +36,12 @@ invisible(lapply(packages, library, character.only = TRUE))
     #input_umbrella <- "N:/RStor/CEMML/ClimateChange/2_NavyClimate/Round2_Extremes_INRMP_integ/MidLant Region/"
 
     #the specific folder inside the Document to HTML Table Converter where the input files are
-    input_installation_folder <- "Creech AFB" #corresponds to shortName on the installation_info.xlsx 
+    input_installation_folder <- "JBLE-Langley" #corresponds to shortName on the installation_info.xlsx 
     installation_type <- "Air Force" #"Navy"
-    input_SME_folder <- "/TEVA"
+    input_SME_folder <- "/FWVA/Updated for HTML Conversion"
   
   #the final file name will start with this and will get the date added
-    subject <- "TEVA"
+    subject <- "FWVA"
     project_name <- paste0(subject, "_", input_installation_folder) 
 
 #####NO MORE CHANGES --- -- -- -- --- - - -- -- - -  - - - - -  --- - - - - - - --- --- --- -- ---
@@ -243,16 +243,16 @@ all_headings <- unique(unlist(lapply(results, names)))
   
   #run
   #TEVAs
-    cols_to_change <- c("SITEID", "CommonName", "ScientificName", "SppID#", "Federal Status:",
-                         "State Status:", "Other Status:", "Presence:", "Breeding Status:",
-                        "1st_Habitat", "2nd_Habitat", "3rd_Habitat", "4th_Habitat",
-                        "VulnerabilityResult", "Confidence", "NE_Level", "OE_Level",
-                        "S_Level", "AC_Level")
-  #FWVAs
-    # cols_to_change <- c("SITEID","HabitatCommunity", "HabitatCommID#", 
-    #                     "1st_Habitat", "2nd_Habitat", "3rd_Habitat", "4th_Habitat", 
-    #                     "VulnerabilityResult", "E_Level",
+    # cols_to_change <- c("SITEID", "CommonName", "ScientificName", "SppID#", "Federal Status:",
+    #                      "State Status:", "Other Status:", "Presence:", "Breeding Status:",
+    #                     "1st_Habitat", "2nd_Habitat", "3rd_Habitat", "4th_Habitat",
+    #                     "VulnerabilityResult", "Confidence", "NE_Level", "OE_Level",
     #                     "S_Level", "AC_Level")
+  #FWVAs
+    cols_to_change <- c("SITEID","HabitatCommunity", "HabitatCommID#",
+                        "1st_Habitat", "2nd_Habitat", "3rd_Habitat", "4th_Habitat",
+                        "VulnerabilityResult", "E_Level",
+                        "S_Level", "AC_Level")
   
   df <- p_be_gone(df, cols_to_change)
   
@@ -273,25 +273,25 @@ all_headings <- unique(unlist(lapply(results, names)))
 #references hanging indent ----
   ##TEVA ----
   #add REFERENCES SECTION HANGING INDENT <p style=padding-left:15px;text-indent:-15px;> 
-  for(i in 1:nrow(df)){
-    df$`References and Credits`[i]
-    #replace each <p> to <p style=padding-left:15px;text-indent:-15px;>
-    temp_string <- df$`References and Credits`[i]
-    temp_string1 <- stringr::str_replace_all(temp_string, "<p>", '<p style=padding-left:15px;text-indent:-15px;>')
-    #temp_string2 <- replace_all_except_last(temp_string1, "</p>", "</p> <br>")
-    df$`References and Credits`[i] <- temp_string1 #change to temp_string2 if you are adding the line breaks
-  }
+  # for(i in 1:nrow(df)){
+  #   df$`References and Credits`[i]
+  #   #replace each <p> to <p style=padding-left:15px;text-indent:-15px;>
+  #   temp_string <- df$`References and Credits`[i]
+  #   temp_string1 <- stringr::str_replace_all(temp_string, "<p>", '<p style=padding-left:15px;text-indent:-15px;>')
+  #   #temp_string2 <- replace_all_except_last(temp_string1, "</p>", "</p> <br>")
+  #   df$`References and Credits`[i] <- temp_string1 #change to temp_string2 if you are adding the line breaks
+  # }
   
   ##FWVA ----
   #add REFERENCES SECTION HANGING INDENT <p style=padding-left:15px;text-indent:-15px;> 
-  # for(i in 1:nrow(df)){
-  #   df$`References`[i]
-  #   #replace each <p> to <p style=padding-left:15px;text-indent:-15px;>
-  #   temp_string <- df$`References`[i]
-  #   temp_string1 <- stringr::str_replace_all(temp_string, "<p>", '<p style=padding-left:15px;text-indent:-15px;>')
-  #   #temp_string2 <- replace_all_except_last(temp_string1, "</p>", "</p> <br>")
-  #   df$`References`[i] <- temp_string1 #change to temp_string2 if you are adding the line breaks
-  # }
+  for(i in 1:nrow(df)){
+    df$`References`[i]
+    #replace each <p> to <p style=padding-left:15px;text-indent:-15px;>
+    temp_string <- df$`References`[i]
+    temp_string1 <- stringr::str_replace_all(temp_string, "<p>", '<p style=padding-left:15px;text-indent:-15px;>')
+    #temp_string2 <- replace_all_except_last(temp_string1, "</p>", "</p> <br>")
+    df$`References`[i] <- temp_string1 #change to temp_string2 if you are adding the line breaks
+  }
   
 # * assign Hex codes and Numeric values to columns that need it -----
   hex_codes <- function(df, report_type){
@@ -422,7 +422,7 @@ all_headings <- unique(unlist(lapply(results, names)))
   }
   
   #CHANGE THIS TO TEVA IF YOU ARE DOING A TEVA CONVERSION
-  df <- hex_codes(df, "TEVA") #TEVA?
+  df <- hex_codes(df, subject) #TEVA?
       
 
 # * add Habitat_Icon columns ----

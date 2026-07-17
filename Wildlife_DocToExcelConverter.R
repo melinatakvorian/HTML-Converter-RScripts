@@ -184,116 +184,48 @@ remove_end_blanks <- function(result_list){
     # Replace all occurrences in the prefix, leave the tail unchanged
     paste0(gsub(from, to, before, fixed = TRUE), after)
   }
-  
-
-  
-# RUN ----
-docx_files <- list.files(input_dir, pattern = "\\.docx$", full.names = TRUE) #pull list of all files in folder
-docx_files <- docx_files[!grepl("^~\\$", basename(docx_files))]
-
-results <- list()
-
-for (file in docx_files) { #for each file, convert it to HTML, Identify its sections, delete empty headers, add to a results mega-list
-  html_doc <- convert_docx_to_html_full(file)
-  sections <- parse_html_sections(html_doc)
-  sections <- sections[names(sections) != ""] #remove accidental headers
-  results[[basename(file)]] <- sections
-}
-
-#QAQC heading names for trailing spaces and line breaks
-results <- remove_end_blanks(results)
-results <- remove_accidental_return(results)
-
-#unfold the results list to be able to create a dataframe
-all_headings <- unique(unlist(lapply(results, names)))
-
-
-# Create dataframe and input HTML in proper sections ----
-  df <- data.frame(matrix(NA_character_, length(results), length(all_headings)),
-                   stringsAsFactors = FALSE)
-  colnames(df) <- all_headings
-  rownames(df) <- names(results)
-  for (i in seq_along(results)) {
-    for (col in names(results[[i]])) {
-      df[i, col] <- results[[i]][[col]]
-    }
-  }
-  
-
-  
-  
-# * remove paragraph notation ----
+  # * remove paragraph notation ----
   p_be_gone <-  function(df, columns){
     for(col in columns){
       if (!col %in% colnames(df)) {
         warning(paste("Column not found, skipping:", col))
         next
       }
-        #remove paragraph notation
-        df[[col]] <- stringr::str_replace_all(df[[col]], "<p>", '')
-        df[[col]] <- stringr::str_replace_all(df[[col]], "</p>", '')
-
+      #remove paragraph notation
+      df[[col]] <- stringr::str_replace_all(df[[col]], "<p>", '')
+      df[[col]] <- stringr::str_replace_all(df[[col]], "</p>", '')
+      
     }
     return(df)
   }
   
-  #REMOVE ITALICS FROM SCIENTIFIC NAMES ----
-  df$ScientificName <- stringr::str_replace_all(df$ScientificName, "<em>", '')
-  df$ScientificName <- stringr::str_replace_all(df$ScientificName, "</em>", '')
-  
-  #run
-  #TEVAs
-    # cols_to_change <- c("SITEID", "CommonName", "ScientificName", "SppID#", "Federal Status:",
-    #                      "State Status:", "Other Status:", "Presence:", "Breeding Status:",
-    #                     "1st_Habitat", "2nd_Habitat", "3rd_Habitat", "4th_Habitat",
-    #                     "VulnerabilityResult", "Confidence", "NE_Level", "OE_Level",
-    #                     "S_Level", "AC_Level")
-  #FWVAs
-    cols_to_change <- c("SITEID","HabitatCommunity", "HabitatCommID#",
-                        "1st_Habitat", "2nd_Habitat", "3rd_Habitat", "4th_Habitat",
-                        "VulnerabilityResult", "E_Level",
-                        "S_Level", "AC_Level")
-  
-  df <- p_be_gone(df, cols_to_change)
-  
-  
-  # add full SITENAME, SITEID ----
-  
-  if(installation_type == "Navy"){
-    installation_info <- readxl::read_xlsx("Installation_IDs.xlsx", sheet=2)
-    SITENAME <- installation_info$InstallationNames[installation_info$SITEID == df$SITEID[1]]
-  }else if(installation_type == "Air Force"){
-    installation_info <- readxl::read_xlsx("Installation_IDs.xlsx", sheet=1)
-    SITENAME <- installation_info$SITENAME[installation_info$SITEID == df$SITEID[1]]
+  # * hanging indents for references ----
+  ref_hanging_indents <- function(df, report_type){
+    if(report_type == "TEVA"){
+      for(i in 1:nrow(df)){
+        df$`References and Credits`[i]
+        #replace each <p> to <p style=padding-left:15px;text-indent:-15px;>
+        temp_string <- df$`References and Credits`[i]
+        temp_string1 <- stringr::str_replace_all(temp_string, "<p>", '<p style=padding-left:15px;text-indent:-15px;>')
+        df$`References and Credits`[i] <- temp_string1 
+      }
+    }else if(report_type == "FWVA"){
+      # for(i in 1:nrow(df)){
+      #   df$References[i] <- stringr::str_replace_all(df$References[i], "<p>", '<p style=padding-left:15px;text-indent:-15px;>')
+      # }
+      for(i in 1:nrow(df)){
+        df$`References`[i]
+        #replace each <p> to <p style=padding-left:15px;text-indent:-15px;>
+        temp_string <- df$`References`[i]
+        temp_string1 <- stringr::str_replace_all(temp_string, "<p>", '<p style=padding-left:15px;text-indent:-15px;>')
+        #temp_string2 <- replace_all_except_last(temp_string1, "</p>", "</p> <br>")
+        df$`References`[i] <- temp_string1 #change to temp_string2 if you are adding the line breaks
+      }
+      return(df)
+    }
   }
-  
-  df[,"SITENAME"] <- SITENAME
-  df <- df %>% relocate(SITENAME, .after = SITEID)
-  
-#references hanging indent ----
-  ##TEVA ----
-  #add REFERENCES SECTION HANGING INDENT <p style=padding-left:15px;text-indent:-15px;> 
-  # for(i in 1:nrow(df)){
-  #   df$`References and Credits`[i]
-  #   #replace each <p> to <p style=padding-left:15px;text-indent:-15px;>
-  #   temp_string <- df$`References and Credits`[i]
-  #   temp_string1 <- stringr::str_replace_all(temp_string, "<p>", '<p style=padding-left:15px;text-indent:-15px;>')
-  #   #temp_string2 <- replace_all_except_last(temp_string1, "</p>", "</p> <br>")
-  #   df$`References and Credits`[i] <- temp_string1 #change to temp_string2 if you are adding the line breaks
-  # }
-  
-  ##FWVA ----
-  #add REFERENCES SECTION HANGING INDENT <p style=padding-left:15px;text-indent:-15px;> 
-  for(i in 1:nrow(df)){
-    df$`References`[i]
-    #replace each <p> to <p style=padding-left:15px;text-indent:-15px;>
-    temp_string <- df$`References`[i]
-    temp_string1 <- stringr::str_replace_all(temp_string, "<p>", '<p style=padding-left:15px;text-indent:-15px;>')
-    #temp_string2 <- replace_all_except_last(temp_string1, "</p>", "</p> <br>")
-    df$`References`[i] <- temp_string1 #change to temp_string2 if you are adding the line breaks
-  }
-  
-# * assign Hex codes and Numeric values to columns that need it -----
+
+  # * assign Hex codes and Numeric values to columns that need it -----
   hex_codes <- function(df, report_type){
     if(report_type == "TEVA"){
       ##TEVAs
@@ -421,11 +353,8 @@ all_headings <- unique(unlist(lapply(results, names)))
     }
   }
   
-  #CHANGE THIS TO TEVA IF YOU ARE DOING A TEVA CONVERSION
-  df <- hex_codes(df, subject) #TEVA?
-      
-
-# * add Habitat_Icon columns ----
+  
+  # * add Habitat_Icon columns ----
   habitat_icons <- function(df){
     df[,'1st_Habitat_Icon'] <- ""
     df[,'2nd_Habitat_Icon'] <- ""
@@ -437,7 +366,91 @@ all_headings <- unique(unlist(lapply(results, names)))
       relocate('3rd_Habitat_Icon', .after = `3rd_Habitat`) %>%
       relocate('4th_Habitat_Icon', .after = `4th_Habitat`)
   }
+  
+# RUN ----
+docx_files <- list.files(input_dir, pattern = "\\.docx$", full.names = TRUE) #pull list of all files in folder
+docx_files <- docx_files[!grepl("^~\\$", basename(docx_files))]
 
+results <- list()
+
+for (file in docx_files) { #for each file, convert it to HTML, Identify its sections, delete empty headers, add to a results mega-list
+  html_doc <- convert_docx_to_html_full(file)
+  sections <- parse_html_sections(html_doc)
+  sections <- sections[names(sections) != ""] #remove accidental headers
+  results[[basename(file)]] <- sections
+}
+
+#QAQC heading names for trailing spaces and line breaks
+results <- remove_end_blanks(results)
+results <- remove_accidental_return(results)
+
+#unfold the results list to be able to create a dataframe
+all_headings <- unique(unlist(lapply(results, names)))
+
+
+# Create dataframe and input HTML in proper sections ----
+  df <- data.frame(matrix(NA_character_, length(results), length(all_headings)),
+                   stringsAsFactors = FALSE)
+  colnames(df) <- all_headings
+  rownames(df) <- names(results)
+  for (i in seq_along(results)) {
+    for (col in names(results[[i]])) {
+      df[i, col] <- results[[i]][[col]]
+    }
+  }
+  
+# run paragraph notation editor ----
+  if(subject == "TEVA"){
+    #TEVAs
+    cols_to_change <- c("SITEID", "CommonName", "ScientificName", "SppID#", "Federal Status:",
+                         "State Status:", "Other Status:", "Presence:", "Breeding Status:",
+                        "1st_Habitat", "2nd_Habitat", "3rd_Habitat", "4th_Habitat",
+                        "VulnerabilityResult", "Confidence", "NE_Level", "OE_Level",
+                        "S_Level", "AC_Level")
+  }else if(subject == "FWVA"){
+    #FWVAs
+    cols_to_change <- c("SITEID","HabitatCommunity", "HabitatCommID#",
+                        "1st_Habitat", "2nd_Habitat", "3rd_Habitat", "4th_Habitat",
+                        "VulnerabilityResult", "E_Level",
+                        "S_Level", "AC_Level")
+  }
+
+  df <- p_be_gone(df, cols_to_change)
+  
+#REMOVE ITALICS FROM SCIENTIFIC NAMES ----
+  if(subject == "TEVA"){
+    df$ScientificName <- stringr::str_replace_all(df$ScientificName, "<em>", '')
+    df$ScientificName <- stringr::str_replace_all(df$ScientificName, "</em>", '')
+  }else(
+    print("Not a TEVA run - Scientific Names are N/A. Nothing will be changed at this step.")
+  )
+
+  
+# add full SITENAME, SITEID ----
+  
+  if(installation_type == "Navy"){
+    installation_info <- readxl::read_xlsx("Installation_IDs.xlsx", sheet=2)
+    SITENAME <- installation_info$InstallationNames[installation_info$SITEID == df$SITEID[1]]
+  }else if(installation_type == "Air Force"){
+    installation_info <- readxl::read_xlsx("Installation_IDs.xlsx", sheet=1)
+    SITENAME <- installation_info$SITENAME[installation_info$SITEID == df$SITEID[1]]
+  }
+  
+  df[,"SITENAME"] <- SITENAME
+  df <- df %>% relocate(SITENAME, .after = SITEID)
+  
+#references hanging indent ----
+  df <- ref_hanging_indents(df, subject)
+  
+
+
+  
+# create hex codes and numbers ----
+  df <- hex_codes(df, subject)
+      
+
+
+# add habitat_icons column ----
   df <- habitat_icons(df)
 
 # Export final files ----

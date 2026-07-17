@@ -12,7 +12,7 @@
 
 ## Install / load necessary packages ----
 
-packages <- c("pandoc","xml2","rvest","writexl", "stringr", "readxl")
+packages <- c("pandoc","xml2","rvest","writexl", "stringr", "readxl", "dplyr")
 
 # Install packages not yet installed
 installed_packages <- packages %in% rownames(installed.packages())
@@ -30,24 +30,27 @@ invisible(lapply(packages, library, character.only = TRUE))
   #PAY ATTENTION TO THE DIRECTION OF THE SLASHES. THEY HAVE TO BE CHANGED TO FORWARD SLASHES, AS SHOWN BELOW
     #the broad folder structure
     #AIR FORCE  
-    #input_umbrella <- "N:/RStor/CEMML/ClimateChange/1_USAFClimate/1_USAF_Natural_Resources/20_2_0004_RevisitingPhase1/"
+    input_umbrella <- "N:/RStor/CEMML/ClimateChange/1_USAFClimate/1_USAF_Natural_Resources/20_2_0004_RevisitingPhase1/"
     
     #NAVY
-    input_umbrella <- "N:/RStor/CEMML/ClimateChange/2_NavyClimate/Round2_Extremes_INRMP_integ/MidLant Region/"
+    #input_umbrella <- "N:/RStor/CEMML/ClimateChange/2_NavyClimate/Round2_Extremes_INRMP_integ/MidLant Region/"
 
     #the specific folder inside the Document to HTML Table Converter where the input files are
-    input_installation_folder <- "NSA Cutler" #corresponds to shortName on the installation_info.xlsx
-    input_SME_folder <- "/Climate/Word to HTML Conversion"
+    input_installation_folder <- "JBLE-Langley" #corresponds to shortName on the installation_info.xlsx 
+    installation_type <- "Air Force" #"Navy"
+    input_SME_folder <- "/FWVA/Updated for HTML Conversion"
   
   #the final file name will start with this and will get the date added
-    subject <- "Climate"
+    subject <- "FWVA"
     project_name <- paste0(subject, "_", input_installation_folder) 
 
 #####NO MORE CHANGES --- -- -- -- --- - - -- -- - -  - - - - -  --- - - - - - - --- --- --- -- ---
 
   input_dir <-  paste0(input_umbrella, input_installation_folder, input_SME_folder)
   current_date <- format(Sys.Date(), "%Y%m%d")  # e.g., "2025-09-24"
-  installation_info <- readxl::read_xlsx("Installation_IDs.xlsx")
+  
+
+
 
 #ERROR CATCH: open files ----
   
@@ -216,50 +219,226 @@ all_headings <- unique(unlist(lapply(results, names)))
     }
   }
   
-# add full SITENAME, SITEID ----
-  key <- match(input_installation_folder, installation_info$FolderName)
-  
-  if(!is.na(key)){
-    df[,"SITENAME"] <- installation_info$SITENAME[key]
-    df[,"SITEID"] <- installation_info$SITEID[key]
-  }else(print("No match found in installation database"))
 
   
-
-##references hanging indent ----
-#add REFERENCES SECTION HANGING INDENT <p style=padding-left:15px;text-indent:-15px;> 
-for(i in 1:nrow(df)){
-  df$References[i]
-  #replace each <p> to <p style=padding-left:15px;text-indent:-15px;>
-  temp_string <- df$References[i]
-  temp_string1 <- stringr::str_replace_all(temp_string, "<p>", '<p style=padding-left:15px;text-indent:-15px;>')
-  #temp_string2 <- replace_all_except_last(temp_string1, "</p>", "</p> <br>")
-  df$References[i] <- temp_string1 #change to temp_string2 if you are adding the line breaks
-}
   
-##line breaks [manually input columns] ----
-numbblocks <- c(3:20) # Change to the columns that need line breaks between paragraphs
-    #add blank line after each paragraph
-    for(a in 1:length(numbblocks)){
-      col_num <- numbblocks[[a]]
-      for(b in 1:nrow(df)){
-        if(is.na(df[[col_num]][b])) next
-
-        #replace each </p> to </p> <br>
-        temp_string <- df[[col_num]][b]
-        temp_string1 <- replace_all_except_last(temp_string, "</p>", "</p> <br>")
-        df[[col_num]][b] <- temp_string1
+# * remove paragraph notation ----
+  p_be_gone <-  function(df, columns){
+    for(col in columns){
+      if (!col %in% colnames(df)) {
+        warning(paste("Column not found, skipping:", col))
+        next
       }
+        #remove paragraph notation
+        df[[col]] <- stringr::str_replace_all(df[[col]], "<p>", '')
+        df[[col]] <- stringr::str_replace_all(df[[col]], "</p>", '')
+
     }
- 
-  #for Hydro Qualitative conversion 
+    return(df)
+  }
+  
+  #REMOVE ITALICS FROM SCIENTIFIC NAMES ----
+  df$ScientificName <- stringr::str_replace_all(df$ScientificName, "<em>", '')
+  df$ScientificName <- stringr::str_replace_all(df$ScientificName, "</em>", '')
+  
+  #run
+  #TEVAs
+    # cols_to_change <- c("SITEID", "CommonName", "ScientificName", "SppID#", "Federal Status:",
+    #                      "State Status:", "Other Status:", "Presence:", "Breeding Status:",
+    #                     "1st_Habitat", "2nd_Habitat", "3rd_Habitat", "4th_Habitat",
+    #                     "VulnerabilityResult", "Confidence", "NE_Level", "OE_Level",
+    #                     "S_Level", "AC_Level")
+  #FWVAs
+    cols_to_change <- c("SITEID","HabitatCommunity", "HabitatCommID#",
+                        "1st_Habitat", "2nd_Habitat", "3rd_Habitat", "4th_Habitat",
+                        "VulnerabilityResult", "E_Level",
+                        "S_Level", "AC_Level")
+  
+  df <- p_be_gone(df, cols_to_change)
+  
+  
+  # add full SITENAME, SITEID ----
+  
+  if(installation_type == "Navy"){
+    installation_info <- readxl::read_xlsx("Installation_IDs.xlsx", sheet=2)
+    SITENAME <- installation_info$InstallationNames[installation_info$SITEID == df$SITEID[1]]
+  }else if(installation_type == "Air Force"){
+    installation_info <- readxl::read_xlsx("Installation_IDs.xlsx", sheet=1)
+    SITENAME <- installation_info$SITENAME[installation_info$SITEID == df$SITEID[1]]
+  }
+  
+  df[,"SITENAME"] <- SITENAME
+  df <- df %>% relocate(SITENAME, .after = SITEID)
+  
+#references hanging indent ----
+  ##TEVA ----
+  #add REFERENCES SECTION HANGING INDENT <p style=padding-left:15px;text-indent:-15px;> 
   # for(i in 1:nrow(df)){
-  #   df$Installation_Summary[i]
-  #   temp_string <- df$Installation_Summary[i]
-  #   temp_string1 <- stringr::str_replace_all(temp_string, "</p> <ul>", "</p> <ul> <br>")
-  #   temp_string2 <- replace_all_except_last(temp_string1, "</p>", "</p> <br>")
-  #   df$Installation_Summary[i] <- temp_string2 #change to temp_string2 if you are adding the line breaks
+  #   df$`References and Credits`[i]
+  #   #replace each <p> to <p style=padding-left:15px;text-indent:-15px;>
+  #   temp_string <- df$`References and Credits`[i]
+  #   temp_string1 <- stringr::str_replace_all(temp_string, "<p>", '<p style=padding-left:15px;text-indent:-15px;>')
+  #   #temp_string2 <- replace_all_except_last(temp_string1, "</p>", "</p> <br>")
+  #   df$`References and Credits`[i] <- temp_string1 #change to temp_string2 if you are adding the line breaks
   # }
+  
+  ##FWVA ----
+  #add REFERENCES SECTION HANGING INDENT <p style=padding-left:15px;text-indent:-15px;> 
+  for(i in 1:nrow(df)){
+    df$`References`[i]
+    #replace each <p> to <p style=padding-left:15px;text-indent:-15px;>
+    temp_string <- df$`References`[i]
+    temp_string1 <- stringr::str_replace_all(temp_string, "<p>", '<p style=padding-left:15px;text-indent:-15px;>')
+    #temp_string2 <- replace_all_except_last(temp_string1, "</p>", "</p> <br>")
+    df$`References`[i] <- temp_string1 #change to temp_string2 if you are adding the line breaks
+  }
+  
+# * assign Hex codes and Numeric values to columns that need it -----
+  hex_codes <- function(df, report_type){
+    if(report_type == "TEVA"){
+      ##TEVAs
+      #repeat this for VulnerabilityResult, Confidence, NE_Level, OE_Level, S_Level, AC_Level
+      
+      #Vuln#
+      df <- df %>% 
+        mutate('Vuln#' = case_when(
+          VulnerabilityResult == "VERY HIGH" ~ 4,
+          VulnerabilityResult == "HIGH" ~ 3,
+          VulnerabilityResult == "MODERATE" ~ 2,
+          VulnerabilityResult == "LOW" ~ 1,
+          TRUE ~ 1
+        )) %>% relocate('Vuln#', .after = VulnerabilityResult)
+      
+      
+      
+      #VulnColor
+      df <- df %>% 
+        mutate(VulnColor = case_when(
+          VulnerabilityResult == "VERY HIGH" ~ "#d42004",
+          VulnerabilityResult == "HIGH" ~ "#f49e0b",
+          VulnerabilityResult == "MODERATE" ~ "#f2e750",
+          VulnerabilityResult == "LOW" ~ "#b2e109",
+          TRUE ~ "none"
+        )) %>% relocate(VulnColor, .after = VulnerabilityResult)
+      
+      #Confidence
+      df <- df %>% 
+        mutate('Conf#' = case_when(
+          Confidence == "HIGH" ~ 3,
+          Confidence == "MODERATE" ~ 2,
+          Confidence == "LOW" ~ 1,
+          TRUE ~ 1
+        )) %>% relocate('Conf#', .after = Confidence)
+      
+      #NE_Level
+      df <- df %>% 
+        mutate(NE_Color = case_when(
+          NE_Level == "High" ~ "#f49e0b",
+          NE_Level == "Moderate" ~ "#f2e750",
+          NE_Level == "Low" ~ "#b2e109",
+          TRUE ~ "none"
+        )) %>% relocate(NE_Color, .after = NE_Level)
+      
+      #OT_Level
+      df <- df %>% 
+        mutate(OE_Color = case_when(
+          OE_Level == "High" ~ "#f49e0b",
+          OE_Level == "Moderate" ~ "#f2e750",
+          OE_Level == "Low" ~ "#b2e109",
+          TRUE ~ "none"
+        )) %>% relocate(OE_Color, .after = OE_Level)
+      
+      #S_Level
+      df <- df %>% 
+        mutate(S_Color = case_when(
+          S_Level == "High" ~ "#f49e0b",
+          S_Level == "Moderate" ~ "#f2e750",
+          S_Level == "Low" ~ "#b2e109",
+          TRUE ~ "none"
+        )) %>% relocate(S_Color, .after = S_Level)
+      
+      #AC_Text
+      #this one is different from the rest!!
+      df <- df %>% 
+        mutate(AC_Color = case_when(
+          AC_Level == "High" ~ "#b2e109",
+          AC_Level == "Moderate" ~ "#f2e750",
+          AC_Level == "Low" ~ "#f49e0b",
+          TRUE ~ "none"
+        )) %>% relocate(AC_Color, .after = AC_Level)
+    }else if(report_type == "FWVA"){
+      ##FWVAs
+      #repeat this for VulnerabilityResult, E_Level, S_Level, AC_Level
+      
+      #Vuln#
+      df <- df %>% 
+        mutate('Vuln#' = case_when(
+          VulnerabilityResult == "VERY HIGH" ~ 4,
+          VulnerabilityResult == "HIGH" ~ 3,
+          VulnerabilityResult == "MODERATE" ~ 2,
+          VulnerabilityResult == "LOW" ~ 1,
+          TRUE ~ 1
+        )) %>% relocate('Vuln#', .after = VulnerabilityResult)
+      
+      #VulnColor
+      df <- df %>% 
+        mutate(VulnColor = case_when(
+          VulnerabilityResult == "VERY HIGH" ~ "#d42004",
+          VulnerabilityResult == "HIGH" ~ "#f49e0b",
+          VulnerabilityResult == "MODERATE" ~ "#f2e750",
+          VulnerabilityResult == "LOW" ~ "#b2e109",
+          TRUE ~ "none"
+        )) %>% relocate(VulnColor, .after = 'Vuln#')
+      
+      #E_Level
+      df <- df %>% 
+        mutate(E_Color = case_when(
+          E_Level == "High" ~ "#f49e0b",
+          E_Level == "Moderate" ~ "#f2e750",
+          E_Level == "Low" ~ "#b2e109",
+          TRUE ~ "none"
+        )) %>% relocate(E_Color, .after = E_Level)
+      
+      
+      #S_Level
+      df <- df %>% 
+        mutate(S_Color = case_when(
+          S_Level == "High" ~ "#f49e0b",
+          S_Level == "Moderate" ~ "#f2e750",
+          S_Level == "Low" ~ "#b2e109",
+          TRUE ~ "none"
+        )) %>% relocate(S_Color, .after = S_Level)
+      
+      
+      #AC_Level
+      df <- df %>% 
+        mutate(AC_Color = case_when(
+          AC_Level == "High" ~ "#f49e0b",
+          AC_Level == "Moderate" ~ "#f2e750",
+          AC_Level == "Low" ~ "#b2e109",
+          TRUE ~ "none"
+        )) %>% relocate(AC_Color, .after = AC_Level)
+    }
+  }
+  
+  #CHANGE THIS TO TEVA IF YOU ARE DOING A TEVA CONVERSION
+  df <- hex_codes(df, subject) #TEVA?
+      
+
+# * add Habitat_Icon columns ----
+  habitat_icons <- function(df){
+    df[,'1st_Habitat_Icon'] <- ""
+    df[,'2nd_Habitat_Icon'] <- ""
+    df[,'3rd_Habitat_Icon'] <- ""
+    df[,'4th_Habitat_Icon'] <- ""
+    df <- df %>% 
+      relocate('1st_Habitat_Icon', .after = `1st_Habitat`) %>% 
+      relocate('2nd_Habitat_Icon', .after = `2nd_Habitat`) %>% 
+      relocate('3rd_Habitat_Icon', .after = `3rd_Habitat`) %>%
+      relocate('4th_Habitat_Icon', .after = `4th_Habitat`)
+  }
+
+  df <- habitat_icons(df)
 
 # Export final files ----
   ##export excel to 3ViewerPackages folder ----

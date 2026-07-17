@@ -427,13 +427,18 @@ all_headings <- unique(unlist(lapply(results, names)))
 
   
 # add full SITENAME, SITEID ----
-  
+  #THIS DOES NOT ASSIGN SITEIDS DYNAMICALLY- 
+  #IT WILL USE THE SAME SITENAMES FOR ALL THE DATA UNLESS SCRIPT CHANGES
   if(installation_type == "Navy"){
-    installation_info <- readxl::read_xlsx("Installation_IDs.xlsx", sheet=2)
-    SITENAME <- installation_info$InstallationNames[installation_info$SITEID == df$SITEID[1]]
+    for(i in 1:nrow(df)){
+      installation_info <- readxl::read_xlsx("Installation_IDs.xlsx", sheet=2)
+      SITENAME <- installation_info$InstallationNames[installation_info$SITEID == df$SITEID[i]]
+    }
   }else if(installation_type == "Air Force"){
+    for(i in 1:nrow(df)){
     installation_info <- readxl::read_xlsx("Installation_IDs.xlsx", sheet=1)
-    SITENAME <- installation_info$SITENAME[installation_info$SITEID == df$SITEID[1]]
+    SITENAME <- installation_info$SITENAME[installation_info$SITEID == df$SITEID[i]]
+    }
   }
   
   df[,"SITENAME"] <- SITENAME

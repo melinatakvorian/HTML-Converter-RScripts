@@ -433,16 +433,19 @@ all_headings <- unique(unlist(lapply(results, names)))
     for(i in 1:nrow(df)){
       installation_info <- readxl::read_xlsx("Installation_IDs.xlsx", sheet=2)
       SITENAME <- installation_info$InstallationNames[installation_info$SITEID == df$SITEID[i]]
+      df[i,"SITENAME"] <- SITENAME
+      df <- df %>% relocate(SITENAME, .after = SITEID)
     }
   }else if(installation_type == "Air Force"){
     for(i in 1:nrow(df)){
     installation_info <- readxl::read_xlsx("Installation_IDs.xlsx", sheet=1)
     SITENAME <- installation_info$SITENAME[installation_info$SITEID == df$SITEID[i]]
+    df[i,"SITENAME"] <- SITENAME
+    df <- df %>% relocate(SITENAME, .after = SITEID)
     }
   }
   
-  df[,"SITENAME"] <- SITENAME
-  df <- df %>% relocate(SITENAME, .after = SITEID)
+  
   
 #references hanging indent ----
   df <- ref_hanging_indents(df, subject)

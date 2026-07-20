@@ -203,22 +203,20 @@ remove_end_blanks <- function(result_list){
   ref_hanging_indents <- function(df, report_type){
     if(report_type == "TEVA"){
       for(i in 1:nrow(df)){
-        df$`References and Credits`[i]
         #replace each <p> to <p style=padding-left:15px;text-indent:-15px;>
         temp_string <- df$`References and Credits`[i]
         temp_string1 <- stringr::str_replace_all(temp_string, "<p>", '<p style=padding-left:15px;text-indent:-15px;>')
         df$`References and Credits`[i] <- temp_string1 
       }
+      return(df)
     }else if(report_type == "FWVA"){
       # for(i in 1:nrow(df)){
       #   df$References[i] <- stringr::str_replace_all(df$References[i], "<p>", '<p style=padding-left:15px;text-indent:-15px;>')
       # }
       for(i in 1:nrow(df)){
-        df$`References`[i]
         #replace each <p> to <p style=padding-left:15px;text-indent:-15px;>
         temp_string <- df$`References`[i]
         temp_string1 <- stringr::str_replace_all(temp_string, "<p>", '<p style=padding-left:15px;text-indent:-15px;>')
-        #temp_string2 <- replace_all_except_last(temp_string1, "</p>", "</p> <br>")
         df$`References`[i] <- temp_string1 #change to temp_string2 if you are adding the line breaks
       }
       return(df)

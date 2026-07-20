@@ -427,14 +427,12 @@ all_headings <- unique(unlist(lapply(results, names)))
 
   
 # add full SITENAME, SITEID ----
-  #THIS DOES NOT ASSIGN SITEIDS DYNAMICALLY- 
-  #IT WILL USE THE SAME SITENAMES FOR ALL THE DATA UNLESS SCRIPT CHANGES
   if(installation_type == "Navy"){
     for(i in 1:nrow(df)){
       installation_info <- readxl::read_xlsx("Installation_IDs.xlsx", sheet=2)
       SITENAME <- installation_info$InstallationNames[installation_info$SITEID == df$SITEID[i]]
-      df[i,"SITENAME"] <- SITENAME
-      df <- df %>% relocate(SITENAME, .after = SITEID)
+      df[i,"InstallationNames"] <- SITENAME
+      df <- df %>% relocate(InstallationNames, .after = SITEID)
     }
   }else if(installation_type == "Air Force"){
     for(i in 1:nrow(df)){
@@ -445,13 +443,8 @@ all_headings <- unique(unlist(lapply(results, names)))
     }
   }
   
-  
-  
 #references hanging indent ----
   df <- ref_hanging_indents(df, subject)
-  
-
-
   
 # create hex codes and numbers ----
   df <- hex_codes(df, subject)

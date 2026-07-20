@@ -36,12 +36,12 @@ invisible(lapply(packages, library, character.only = TRUE))
     #input_umbrella <- "N:/RStor/CEMML/ClimateChange/2_NavyClimate/Round2_Extremes_INRMP_integ/MidLant Region/"
 
     #the specific folder inside the Document to HTML Table Converter where the input files are
-    input_installation_folder <- "BMGR E_W" #corresponds to shortName on the installation_info.xlsx 
+    input_installation_folder <- "Luke AFB" #corresponds to shortName on the installation_info.xlsx 
     installation_type <- "Air Force" #"Navy"
-    input_SME_folder <- "/FWVA/Word to HTML Conversion"
+    input_SME_folder <- "/TEVA/Word to HTML Conversion"
   
   #the final file name will start with this and will get the date added
-    subject <- "FWVA"
+    subject <- "TEVA"
     project_name <- paste0(subject, "_", input_installation_folder) 
 
 #####NO MORE CHANGES --- -- -- -- --- - - -- -- - -  - - - - -  --- - - - - - - --- --- --- -- ---
@@ -457,7 +457,8 @@ all_headings <- unique(unlist(lapply(results, names)))
 # Export final files ----
   ##export excel to 3ViewerPackages folder ----
     out_dir <- paste0(input_umbrella, input_installation_folder, "/3ViewerPackages/HTML_excels") 
-    # ******** NOTE THAT THE FOLDER STRUCTURE MUST MATCH WHAT IS ABOVE ^^^ EXACTLY.  **********
+    
+  # ******** NOTE THAT THE FOLDER STRUCTURE MUST MATCH WHAT IS ABOVE ^^^ EXACTLY.  **********
     # CHANGE out_dir AS NEEDED IF THERE ARE ANY DIFFERENCES IN THE LOCATION YOU WANT TO SAVE TO.
     
     if (!dir.exists(out_dir)) dir.create(out_dir, recursive = TRUE)

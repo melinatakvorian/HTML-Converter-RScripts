@@ -29,7 +29,7 @@ invisible(lapply(packages, library, character.only = TRUE))
 
 # ----TEXT FOR YOU TO CHANGE-----------
 # Select which installation folder you're working in
-input_installation_folder <- "Cold Bay LRRS"
+input_installation_folder <- "Indian Mountain LRRS"
 
 # Write if working on AF (AIR FORCE) or Navy (NAVY):
 # inst_sheet = "NAVY"
@@ -40,10 +40,10 @@ inst_sheet = "AIR FORCE"
 
 # Select which analysis you're doing and the name of the file folder
 #PAY ATTENTION TO THE DIRECTION OF THE SLASHES. THEY HAVE TO BE CHANGED TO FORWARD SLASHES, AS SHOWN BELOW
-input_SME_folder <- "/Hydrology/Word to HTML" 
+input_SME_folder <- "/Climate/Word to HTML Conversion" 
 
 #the final file name will start with this and will get the date added
-subject <- "Hydro"
+subject <- "Climate"
 project_name <- paste0(subject, "_", input_installation_folder)
 
 # this will select which base to select your data from

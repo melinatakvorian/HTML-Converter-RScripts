@@ -36,7 +36,7 @@ invisible(lapply(packages, library, character.only = TRUE))
     #input_umbrella <- "N:/RStor/CEMML/ClimateChange/2_NavyClimate/Round2_Extremes_INRMP_integ/MidLant Region/"
 
     #the specific folder inside the Document to HTML Table Converter where the input files are
-    input_installation_folder <- "Luke AFB" #corresponds to shortName on the installation_info.xlsx 
+    input_installation_folder <- "Eielson AFB" #corresponds to shortName on the installation_info.xlsx 
     installation_type <- "Air Force" #"Navy"
     input_SME_folder <- "/TEVA/Word to HTML Conversion"
   

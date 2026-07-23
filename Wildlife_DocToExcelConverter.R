@@ -36,9 +36,9 @@ invisible(lapply(packages, library, character.only = TRUE))
     #input_umbrella <- "N:/RStor/CEMML/ClimateChange/2_NavyClimate/Round2_Extremes_INRMP_integ/MidLant Region/"
 
     #the specific folder inside the Document to HTML Table Converter where the input files are
-    input_installation_folder <- "Eielson AFB" #corresponds to shortName on the installation_info.xlsx 
+    input_installation_folder <- "Creech AFB" #corresponds to shortName on the installation_info.xlsx 
     installation_type <- "Air Force" #"Navy"
-    input_SME_folder <- "/TEVA/Word to HTML Conversion"
+    input_SME_folder <- "/TEVA"
   
   #the final file name will start with this and will get the date added
     subject <- "TEVA"
@@ -254,9 +254,9 @@ remove_end_blanks <- function(result_list){
       #Confidence
       df <- df %>% 
         mutate('Conf#' = case_when(
-          Confidence == "HIGH" ~ 3,
-          Confidence == "MODERATE" ~ 2,
-          Confidence == "LOW" ~ 1,
+          Confidence == "High" ~ 3,
+          Confidence == "Moderate" ~ 2,
+          Confidence == "Low" ~ 1,
           TRUE ~ 1
         )) %>% relocate('Conf#', .after = Confidence)
       

@@ -36,9 +36,9 @@ invisible(lapply(packages, library, character.only = TRUE))
     #input_umbrella <- "N:/RStor/CEMML/ClimateChange/2_NavyClimate/Round2_Extremes_INRMP_integ/MidLant Region/"
 
     #the specific folder inside the Document to HTML Table Converter where the input files are
-    input_installation_folder <- "JBLE-Eustis" #corresponds to shortName on the installation_info.xlsx 
+    input_installation_folder <- "JBLE-Langley" #corresponds to shortName on the installation_info.xlsx 
     installation_type <- "Air Force" #"Navy"
-    input_SME_folder <- "/TEVA/Updated for HTML Conversion"
+    input_SME_folder <- "/TEVA/Word to HTML Conversion"
   
   #the final file name will start with this and will get the date added
     subject <- "TEVA"
@@ -471,7 +471,7 @@ all_headings <- unique(unlist(lapply(results, names)))
       target <- substr(df$VulnSummary[i], startval, endval)
       before <- substr(df$VulnSummary[i], 1, startval - 1)
       after  <- substr(df$VulnSummary[i], endval + 1, nchar(df$VulnSummary[i]))
-      df$VulnSummary[i] <- paste0(before, '<strong style="color:#b2e109;">', target, '</strong>', after)
+      df$VulnSummary[i] <- paste0(before, '<strong><span style="color:#b2e109;">', target, '</span></strong>', after)
       
     }else if(!is.na(vhigh_log[i])){
       startval <- as.numeric(vhigh_log[i])
@@ -479,7 +479,7 @@ all_headings <- unique(unlist(lapply(results, names)))
       target <- substr(df$VulnSummary[i], startval, endval)
       before <- substr(df$VulnSummary[i], 1, startval - 1)
       after  <- substr(df$VulnSummary[i], endval + 1, nchar(df$VulnSummary[i]))
-      df$VulnSummary[i] <- paste0(before, '<strong style="color:#d42004;">', target, '</strong>', after)
+      df$VulnSummary[i] <- paste0(before, '<strong><span style="color:#d42004;">', target, '</span></strong>', after)
       
     }else if(!is.na(med_log[i])){
       startval <- as.numeric(med_log[i])
@@ -487,7 +487,7 @@ all_headings <- unique(unlist(lapply(results, names)))
       target <- substr(df$VulnSummary[i], startval, endval)
       before <- substr(df$VulnSummary[i], 1, startval - 1)
       after  <- substr(df$VulnSummary[i], endval + 1, nchar(df$VulnSummary[i]))
-      df$VulnSummary[i] <- paste0(before, '<strong style="color:#f2e750;">', target, '</strong>', after)
+      df$VulnSummary[i] <- paste0(before, '<strong><span style="color:#f2e750;">', target, '</span></strong>', after)
       
       
     }else if(!is.na(high_log[i])){
@@ -496,7 +496,7 @@ all_headings <- unique(unlist(lapply(results, names)))
       target <- substr(df$VulnSummary[i], startval, endval)
       before <- substr(df$VulnSummary[i], 1, startval - 1)
       after  <- substr(df$VulnSummary[i], endval + 1, nchar(df$VulnSummary[i]))
-      df$VulnSummary[i] <- paste0(before, '<strong style="color:#f49e0b;">', target, '</strong>', after)
+      df$VulnSummary[i] <- paste0(before, '<strong><span style="color:#f49e0b;">', target, '</span></strong>', after)
       
     }else{
       next}

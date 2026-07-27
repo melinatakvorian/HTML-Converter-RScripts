@@ -471,7 +471,7 @@ all_headings <- unique(unlist(lapply(results, names)))
       target <- substr(df$VulnSummary[i], startval, endval)
       before <- substr(df$VulnSummary[i], 1, startval - 1)
       after  <- substr(df$VulnSummary[i], endval + 1, nchar(df$VulnSummary[i]))
-      df$VulnSummary[i] <- paste0(before, '<strong><span style="color:#b2e109;">', target, '</span></strong>', after)
+      df$VulnSummary[i] <- paste0(before, '<strong><span style="color:#8eb407;">', target, '</span></strong>', after)
       
     }else if(!is.na(vhigh_log[i])){
       startval <- as.numeric(vhigh_log[i])
@@ -487,7 +487,7 @@ all_headings <- unique(unlist(lapply(results, names)))
       target <- substr(df$VulnSummary[i], startval, endval)
       before <- substr(df$VulnSummary[i], 1, startval - 1)
       after  <- substr(df$VulnSummary[i], endval + 1, nchar(df$VulnSummary[i]))
-      df$VulnSummary[i] <- paste0(before, '<strong><span style="color:#f2e750;">', target, '</span></strong>', after)
+      df$VulnSummary[i] <- paste0(before, '<strong><span style="color:#BCC208;">', target, '</span></strong>', after)
       
       
     }else if(!is.na(high_log[i])){

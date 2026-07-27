@@ -403,19 +403,19 @@ all_headings <- unique(unlist(lapply(results, names)))
     cols_to_change <- c("SITEID", "CommonName", "ScientificName", "SppID#", "Federal Status:",
                          "State Status:", "Other Status:", "Presence:", "Breeding Status:",
                         "1st_Habitat", "2nd_Habitat", "3rd_Habitat", "4th_Habitat",
-                        "VulnerabilityResult", "Confidence", "NE_Level", "OE_Level",
-                        "S_Level", "AC_Level")
+                        "VulnerabilityResult", "Confidence","NE_Text", "NE_Level", "OE_Level",
+                        "OE_Text", "S_Text", "S_Level", "AC_Text", "AC_Level")
   }else if(subject == "FWVA"){
     #FWVAs
     cols_to_change <- c("SITEID","HabitatCommunity", "HabitatCommID#",
                         "1st_Habitat", "2nd_Habitat", "3rd_Habitat", "4th_Habitat",
-                        "VulnerabilityResult", "E_Level",
-                        "S_Level", "AC_Level")
+                        "VulnerabilityResult", "E_Text", "E_Level", "S_Text",
+                        "S_Level", "AC_Text", "AC_Level")
   }
 
   df <- p_be_gone(df, cols_to_change)
   
-#REMOVE ITALICS FROM SCIENTIFIC NAMES ----
+#Remove italics from sci names ----
   if(subject == "TEVA"){
     df$ScientificName <- stringr::str_replace_all(df$ScientificName, "<em>", '')
     df$ScientificName <- stringr::str_replace_all(df$ScientificName, "</em>", '')

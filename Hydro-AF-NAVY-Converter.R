@@ -87,7 +87,8 @@ convert_docx_to_html_full <- function(docx_file, filepath) {
     output = html_file,
     from = "docx",
     to = "html",
-    standalone = TRUE
+    standalone = TRUE,
+    args = c("--wrap=none")
   )
   
   xml2::read_html(html_file)

@@ -15,11 +15,9 @@
 # ---------------------------------------------------------------
 
 escape_regex <- function(x) {
-  # Escape one special character at a time using fixed = TRUE, so no
-  # regex engine ever has to parse a pattern containing these
-  # characters together (which is what caused the invalid regex error).
-  # IMPORTANT: backslash must be escaped first, or it would double-escape
-  # the backslashes inserted for the other characters.
+  # Escape one special character at a time using fixed = TRUE, 
+  # so no regex engine ever has to parse a pattern containing these characters together.
+  # IMPORTANT: backslash must be escaped first, or it would double-escape the backslashes inserted for the other characters.
   specials <- c("\\", ".", "|", "(", ")", "[", "]", "{", "}", "^", "$", "*", "+", "?")
   for (ch in specials) {
     x <- gsub(ch, paste0("\\", ch), x, fixed = TRUE)
@@ -30,64 +28,74 @@ escape_regex <- function(x) {
 bold_first_term_occurrence <- function(df, cols, glossary, ignore_case = TRUE) {
   
   # longest terms first, so multi-word phrases win over their substrings
-  glossary <- glossary[order(-nchar(glossary))]
+  glossary <- glossary[order(-nchar(glossary))] #order glossary terms from longest to shortest
   
-  for (i in seq_len(nrow(df))) {
+  for (i in seq_len(nrow(df))) { #run along each row of the data frame
     
-    texts <- setNames(as.character(unlist(df[i, cols])), cols)
+    #create a list of the text we are investigating in df[i,] 
+    #where each item is the data from one of the sections and each item's name is that section's name
+      texts <- setNames(as.character(unlist(df[i, cols])), cols)
     
-    # track character ranges in each column that are already inside a
-    # <strong> tag, so later terms don't re-match inside them
-    protected <- setNames(vector("list", length(cols)), cols)
-    for (col in cols) protected[[col]] <- matrix(numeric(0), ncol = 2)
-    
-    for (term in glossary) {
-      pattern <- paste0("\\b", escape_regex(term), "\\b")
-      found <- FALSE
+    # track character ranges in each column that are already inside a <strong> tag,
+    #so later terms don't re-match inside them
+      #I don't really understand this
+      protected <- setNames(vector("list", length(cols)), cols)
       
-      for (col in cols) {
-        if (found) break
-        txt <- texts[[col]]
-        if (is.na(txt) || !nzchar(txt)) next
-        
-        m <- gregexpr(pattern, txt, ignore.case = ignore_case, perl = TRUE)[[1]]
-        if (m[1] == -1) next
-        lens <- attr(m, "match.length")
-        prot <- protected[[col]]
-        
-        for (k in seq_along(m)) {
-          start <- m[k]; end <- start + lens[k] - 1
-          
-          overlap <- FALSE
-          if (nrow(prot) > 0) {
-            overlap <- any(start <= prot[, 2] & end >= prot[, 1])
-          }
-          if (overlap) next
-          
-          matched_text <- substr(txt, start, end)
-          new_txt <- paste0(
-            substr(txt, 1, start - 1),
-            "<strong>", matched_text, "</strong>",
-            substr(txt, end + 1, nchar(txt))
-          )
-          
-          # shift any already-protected ranges that came after this match
-          tag_len <- nchar("<strong>") + nchar("</strong>")
-          if (nrow(prot) > 0) {
-            shift <- ifelse(prot[, 1] > end, tag_len, 0)
-            prot[, 1] <- prot[, 1] + shift
-            prot[, 2] <- prot[, 2] + shift
-          }
-          new_start <- start + nchar("<strong>")
-          new_end   <- new_start + (end - start)
-          prot <- rbind(prot, c(new_start, new_end))
-          
-          protected[[col]] <- prot
-          texts[[col]] <- new_txt
-          found <- TRUE
-          break
-        }
+      for (col in cols){
+        protected[[col]] <- matrix(numeric(0), ncol = 2)
       }
+    
+    for (term in glossary) {#for each term in the glossary
+      pattern <- paste0("\\b", escape_regex(term), "\\b") #create a 'tag' to assign for terms that need bolding
+      found <- FALSE #set found object to FALSE
+      
+      for (col in cols) { #for each piece of data in 'sections'
+        if (found) break #if found is true, break this code
+        txt <- texts[[col]] #assign the text chunk to an object called 'txt'
+        if (is.na(txt) || !nzchar(txt)) next #if txt is null or txt has no characters, then move to the next section of sections
+        
+        #find all the matches of term in all sections
+        #store the index of each match within txt, as well as the length of the match
+          m <- gregexpr(pattern, txt, ignore.case = ignore_case, perl = TRUE)[[1]] 
+          if (m[1] == -1) next #if there are no mathces (m is -1), skip to the next term
+          lens <- attr(m, "match.length") #takes the length of the matched words and ties it to the match's index
+          prot <- protected[[col]] #the indices for the already bolded terms of this section
+        
+          
+            for (k in seq_along(m)) { #for each match in the indices of matches (m)
+              start <- m[k] #set the starting point as the m value assigned to this loop number
+              end <- start + lens[k] - 1 #NOT SURE WHAT IS DONE HERE
+              
+              overlap <- FALSE #set overlap to false
+              if (nrow(prot) > 0) { #if the number of words that are already bolded is greater than 0
+                overlap <- any(start <= prot[, 2] & end >= prot[, 1]) #set overlap to TRUE if the term is already bolded
+              }
+              if (overlap) next #if overlap is TRUE, then go to the next match
+              
+              matched_text <- substr(txt, start, end) #
+              new_txt <- paste0(
+                substr(txt, 1, start - 1),
+                "<strong>", matched_text, "</strong>",
+                substr(txt, end + 1, nchar(txt))
+              )
+              
+              # shift any already-protected ranges that came after this match
+              tag_len <- nchar("<strong>") + nchar("</strong>") #
+              if (nrow(prot) > 0) { #
+                shift <- ifelse(prot[, 1] > end, tag_len, 0)
+                prot[, 1] <- prot[, 1] + shift
+                prot[, 2] <- prot[, 2] + shift
+              }
+              new_start <- start + nchar("<strong>")
+              new_end   <- new_start + (end - start)
+              prot <- rbind(prot, c(new_start, new_end))
+              
+              protected[[col]] <- prot
+              texts[[col]] <- new_txt
+              found <- TRUE
+              break
+            }
+      }#end of loop for each piece of data in sections
     }
     
     df[i, cols] <- as.list(texts[cols])
@@ -97,27 +105,27 @@ bold_first_term_occurrence <- function(df, cols, glossary, ignore_case = TRUE) {
 }
 
 #TEST ----
-glossary <- c("weather", "vulnerability", "natural hazards", "temperature-dependent sex determination", "drought", "frequency", "duration")
-sections <- c("VulnSummary", "NE_Text", "OE_Text", "S_Text", "AC_Text")
-
-result <- bold_first_term_occurrence(df, cols = sections, glossary = glossary)
-print(result)
+  glossary <- c("weather", "vulnerability", "natural hazards", "temperature-dependent sex determination", "drought", "frequency", "duration")
+  sections <- c("VulnSummary", "NE_Text", "OE_Text", "S_Text", "AC_Text")
+  
+  result <- bold_first_term_occurrence(df, cols = sections, glossary = glossary)
+  print(result)
 
 
 #EXPORT ----
-##export excel to 3ViewerPackages folder ----
-out_dir <- paste0(input_umbrella, input_installation_folder, "/3ViewerPackages/HTML_excels") 
-
-# ******** NOTE THAT THE FOLDER STRUCTURE MUST MATCH WHAT IS ABOVE ^^^ EXACTLY.  **********
-# CHANGE out_dir AS NEEDED IF THERE ARE ANY DIFFERENCES IN THE LOCATION YOU WANT TO SAVE TO.
-
-if (!dir.exists(out_dir)) dir.create(out_dir, recursive = TRUE)
-
-output_filename <- paste0(project_name, "_HTML_formatted.xlsx")
-shortcut_location <- file.path(input_dir, output_filename) #save the path to the future shortcut
-
-write_xlsx(result, shortcut_location) #create file and save to folder
-message("Conversion complete. XLSX saved to: ", file.path(out_dir, output_filename))
+  ##export excel to 3ViewerPackages folder ----
+  out_dir <- paste0(input_umbrella, input_installation_folder, "/3ViewerPackages/HTML_excels") 
+  
+  # ******** NOTE THAT THE FOLDER STRUCTURE MUST MATCH WHAT IS ABOVE ^^^ EXACTLY.  **********
+  # CHANGE out_dir AS NEEDED IF THERE ARE ANY DIFFERENCES IN THE LOCATION YOU WANT TO SAVE TO.
+  
+  if (!dir.exists(out_dir)) dir.create(out_dir, recursive = TRUE)
+  
+  output_filename <- paste0(project_name, "_HTML_formatted.xlsx")
+  shortcut_location <- file.path(input_dir, output_filename) #save the path to the future shortcut
+  
+  write_xlsx(result, shortcut_location) #create file and save to folder
+  message("Conversion complete. XLSX saved to: ", file.path(out_dir, output_filename))
 
 # ---------------------------------------------------------------
 # Example usage ----

@@ -36,9 +36,9 @@ invisible(lapply(packages, library, character.only = TRUE))
     #input_umbrella <- "N:/RStor/CEMML/ClimateChange/2_NavyClimate/Round2_Extremes_INRMP_integ/MidLant Region/"
 
     #the specific folder inside the Document to HTML Table Converter where the input files are
-    input_installation_folder <- "JBLE-Langley" #corresponds to shortName on the installation_info.xlsx 
+    input_installation_folder <- "Creech AFB" #corresponds to shortName on the installation_info.xlsx 
     installation_type <- "Air Force" #"Navy"
-    input_SME_folder <- "/TEVA/Word to HTML Conversion"
+    input_SME_folder <- "/TEVA/Test Bolding"
   
   #the final file name will start with this and will get the date added
     subject <- "TEVA"
@@ -224,7 +224,25 @@ remove_end_blanks <- function(result_list){
       return(df)
     }
   }
-
+  # * update U.S. to US ----
+  update_US <- function(df, report_type){
+    if(report_type == "TEVA"){
+      for(i in 1:nrow(df)){
+        references <- df$`References and Credits`[i]
+        references_1 <- stringr::str_replace_all(references, "U.S.", "US")
+        df$`References and Credits`[i] <- references_1
+      }
+      return(df)
+    }else if(report_type == "FWVA"){
+      for(i in 1:nrow(df)){
+        #replace each <p> to <p style=padding-left:15px;text-indent:-15px;>
+        temp_string <- df$`References`[i]
+        references_1 <- stringr::str_replace_all(references, "U.S.", "US")
+        df$`References`[i] <- references_1
+      }
+      return(df)
+    }
+  }
   # * assign Hex codes and Numeric values to columns that need it -----
   hex_codes <- function(df, report_type){
     if(report_type == "TEVA"){
@@ -446,6 +464,9 @@ all_headings <- unique(unlist(lapply(results, names)))
 #references hanging indent ----
   df <- ref_hanging_indents(df, subject)
   
+#change US type ----
+  df <- update_US(df, subject)
+  
 # create hex codes and numbers ----
   df <- hex_codes(df, subject)
       
@@ -501,6 +522,7 @@ all_headings <- unique(unlist(lapply(results, names)))
     }else{
       next}
   }
+
   
 # Export final files ----
   ##export excel to 3ViewerPackages folder ----

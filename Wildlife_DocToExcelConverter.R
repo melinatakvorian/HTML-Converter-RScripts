@@ -38,10 +38,10 @@ invisible(lapply(packages, library, character.only = TRUE))
     #the specific folder inside the Document to HTML Table Converter where the input files are
     input_installation_folder <- "Creech AFB" #corresponds to shortName on the installation_info.xlsx 
     installation_type <- "Air Force" #"Navy"
-    input_SME_folder <- "/FWVA/FormatforBolding"
+    input_SME_folder <- "/TEVA/Test Bolding"
   
   #the final file name will start with this and will get the date added
-    subject <- "FWVA"
+    subject <- "TEVA"
     project_name <- paste0(subject, "_", input_installation_folder) 
 
 #####NO MORE CHANGES --- -- -- -- --- - - -- -- - -  - - - - -  --- - - - - - - --- --- --- -- ---

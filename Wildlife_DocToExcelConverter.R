@@ -36,12 +36,12 @@ invisible(lapply(packages, library, character.only = TRUE))
     #input_umbrella <- "N:/RStor/CEMML/ClimateChange/2_NavyClimate/Round2_Extremes_INRMP_integ/MidLant Region/"
 
     #the specific folder inside the Document to HTML Table Converter where the input files are
-    input_installation_folder <- "JBLE-Eustis" #corresponds to shortName on the installation_info.xlsx 
+    input_installation_folder <- "JBLE-Langley" #corresponds to shortName on the installation_info.xlsx 
     installation_type <- "Air Force" #"Navy"
-    input_SME_folder <- "/TEVA/Updated for HTML Conversion/Test"
+    input_SME_folder <- "/FWVA/Updated for HTML Conversion/Test"
   
   #the final file name will start with this and will get the date added
-    subject <- "TEVA"
+    subject <- "FWVA"
     project_name <- paste0(subject, "_", input_installation_folder) 
 
 #####NO MORE CHANGES --- -- -- -- --- - - -- -- - -  - - - - -  --- - - - - - - --- --- --- -- ---
@@ -579,7 +579,8 @@ all_headings <- unique(unlist(lapply(results, names)))
     if (!dir.exists(out_dir)) dir.create(out_dir, recursive = TRUE)
     
     output_filename <- paste0(project_name, "_HTML_formatted_", current_date, ".xlsx")
-    write_xlsx(df, file.path(out_dir, output_filename)) #create file and save to 3ViewerPackages folder
+    #write_xlsx(df, file.path(out_dir, output_filename)) #create file and save to 3ViewerPackages folder
+    write_xlsx(result, file.path(out_dir, output_filename)) #create file and save to 3ViewerPackages folder
     message("Conversion complete. XLSX saved to: ", file.path(out_dir, output_filename))
 
   ##create shortcut to Word to HTML folder ----

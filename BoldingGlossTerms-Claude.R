@@ -113,12 +113,12 @@ bold_first_term_occurrence <- function(df, cols, glossary, ignore_case = TRUE) {
                 " ENSO", "emergent vegetation", "emissions", "endemic species", " ESA", "eutrophication",
                 "evapotranspiration", "exposure", "extreme heat days", "extreme weather event", "false spring", 
                 "fecundity", "flash drought", "flash flood", "frequency", " GAP", "green-up", "habitat vulnerability index", 
-                " HVI", "hibernaculum", "historical baseline", "hotdays", "hurricane", "hydrological drought", "ice storm", "indicator species", 
+                " HVI", "hibernaculum", "hibernacula", "historical baseline", "hotdays", "hurricane", "hydrological drought", "ice storm", "indicator species", 
                 "intensity", "interspecific brood parasitism", "keystone species", "la niña", "marine noise pollution", " MBTA",
                 "mesic", "mesopredator", "microclimate", "missionscape", " MMPA", "monsoon", " NABCI", "National Vegetation Classification System",
-                " NVC", " NVCS", "natural hazard", "natural hazard exposure", " NE", "nertic", " NMFS", " NOAA",
+                " NVC", " NVCS", "natural hazard", "natural hazard exposure", " NE", "neritic", " NMFS", " NOAA",
                 "Northern Atlantic Oscillation", " NAO", "ocean acidification", " OA", "other exposures", " OE", "PARC MSS", "pelagic",
-                "perennial", "perennial plant", "permafrost", "permanent inundation", "phenology", "phenoligical", "PIF MSS", "piscivorous",
+                "perennial", "perennial plant", "permafrost", "permanent inundation", "phenology", "phenological", "PIF MSS", "piscivorous",
                 "polyandry", "population bottleneck", "precipitation", "projection", "potential impact", "Representative Concentration Pathway",
                 " RCP", "resilience", "saltwater intrusion", "scenario", "sea level decrease", "sea level increase", " SLI", "sea surface temperature",
                 " SST", "sensitivity", "severity", " SFS", " SGCN", "snowpack", "SOTB TPS", " SPEI",
@@ -131,8 +131,11 @@ bold_first_term_occurrence <- function(df, cols, glossary, ignore_case = TRUE) {
 
   sections <- c("VulnSummary", "NE_Text", "OE_Text", "S_Text", "AC_Text")
   
+  
+#run for dataframe
   result <- bold_first_term_occurrence(df, cols = sections, glossary = glossary)
-  print(result)
+  
+  #print(result)
 
 
 #EXPORT ----

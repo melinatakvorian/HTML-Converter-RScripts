@@ -36,9 +36,9 @@ invisible(lapply(packages, library, character.only = TRUE))
     #input_umbrella <- "N:/RStor/CEMML/ClimateChange/2_NavyClimate/Round2_Extremes_INRMP_integ/MidLant Region/"
 
     #the specific folder inside the Document to HTML Table Converter where the input files are
-    input_installation_folder <- "JBLE-Langley" #corresponds to shortName on the installation_info.xlsx 
+    input_installation_folder <- "JBLE-Eustis" #corresponds to shortName on the installation_info.xlsx 
     installation_type <- "Air Force" #"Navy"
-    input_SME_folder <- "/FWVA/Updated for HTML Conversion/Test"
+    input_SME_folder <- "/FWVA/Test"
   
   #the final file name will start with this and will get the date added
     subject <- "FWVA"
@@ -236,7 +236,7 @@ remove_end_blanks <- function(result_list){
     }else if(report_type == "FWVA"){
       for(i in 1:nrow(df)){
         #replace each <p> to <p style=padding-left:15px;text-indent:-15px;>
-        temp_string <- df$`References`[i]
+        references <- df$`References`[i]
         references_1 <- stringr::str_replace_all(references, "U.S.", "US")
         df$`References`[i] <- references_1
       }

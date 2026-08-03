@@ -569,6 +569,25 @@ all_headings <- unique(unlist(lapply(results, names)))
       next}
   }
   
+#line breaks [manually input columns] ----
+  if(subject == "FWVA"){
+    numbblocks <- c(5, 18) # Change to the columns that need line breaks between paragraphs
+    #add blank line after each paragraph
+    for(a in 1:length(numbblocks)){
+      col_num <- numbblocks[[a]]
+      for(b in 1:nrow(df)){
+        if(is.na(df[[col_num]][b])) next
+        
+        #replace each </p> to </p> <br>
+        temp_string <- df[[col_num]][b]
+        temp_string1 <- replace_all_except_last(temp_string, "</p>", "</p> <br>")
+        df[[col_num]][b] <- temp_string1
+      }
+    }
+  }
+
+    
+  
 # Export final files ----
   ##export excel to 3ViewerPackages folder ----
     out_dir <- paste0(input_umbrella, input_installation_folder, "/3ViewerPackages/HTML_excels") 

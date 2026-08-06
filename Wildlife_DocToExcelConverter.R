@@ -36,12 +36,12 @@ invisible(lapply(packages, library, character.only = TRUE))
     #input_umbrella <- "N:/RStor/CEMML/ClimateChange/2_NavyClimate/Round2_Extremes_INRMP_integ/MidLant Region/"
 
     #the specific folder inside the Document to HTML Table Converter where the input files are
-    input_installation_folder <- "Creech AFB" #corresponds to shortName on the installation_info.xlsx 
+    input_installation_folder <- "Eielson AFB" #corresponds to shortName on the installation_info.xlsx 
     installation_type <- "Air Force" #"Navy"
-    input_SME_folder <- "/TEVA/Test Bolding"
+    input_SME_folder <- "/FWVA"
   
   #the final file name will start with this and will get the date added
-    subject <- "TEVA"
+    subject <- "FWVA"
     project_name <- paste0(subject, "_", input_installation_folder) 
 
 #####NO MORE CHANGES --- -- -- -- --- - - -- -- - -  - - - - -  --- - - - - - - --- --- --- -- ---
@@ -363,9 +363,9 @@ remove_end_blanks <- function(result_list){
       #AC_Level
       df <- df %>% 
         mutate(AC_Color = case_when(
-          AC_Level == "High" ~ "#f49e0b",
+          AC_Level == "High" ~ "#b2e109",
           AC_Level == "Moderate" ~ "#f2e750",
-          AC_Level == "Low" ~ "#b2e109",
+          AC_Level == "Low" ~ "#f49e0b",
           TRUE ~ "none"
         )) %>% relocate(AC_Color, .after = AC_Level)
     }

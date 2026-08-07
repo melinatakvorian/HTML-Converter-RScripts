@@ -1,4 +1,4 @@
-# ---------------------------------------------------------------
+
 # bold_first_term_occurrence()
 #
 # For each row of `df`, looks across the columns in `cols` (in the
@@ -12,7 +12,7 @@
 #   "heartache".
 # - Matches inside text you've already bolded (from an earlier,
 #   longer term) are skipped, so you never get nested/broken tags.
-# ---------------------------------------------------------------
+
 
 escape_regex <- function(x) {
   # Escape one special character at a time using fixed = TRUE, 
@@ -104,10 +104,10 @@ bold_first_term_occurrence <- function(df, cols, glossary, ignore_case = TRUE) {
   df
 }
 
-#TEST ----
-  glossary <- c("adaptation", "AC ", "adaptive capacity", "adaptive management", " AFB", " AFS", 
-                "afforestation", "anadromous", "asymptomatic reservoir", "asynchronous breeding ", " BBS", 
-                " BCC", "benthic"," BGEPA", "bioaccumulation", "bioclimatic variables", "bioindicators",
+#Glossary list for wildlife ----
+  glossary <- c("adaptation", "AC ", "adaptive capacity", "adaptive management", "AFB", "AFS", 
+                "afforestation", "anadromous", "asymptomatic reservoir", "asynchronous breeding ", "BBS", 
+                "BCC", "benthic","BGEPA", "bioaccumulation", "bioclimatic variables", "bioindicators",
                 "bycatch", "CEMML", "climate", "colddays", " DDT", " DOD", " DODD", " DODI", " DPS", "drought", "duration", "echolocation",
                 "ecological niche model", "ecosystem engineer", "ecosystem services", "ectothermic", "el niño", "el niño-southern oscillation", 
                 " ENSO", "emergent vegetation", "emissions", "endemic species", " ESA", "eutrophication",

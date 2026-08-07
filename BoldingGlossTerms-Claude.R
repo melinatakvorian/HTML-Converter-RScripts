@@ -133,12 +133,73 @@ bold_first_term_occurrence <- function(df, cols, glossary, ignore_case = TRUE) {
   sections_TEVA <- c("VulnSummary", "NE_Text", "OE_Text", "S_Text", "AC_Text")
   sections_FWVA <- c("ProminentTaxa", "VulnSummary", "E_Text", "S_Text", "AC_Text")
   
+#unbold everything first
+  if(subject == "TEVA"){
+    for(col in sections_TEVA){
+      df[[col]] <- stringr::str_replace_all(df[[col]], "<strong>", '')
+      df[[col]] <- stringr::str_replace_all(df[[col]], "</strong>", '')
+    }
+  }else if (subject == "FWVA"){
+    for(col in sections_FWVA){
+      df[[col]] <- stringr::str_replace_all(df[[col]], "<strong>", '')
+      df[[col]] <- stringr::str_replace_all(df[[col]], "</strong>", '')
+    }
+  }
+
   
 #run for dataframe
   result <- bold_first_term_occurrence(df, cols = sections_TEVA, glossary = glossary)
   
   #print(result)
 
+  
+  
+#create colored text for the vulnerability ----
+  #the script needs to detect this text "vulnerability to short- and long-term weather changes" and find the word BEFORE it. 
+  #or it needs to detect the first instance of "low", "high", "moderate", "very high" in the vulnerability summary and add the hex codes
+  # <span style="color: #ff0000;">special</span>
+  low_log <- str_locate(result$VulnSummary, "low <strong>vul")
+  med_log <- str_locate(result$VulnSummary, "moderate <strong>vul")
+  high_log <- str_locate(result$VulnSummary, "high <strong>vul")
+  vhigh_log <- str_locate(result$VulnSummary, "very high <strong>vul")
+  
+  for(i in 1:nrow(result)){
+    if(!is.na(low_log[i])){
+      startval <- as.numeric(low_log[i])
+      endval <- startval+2
+      target <- substr(result$VulnSummary[i], startval, endval)
+      before <- substr(result$VulnSummary[i], 1, startval - 1)
+      after  <- substr(result$VulnSummary[i], endval + 1, nchar(result$VulnSummary[i]))
+      result$VulnSummary[i] <- paste0(before, '<strong><span style="color:#8eb407;">', target, '</span></strong>', after)
+      
+    }else if(!is.na(vhigh_log[i])){
+      startval <- as.numeric(vhigh_log[i])
+      endval <- startval+8
+      target <- substr(result$VulnSummary[i], startval, endval)
+      before <- substr(result$VulnSummary[i], 1, startval - 1)
+      after  <- substr(result$VulnSummary[i], endval + 1, nchar(result$VulnSummary[i]))
+      result$VulnSummary[i] <- paste0(before, '<strong><span style="color:#d42004;">', target, '</span></strong>', after)
+      
+    }else if(!is.na(med_log[i])){
+      startval <- as.numeric(med_log[i])
+      endval <- startval+7
+      target <- substr(result$VulnSummary[i], startval, endval)
+      before <- substr(result$VulnSummary[i], 1, startval - 1)
+      after  <- substr(result$VulnSummary[i], endval + 1, nchar(result$VulnSummary[i]))
+      result$VulnSummary[i] <- paste0(before, '<strong><span style="color:#BCC208;">', target, '</span></strong>', after)
+      
+      
+    }else if(!is.na(high_log[i])){
+      startval <- as.numeric(high_log[i])
+      endval <- startval+3
+      target <- substr(result$VulnSummary[i], startval, endval)
+      before <- substr(result$VulnSummary[i], 1, startval - 1)
+      after  <- substr(result$VulnSummary[i], endval + 1, nchar(result$VulnSummary[i]))
+      result$VulnSummary[i] <- paste0(before, '<strong><span style="color:#f49e0b;">', target, '</span></strong>', after)
+      
+    }else{
+      next}
+  }
 
 #EXPORT ----
   ##export excel to 3ViewerPackages folder ----

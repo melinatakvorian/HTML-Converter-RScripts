@@ -124,7 +124,7 @@ bold_first_term_occurrence <- function(df, cols, glossary, ignore_case = TRUE) {
                 "RCP", "resilience", "saltwater intrusion", "scenario", "sea level decrease", "sea level increase", "SLI", "sea surface temperature",
                 "SST", "sensitivity", "severity", "SFS", "SGCN", "snowpack", "SOTB TPS", "SPEI",
                 "stochastic", "sp.", "spp.", "ssp.", "storm surge", " SS", "SWAP", "TED",
-                "temperature-dependent sex determination", "terrestrial ecosystems", "TEVA", "tropical cyclone", 
+                "temperature-dependent sex determination", "terrestrial ecosystems", "TEVA", "torpor", "tropical cyclone", 
                 "tropical storm", "typhoon", "USFWS", "USGS",
                 "var.", "vulnerability", "vulnerability assessment", "VA", "weather", "wet days", 
                 "white-nose syndrome", "WNS", "xeric")

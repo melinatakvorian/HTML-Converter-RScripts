@@ -31,7 +31,7 @@ invisible(lapply(packages, library, character.only = TRUE))
  
 # ----TEXT FOR YOU TO CHANGE-----------
   # Select which installation folder you're working in
-  input_installation_folder <- "Indian Mountain LRRS"
+  input_installation_folder <- "Pituffik Space Base"
 
   # Write if working on AF (AIR FORCE) or Navy (NAVY):
   # inst_sheet = "NAVY"
@@ -47,7 +47,7 @@ invisible(lapply(packages, library, character.only = TRUE))
   subject <- "Hydro"
   project_name <- paste0(subject, "_", input_installation_folder)
   
-  # this will select which base to select your data from
+  # this will select which sheet to select your data from
   ifelse(inst_sheet == "AIR FORCE",
          input_umbrella <- "N:/RStor/CEMML/ClimateChange/1_USAFClimate/1_USAF_Natural_Resources/20_2_0004_RevisitingPhase1/",
          input_umbrella <- paste0("N:/RStor/CEMML/ClimateChange/2_NavyClimate/Round2_Extremes_INRMP_integ/", navy_region, "/"))

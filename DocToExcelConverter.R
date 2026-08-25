@@ -12,7 +12,7 @@
 
 ## Install / load necessary packages ----
 
-packages <- c("pandoc","xml2","rvest","writexl", "stringr", "readxl")
+packages <- c("pandoc","xml2","rvest","writexl", "stringr", "readxl", "dplyr")
 
 # Install packages not yet installed
 installed_packages <- packages %in% rownames(installed.packages())
@@ -29,21 +29,21 @@ invisible(lapply(packages, library, character.only = TRUE))
 
 # ----TEXT FOR YOU TO CHANGE-----------
 # Select which installation folder you're working in
-input_installation_folder <- "Indian Mountain LRRS"
+input_installation_folder <- "NAVSTA Mayport"
 
 # Write if working on AF (AIR FORCE) or Navy (NAVY):
-# inst_sheet = "NAVY"
-inst_sheet = "AIR FORCE"
+inst_sheet = "NAVY"
+# inst_sheet = "AIR FORCE"
 
 # If Navy, select which region
-# navy_region = "Southeast Region"
+navy_region = "Southeast Region"
 
 # Select which analysis you're doing and the name of the file folder
 #PAY ATTENTION TO THE DIRECTION OF THE SLASHES. THEY HAVE TO BE CHANGED TO FORWARD SLASHES, AS SHOWN BELOW
-input_SME_folder <- "/Climate/Word to HTML Conversion" 
+input_SME_folder <- "/SLR/Word to HTML Conversion" 
 
 #the final file name will start with this and will get the date added
-subject <- "Climate"
+subject <- "SLR"
 project_name <- paste0(subject, "_", input_installation_folder)
 
 # this will select which base to select your data from
@@ -55,7 +55,6 @@ ifelse(inst_sheet == "AIR FORCE",
 
   input_dir <-  paste0(input_umbrella, input_installation_folder, input_SME_folder)
   current_date <- format(Sys.Date(), "%Y%m%d")  # e.g., "2025-09-24"
-  installation_info <- readxl::read_xlsx("Installation_IDs.xlsx")
 
 #ERROR CATCH: open files ----
   
@@ -84,7 +83,8 @@ convert_docx_to_html_full <- function(docx_file) {
     output = html_file,
     from = "docx",
     to = "html",
-    standalone = TRUE
+    standalone = TRUE, 
+    args =  c("--wrap=none")
   )
   
   xml2::read_html(html_file)
@@ -190,7 +190,20 @@ remove_end_blanks <- function(result_list){
     paste0(gsub(from, to, before, fixed = TRUE), after)
   }
   
-
+  # * remove paragraph notation ----
+  p_be_gone <-  function(df, columns){
+    for(col in columns){
+      if (!col %in% colnames(df)) {
+        warning(paste("Column not found, skipping:", col))
+        next
+      }
+      #remove paragraph notation
+      df[[col]] <- stringr::str_replace_all(df[[col]], "<p>", '')
+      df[[col]] <- stringr::str_replace_all(df[[col]], "</p>", '')
+      
+    }
+    return(df)
+  }
   
 # RUN ----
 docx_files <- list.files(input_dir, pattern = "\\.docx$", full.names = TRUE) #pull list of all files in folder
@@ -224,15 +237,22 @@ all_headings <- unique(unlist(lapply(results, names)))
     }
   }
   
-# add full SITENAME, SITEID ----
-  key <- match(input_installation_folder, installation_info$FolderName)
-  
-  if(!is.na(key)){
-    df[,"SITENAME"] <- installation_info$SITENAME[key]
-    df[,"SITEID"] <- installation_info$SITEID[key]
-  }else(print("No match found in installation database"))
-
-  
+## add full SITENAME, SITEID ----
+  if(inst_sheet == "Navy"){
+    for(i in 1:nrow(df)){
+      installation_info <- readxl::read_xlsx("Installation_IDs.xlsx", sheet=2)
+      SITENAME <- installation_info$InstallationNames[installation_info$SITEID == df$SITEID[i]]
+      df[i,"InstallationNames"] <- SITENAME
+      df <- df %>% relocate(InstallationNames, .after = SITEID)
+    }
+  }else if(inst_sheet == "Air Force"){
+    for(i in 1:nrow(df)){
+      installation_info <- readxl::read_xlsx("Installation_IDs.xlsx", sheet=1)
+      SITENAME <- installation_info$SITENAME[installation_info$SITEID == df$SITEID[i]]
+      df[i,"SITENAME"] <- SITENAME
+      df <- df %>% relocate(SITENAME, .after = SITEID)
+    }
+  }
 
 ##references hanging indent ----
 #add REFERENCES SECTION HANGING INDENT <p style=padding-left:15px;text-indent:-15px;> 
@@ -246,7 +266,7 @@ for(i in 1:nrow(df)){
 }
   
 ##line breaks [manually input columns] ----
-numbblocks <- c(3:20) # Change to the columns that need line breaks between paragraphs
+numbblocks <- c(5) # Change to the columns that need line breaks between paragraphs
     #add blank line after each paragraph
     for(a in 1:length(numbblocks)){
       col_num <- numbblocks[[a]]
@@ -260,6 +280,11 @@ numbblocks <- c(3:20) # Change to the columns that need line breaks between para
       }
     }
  
+##remove paragraph notation where desired ----
+  cols_to_change <- c("SITEID", "Navy_Scenario", "AnnualChanceEvent") #change this to the name of the columns in the specific analysis
+  df <- p_be_gone(df, cols_to_change)
+  
+  
   #for Hydro Qualitative conversion 
   # for(i in 1:nrow(df)){
   #   df$Installation_Summary[i]

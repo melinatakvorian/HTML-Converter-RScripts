@@ -167,7 +167,7 @@ remove_end_blanks <- function(result_list){
   }
 
 
-  # ----- * replace the last instance of a substring -----
+  # ----- * replace all except the last instance of a substring -----
   replace_all_except_last <- function(s, from, to) {
     # Find the last occurrence of `from`
     matches <- gregexpr(from, s, fixed = TRUE)[[1]]
@@ -225,19 +225,36 @@ remove_end_blanks <- function(result_list){
     }
   }
   # * update U.S. to US ----
-  update_US <- function(df, report_type){
-    if(report_type == "TEVA"){
-      for(i in 1:nrow(df)){
-        references <- df$`References and Credits`[i]
-        references_1 <- stringr::str_replace_all(references, "U.S.", "US")
-        df$`References and Credits`[i] <- references_1
+    #THIS NEEDS TO BE DONE FOR BASICALLY ALL THE COLUMNS IN THE DATASET
+
+  update_US <- function(df, report_type, installation_type){
+    if(installation_type == "Air Force" && report_type == "TEVA"){
+      
+      cols_to_search <- c(24,25,28,31,34) #the indices of VulnSummary, NE_Text, OE_Text, S_Text, AC_Text
+      
+      for(col in cols_to_search){ 
+        df[[col]] <- gsub("U\\.S\\. ([A-Z])", "US. \\1", df[[col]])  # detect capital letters indicating a new sentence
+        df[[col]] <- gsub("U\\.S\\.<sup", "US.<sup", df[[col]]) #detect superscripted numbers indicating a new sentence
+        df[[col]] <- gsub("U\\.S\\.", "US", df[[col]])                # everything else
       }
+      
       return(df)
-    }else if(report_type == "FWVA"){
+      
+    }else if(installation_type == "Air Force" && report_type == "FWVA"){
+      cols_to_search <- c(18, 19, 22, 25) #the indices of VulnSummary, E_Text, S_Text, AC_Text
+      
+      for(col in cols_to_search){ 
+        df[[col]] <- gsub("U\\.S\\. ([A-Z])", "US. \\1", df[[col]])  # detect capital letters indicating a new sentence
+        df[[col]] <- gsub("U\\.S\\.<sup", "US.<sup", df[[col]]) #detect superscripted numbers indicating a new sentence
+        df[[col]] <- gsub("U\\.S\\.", "US", df[[col]])                # everything else
+      }
+      
+      return(df)
+      
+    }else if(installation_type == "Navy"){
       for(i in 1:nrow(df)){
-        #replace each <p> to <p style=padding-left:15px;text-indent:-15px;>
         references <- df$`References`[i]
-        references_1 <- stringr::str_replace_all(references, "U.S.", "US")
+        
         df$`References`[i] <- references_1
       }
       return(df)

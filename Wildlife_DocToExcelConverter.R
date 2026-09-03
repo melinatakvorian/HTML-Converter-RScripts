@@ -225,7 +225,8 @@ remove_end_blanks <- function(result_list){
     }
   }
   # * update U.S. to US ----
-    #THIS NEEDS TO BE DONE FOR BASICALLY ALL THE COLUMNS IN THE DATASET
+    #THE ONLY USE-CASE THIS DOES NOT HANDLE IS WHEN U.S. IS THE LAST WORD OF THE LAST SENTENCE OF THE STRING.
+    #THIS FUNCTION WILL MAKE THAT U.S. -> US, WHERE THERE IS NO PERIOD TO END THE SENTENCE
 
   update_US <- function(df, report_type, installation_type){
     if(installation_type == "Air Force" && report_type == "TEVA"){

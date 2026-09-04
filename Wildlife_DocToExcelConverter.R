@@ -459,15 +459,36 @@ all_headings <- unique(unlist(lapply(results, names)))
   if(installation_type == "Navy"){
     for(i in 1:nrow(df)){
       installation_info <- readxl::read_xlsx("Installation_IDs.xlsx", sheet=2)
-      SITENAME <- installation_info$InstallationNames[installation_info$SITEID == df$SITEID[i]]
+      
+      #create SITENAME and assign the value from the corresponding row of the excel spreadsheet according to SITEID
+      SITENAME <- installation_info$InstallationNames[installation_info$SITEID == df$SITEID[i]] 
+      
+      #assign the correct InstallationNames to that row of data
       df[i,"InstallationNames"] <- SITENAME
+      
+      #move the InstallationNames to the correct row 
       df <- df %>% relocate(InstallationNames, .after = SITEID)
+      
+      #create InstallationID and assign the value from the corresponding row of the excel spreadsheet according to SITEID
+      InstallationID <- installation_info$`Installation ID (Site Code)`[installation_info$SITEID == df$SITEID[i]]
+      
+      #assign the correct InstallationNames to that row of data
+      df[i,"Installation ID (Site Code)"] <- InstallationID
+      
+      #move the new column after the SITEID column
+      df <- df %>% relocate(`Installation ID (Site Code)`, .after = SITEID)
     }
   }else if(installation_type == "Air Force"){
     for(i in 1:nrow(df)){
     installation_info <- readxl::read_xlsx("Installation_IDs.xlsx", sheet=1)
+    
+    #create SITENAME and assign the value from the corresponding row of the excel spreadsheet according to SITEID
     SITENAME <- installation_info$SITENAME[installation_info$SITEID == df$SITEID[i]]
+    
+    #assign the correct SITENAME to that row of data
     df[i,"SITENAME"] <- SITENAME
+    
+    #move the SITENAME to the correct row 
     df <- df %>% relocate(SITENAME, .after = SITEID)
     }
   }

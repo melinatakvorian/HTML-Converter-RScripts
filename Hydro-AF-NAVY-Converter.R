@@ -31,15 +31,15 @@ invisible(lapply(packages, library, character.only = TRUE))
  
 # ----TEXT FOR YOU TO CHANGE-----------
   # Select which installation folder you're working in
-  input_installation_folder <- "NSA Cutler"
+  input_installation_folder <- "NSB Kings Bay"
 
   # Write if working on AF (AIR FORCE) or Navy (NAVY):
   inst_sheet = "NAVY"
   # inst_sheet = "AIR FORCE"
 
   # If Navy, select which region
-  navy_region = "MidLant Region"
-  # navy_region = "Southeast Region"
+  # navy_region = "MidLant Region"
+  navy_region = "Southeast Region"
   # navy_region = "Hawaii Region"
   
   # Select which analysis you're doing (shouldn't need to change)

@@ -12,7 +12,7 @@
 
 ## Install / load necessary packages ----
 
-packages <- c("pandoc","xml2","rvest","writexl", "readxl","dplyr")
+packages <- c("pandoc","xml2","rvest","writexl", "readxl","dplyr", "tidyr", "stringr")
 # Install packages not yet installed
 installed_packages <- packages %in% rownames(installed.packages())
 if (any(installed_packages == FALSE)) {
@@ -31,14 +31,16 @@ invisible(lapply(packages, library, character.only = TRUE))
  
 # ----TEXT FOR YOU TO CHANGE-----------
   # Select which installation folder you're working in
-  input_installation_folder <- "Pituffik Space Base"
+  input_installation_folder <- "NSA Cutler"
 
   # Write if working on AF (AIR FORCE) or Navy (NAVY):
-  # inst_sheet = "NAVY"
-  inst_sheet = "AIR FORCE"
+  inst_sheet = "NAVY"
+  # inst_sheet = "AIR FORCE"
 
   # If Navy, select which region
+  navy_region = "MidLant Region"
   # navy_region = "Southeast Region"
+  # navy_region = "Hawaii Region"
   
   # Select which analysis you're doing (shouldn't need to change)
   input_SME_folder <- "/Hydrology/Word to HTML" 
@@ -461,7 +463,7 @@ for(file in seq_along(results_disr)){
   #numeric column names
   new_cols <- c("Minimum_SPEI", "Maximum_SPEI", 
                 "Dry_Variability", "Wet_Variability", "Dry_Events", "Wet_Events", 
-                "Dry_Change", "Wet_Change", "")
+                "Dry_Change", "Wet_Change")
   
   #assign names
   colnames(all_scenarios_df2)[cols:cols_w_nos] <- new_cols #this one errors, don't worry about it
@@ -556,6 +558,8 @@ for(file in seq_along(results_disr)){
 
   
 # ADDING NAVY VIEWER CODE #########################
+  
+  ### MA changing this 9/4/2026
   
   if(inst_sheet == "NAVY"){
     sample_doc <- all_scenarios_df3
@@ -653,14 +657,28 @@ for(file in seq_along(results_disr)){
     ##### Add a bunch of historical columns
     row_to_copy <- sample_doc_long6 %>% slice(5)
     
+    ### This is old code, should be ok to delete
+    # sample_doc_long7 <- sample_doc_long6 %>% 
+    #   mutate(row_id = row_number(),
+    #          Scenario = if_else(row_number() == 5, sample_doc_long6$Scenario[4], Scenario)) %>% 
+    #   bind_rows(row_to_copy %>% mutate(row_id = 1.5, Scenario = sample_doc_long6$Scenario[1]),
+    #             row_to_copy %>% mutate(row_id = 2.5, Scenario = sample_doc_long6$Scenario[2]),
+    #             row_to_copy %>% mutate(row_id = 3.5, Scenario = sample_doc_long6$Scenario[3])) %>% 
+    #   arrange(row_id) %>% 
+    #   select(-row_id)
+    
+    
     sample_doc_long7 <- sample_doc_long6 %>% 
       mutate(row_id = row_number(),
-             Scenario = if_else(row_number() == 5, sample_doc_long6$Scenario[4], Scenario)) %>% 
-      bind_rows(row_to_copy %>% mutate(row_id = 1.5, Scenario = sample_doc_long6$Scenario[1]),
-                row_to_copy %>% mutate(row_id = 2.5, Scenario = sample_doc_long6$Scenario[2]),
-                row_to_copy %>% mutate(row_id = 3.5, Scenario = sample_doc_long6$Scenario[3])) %>% 
+             Scenario = if_else(row_number() == 5, sample_doc_long6$Scenario[4], Scenario))%>% 
+      bind_rows(row_to_copy %>% mutate(row_id = 0.5, Scenario = sample_doc_long6$Scenario[1]),
+                row_to_copy %>% mutate(row_id = 1.5, Scenario = sample_doc_long6$Scenario[2]),
+                row_to_copy %>% mutate(row_id = 2.5, Scenario = sample_doc_long6$Scenario[3]),
+                row_to_copy %>% mutate(row_id = 3.5, Scenario = sample_doc_long6$Scenario[4])) %>% 
+      slice(-5) %>% #get rid of the extra Modeled Historical Baseline row
       arrange(row_id) %>% 
       select(-row_id)
+    
     
     ##### Try to separate the Summary column into 2
     
@@ -737,15 +755,33 @@ for(file in seq_along(results_disr)){
       filter(df2, Chart != "Summary"),
       summary_rows
     )
+    
+    ### Adding back in SiteID and adding InstallationID, also TimePeriod
+    SITEID <- installation_info$SITEID[installation_info$InstallationNames == df3$Installation[1]]
+    InstallationID <- installation_info$InstallationID[installation_info$InstallationNames == df3$Installation[1]]
+    
+    df4 <- df3 %>% 
+      mutate(SITEID = SITEID, 
+             InstallationID = InstallationID,
+             InstallationName = df3$Installation, 
+             .before = 1) %>% 
+      mutate(TimePeriod = case_when(
+        Scenario %in% c("Moderate Disruption/Near Term", "High Disruption/Near Term") ~ "2021 to 2050",
+        Scenario %in% c("Moderate Disruption/Far Term", "High Disruption/Far Term") ~ "2051 to 2080", 
+        TRUE ~ ""), .before = 6) %>% 
+     select(-Installation)
+    
   }
-  
   
   # Export final files ----
   ##export excel to 3ViewerPackages folder ----
   
   # Figure out what output to use (AF vs NAVY) ############# MA ADDED THIS TO MAKE SURE THE RIGHT OUTPUT COMES OUT, ALSO FILENAME HAS CHANGED TO REFLECT THIS
-  ifelse(inst_sheet == "NAVY", output_file <- df3, output_file <- all_scenarios_df3)
-  
+  if (inst_sheet == "NAVY") {
+    output_file <- df4
+  } else {
+    output_file <- all_scenarios_df3
+  }
   
   out_dir <- paste0(input_umbrella, input_installation_folder, "/3ViewerPackages/HTML_excels") 
   # ******** NOTE THAT THE FOLDER STRUCTURE MUST MATCH WHAT IS ABOVE ^^^ EXACTLY.  **********

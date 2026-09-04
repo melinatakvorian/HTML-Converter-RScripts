@@ -30,18 +30,18 @@ invisible(lapply(packages, library, character.only = TRUE))
   #PAY ATTENTION TO THE DIRECTION OF THE SLASHES. THEY HAVE TO BE CHANGED TO FORWARD SLASHES, AS SHOWN BELOW
     #the broad folder structure
     #AIR FORCE  
-    input_umbrella <- "N:/RStor/CEMML/ClimateChange/1_USAFClimate/1_USAF_Natural_Resources/20_2_0004_RevisitingPhase1/"
+    #input_umbrella <- "N:/RStor/CEMML/ClimateChange/1_USAFClimate/1_USAF_Natural_Resources/20_2_0004_RevisitingPhase1/"
     
     #NAVY
-    #input_umbrella <- "N:/RStor/CEMML/ClimateChange/2_NavyClimate/Round2_Extremes_INRMP_integ/MidLant Region/"
+    input_umbrella <- "N:/RStor/CEMML/ClimateChange/2_NavyClimate/Round2_Extremes_INRMP_integ/MidLant Region/"
 
     #the specific folder inside the Document to HTML Table Converter where the input files are
-    input_installation_folder <- "Nellis AFB, NTTR" #corresponds to shortName on the installation_info.xlsx 
-    installation_type <- "Air Force" #"Navy"
-    input_SME_folder <- "/TEVA"
+    input_installation_folder <- "NSA Cutler" #corresponds to shortName on the installation_info.xlsx 
+    installation_type <- "Navy" #"Navy"
+    input_SME_folder <- "/F&W"
   
   #the final file name will start with this and will get the date added
-    subject <- "TEVA"
+    subject <- "FWVA"
     project_name <- paste0(subject, "_", input_installation_folder) 
 
 #####NO MORE CHANGES --- -- -- -- --- - - -- -- - -  - - - - -  --- - - - - - - --- --- --- -- ---
@@ -252,13 +252,6 @@ remove_end_blanks <- function(result_list){
       
       return(df)
       
-    }else if(installation_type == "Navy"){
-      for(i in 1:nrow(df)){
-        references <- df$`References`[i]
-        
-        df$`References`[i] <- references_1
-      }
-      return(df)
     }
   }
   # * assign Hex codes and Numeric values to columns that need it -----
@@ -392,15 +385,15 @@ remove_end_blanks <- function(result_list){
   
   # * add Habitat_Icon columns ----
   habitat_icons <- function(df){
-    df[,'1st_Habitat_Icon'] <- ""
-    df[,'2nd_Habitat_Icon'] <- ""
-    df[,'3rd_Habitat_Icon'] <- ""
-    df[,'4th_Habitat_Icon'] <- ""
+    df[,'FirstHabitatIcon'] <- ""
+    df[,'SecondHabitatIcon'] <- ""
+    df[,'ThirdHabitatIcon'] <- ""
+    df[,'FourthHabitatIcon'] <- ""
     df <- df %>% 
-      relocate('1st_Habitat_Icon', .after = `1st_Habitat`) %>% 
-      relocate('2nd_Habitat_Icon', .after = `2nd_Habitat`) %>% 
-      relocate('3rd_Habitat_Icon', .after = `3rd_Habitat`) %>%
-      relocate('4th_Habitat_Icon', .after = `4th_Habitat`)
+      relocate('FirstHabitatIcon', .after = `FirstHabitat`) %>% 
+      relocate('SecondHabitatIcon', .after = `SecondHabitat`) %>% 
+      relocate('ThirdHabitatIcon', .after = `ThirdHabitat`) %>%
+      relocate('FourthHabitatIcon', .after = `FourthHabitat`)
   }
   
 # RUN ----
@@ -488,8 +481,6 @@ all_headings <- unique(unlist(lapply(results, names)))
 # create hex codes and numbers ----
   df <- hex_codes(df, subject)
       
-
-
 # add habitat_icons column ----
   df <- habitat_icons(df)
 

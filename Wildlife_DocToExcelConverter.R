@@ -38,7 +38,7 @@ invisible(lapply(packages, library, character.only = TRUE))
     #the specific folder inside the Document to HTML Table Converter where the input files are
     input_installation_folder <- "NSA Cutler" #corresponds to shortName on the installation_info.xlsx 
     installation_type <- "Navy" #"Navy"
-    input_SME_folder <- "/F&W"
+    input_SME_folder <- "/FWVA"
   
   #the final file name will start with this and will get the date added
     subject <- "FWVA"

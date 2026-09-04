@@ -458,7 +458,7 @@ all_headings <- unique(unlist(lapply(results, names)))
 # add full SITENAME, SITEID ----
   if(installation_type == "Navy"){
     for(i in 1:nrow(df)){
-      installation_info <- readxl::read_xlsx("Installation_IDs.xlsx", sheet=2)
+      installation_info <- readxl::read_xlsx("N:/RStor/CEMML/ClimateChange/Document Standards/Templates/TEMPLATES_SME_Word_Docs/Installation_IDs.xlsx", sheet=2)
       
       #create SITENAME and assign the value from the corresponding row of the excel spreadsheet according to SITEID
       SITENAME <- installation_info$InstallationNames[installation_info$SITEID == df$SITEID[i]] 

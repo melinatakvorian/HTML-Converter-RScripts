@@ -29,21 +29,21 @@ invisible(lapply(packages, library, character.only = TRUE))
 
 # ----TEXT FOR YOU TO CHANGE-----------
 # Select which installation folder you're working in
-input_installation_folder <- "NAVSTA Mayport"
+input_installation_folder <- "Indian Mountain LRRS"
 
 # Write if working on AF (AIR FORCE) or Navy (NAVY):
-inst_sheet = "NAVY"
-# inst_sheet = "AIR FORCE"
+# inst_sheet = "NAVY"
+inst_sheet = "AIR FORCE"
 
 # If Navy, select which region
 navy_region = "Southeast Region"
 
 # Select which analysis you're doing and the name of the file folder
 #PAY ATTENTION TO THE DIRECTION OF THE SLASHES. THEY HAVE TO BE CHANGED TO FORWARD SLASHES, AS SHOWN BELOW
-input_SME_folder <- "/SLR/Word to HTML Conversion" 
+input_SME_folder <- "/Vegetation_Habitats/Word to HTML Conversion" 
 
 #the final file name will start with this and will get the date added
-subject <- "SLR"
+subject <- "Veg"
 project_name <- paste0(subject, "_", input_installation_folder)
 
 # this will select which base to select your data from
@@ -237,15 +237,19 @@ all_headings <- unique(unlist(lapply(results, names)))
     }
   }
   
+##remove paragraph notation where desired (MA moved this from below to get SITENAME code to work ----
+  cols_to_change <- c("SITEID") #change this to the name of the columns in the specific analysis
+  df <- p_be_gone(df, cols_to_change)
+  
 ## add full SITENAME, SITEID ----
-  if(inst_sheet == "Navy"){
+  if(inst_sheet == "NAVY"){
     for(i in 1:nrow(df)){
       installation_info <- readxl::read_xlsx("Installation_IDs.xlsx", sheet=2)
       SITENAME <- installation_info$InstallationNames[installation_info$SITEID == df$SITEID[i]]
       df[i,"InstallationNames"] <- SITENAME
       df <- df %>% relocate(InstallationNames, .after = SITEID)
     }
-  }else if(inst_sheet == "Air Force"){
+  }else if(inst_sheet == "AIR FORCE"){
     for(i in 1:nrow(df)){
       installation_info <- readxl::read_xlsx("Installation_IDs.xlsx", sheet=1)
       SITENAME <- installation_info$SITENAME[installation_info$SITEID == df$SITEID[i]]
@@ -280,9 +284,6 @@ numbblocks <- c(5) # Change to the columns that need line breaks between paragra
       }
     }
  
-##remove paragraph notation where desired ----
-  cols_to_change <- c("SITEID", "Navy_Scenario", "AnnualChanceEvent") #change this to the name of the columns in the specific analysis
-  df <- p_be_gone(df, cols_to_change)
   
   
   #for Hydro Qualitative conversion 

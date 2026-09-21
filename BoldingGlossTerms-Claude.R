@@ -1,17 +1,17 @@
-
-# bold_first_term_occurrence()
-#
-# For each row of `df`, looks across the columns in `cols` (in the
-# order you give them) and, for every term in `glossary`, wraps ONLY
-# the first occurrence of that term (across all selected columns)
-# in <strong></strong>. Writes the result back into the same cells.
-#
-# - Longer/multi-word terms are matched before shorter ones, so
-#   "heart attack" claims its match before "heart" does.
-# - Matching uses word boundaries (\\b) so "art" won't match inside
-#   "heartache".
-# - Matches inside text you've already bolded (from an earlier,
-#   longer term) are skipped, so you never get nested/broken tags.
+#Goal:
+  # bold_first_term_occurrence()
+  #
+  # For each row of `df`, looks across the columns in `cols` (in the
+  # order you give them) and, for every term in `glossary`, wraps ONLY
+  # the first occurrence of that term (across all selected columns)
+  # in <strong></strong>. Writes the result back into the same cells.
+  #
+  # - Longer/multi-word terms are matched before shorter ones, so
+  #   "heart attack" claims its match before "heart" does.
+  # - Matching uses word boundaries (\\b) so "art" won't match inside
+  #   "heartache".
+  # - Matches inside text you've already bolded (from an earlier,
+  #   longer term) are skipped, so you never get nested/broken tags.
 
 
 escape_regex <- function(x) {
@@ -128,8 +128,9 @@ bold_first_term_occurrence <- function(df, cols, glossary, ignore_case = TRUE) {
                 "tropical storm", "typhoon", "USFWS", "USGS",
                 "var.", "vulnerability", "vulnerability assessment", "VA", "weather", "wet days", 
                 "white-nose syndrome", "WNS", "xeric")
-#abbreviations like NE, OE, OA, SS, VA, AC, should all be checked after running to make sure random parts of words didn't get bolded
 
+#abbreviations like NE, OE, OA, SS, VA, AC, should all be checked after running 
+#to make sure random parts of words didn't get bolded
 
   sections_TEVA <- c("VulnSummary", "NE_Text", "OE_Text", "S_Text", "AC_Text")
   sections_FWVA <- c("ProminentTaxa", "VulnSummary", "E_Text", "S_Text", "AC_Text")
@@ -148,135 +149,38 @@ bold_first_term_occurrence <- function(df, cols, glossary, ignore_case = TRUE) {
   }
 
   
-#run for dataframe
-  result <- bold_first_term_occurrence(df, cols = sections_FWVA, glossary = glossary)
-  
-  #print(result)
-
-  
-  
-#create colored text for the vulnerability ----
-  ##with bolding ----
-  #the script needs to detect this text "vulnerability to short- and long-term weather changes" and find the word BEFORE it. 
-  #or it needs to detect the first instance of "low", "high", "moderate", "very high" in the vulnerability summary and add the hex codes
-  # <span style="color: #ff0000;">special</span>
-  low_log <- str_locate(result$VulnSummary, "low <strong>vul")
-  med_log <- str_locate(result$VulnSummary, "moderate <strong>vul")
-  high_log <- str_locate(result$VulnSummary, "high <strong>vul")
-  vhigh_log <- str_locate(result$VulnSummary, "very high <strong>vul")
-  
-  for(i in 1:nrow(result)){
-    if(!is.na(low_log[i])){
-      startval <- as.numeric(low_log[i])
-      endval <- startval+2
-      target <- substr(result$VulnSummary[i], startval, endval)
-      before <- substr(result$VulnSummary[i], 1, startval - 1)
-      after  <- substr(result$VulnSummary[i], endval + 1, nchar(result$VulnSummary[i]))
-      result$VulnSummary[i] <- paste0(before, '<strong><span style="color:#8eb407;">', target, '</span></strong>', after)
-      
-    }else if(!is.na(vhigh_log[i])){
-      startval <- as.numeric(vhigh_log[i])
-      endval <- startval+8
-      target <- substr(result$VulnSummary[i], startval, endval)
-      before <- substr(result$VulnSummary[i], 1, startval - 1)
-      after  <- substr(result$VulnSummary[i], endval + 1, nchar(result$VulnSummary[i]))
-      result$VulnSummary[i] <- paste0(before, '<strong><span style="color:#d42004;">', target, '</span></strong>', after)
-      
-    }else if(!is.na(med_log[i])){
-      startval <- as.numeric(med_log[i])
-      endval <- startval+7
-      target <- substr(result$VulnSummary[i], startval, endval)
-      before <- substr(result$VulnSummary[i], 1, startval - 1)
-      after  <- substr(result$VulnSummary[i], endval + 1, nchar(result$VulnSummary[i]))
-      result$VulnSummary[i] <- paste0(before, '<strong><span style="color:#BCC208;">', target, '</span></strong>', after)
-      
-      
-    }else if(!is.na(high_log[i])){
-      startval <- as.numeric(high_log[i])
-      endval <- startval+3
-      target <- substr(result$VulnSummary[i], startval, endval)
-      before <- substr(result$VulnSummary[i], 1, startval - 1)
-      after  <- substr(result$VulnSummary[i], endval + 1, nchar(result$VulnSummary[i]))
-      result$VulnSummary[i] <- paste0(before, '<strong><span style="color:#f49e0b;">', target, '</span></strong>', after)
-      
-    }else{
-      next}
-  }
-  
-  # ##doing it without bolding ----
-  #   #the script needs to detect this text "vulnerability to short- and long-term weather changes" and find the word BEFORE it.
-  #   #or it needs to detect the first instance of "low", "high", "moderate", "very high" in the vulnerability summary and add the hex codes
-  #   # <span style="color: #ff0000;">special</span>
-  #   low_log <- str_locate(df$VulnSummary, "low vul")
-  #   med_log <- str_locate(df$VulnSummary, "moderate vul")
-  #   high_log <- str_locate(df$VulnSummary, "high vul")
-  #   vhigh_log <- str_locate(df$VulnSummary, "very high vul")
-  # 
-  #   for(i in 1:nrow(df)){
-  #     if(!is.na(low_log[i])){
-  #       startval <- as.numeric(low_log[i])
-  #       endval <- startval+2
-  #       target <- substr(df$VulnSummary[i], startval, endval)
-  #       before <- substr(df$VulnSummary[i], 1, startval - 1)
-  #       after  <- substr(df$VulnSummary[i], endval + 1, nchar(df$VulnSummary[i]))
-  #       df$VulnSummary[i] <- paste0(before, '<strong><span style="color:#8eb407;">', target, '</span></strong>', after)
-  # 
-  #     }else if(!is.na(vhigh_log[i])){
-  #       startval <- as.numeric(vhigh_log[i])
-  #       endval <- startval+8
-  #       target <- substr(df$VulnSummary[i], startval, endval)
-  #       before <- substr(df$VulnSummary[i], 1, startval - 1)
-  #       after  <- substr(df$VulnSummary[i], endval + 1, nchar(df$VulnSummary[i]))
-  #       df$VulnSummary[i] <- paste0(before, '<strong><span style="color:#d42004;">', target, '</span></strong>', after)
-  # 
-  #     }else if(!is.na(med_log[i])){
-  #       startval <- as.numeric(med_log[i])
-  #       endval <- startval+7
-  #       target <- substr(df$VulnSummary[i], startval, endval)
-  #       before <- substr(df$VulnSummary[i], 1, startval - 1)
-  #       after  <- substr(df$VulnSummary[i], endval + 1, nchar(df$VulnSummary[i]))
-  #       df$VulnSummary[i] <- paste0(before, '<strong><span style="color:#BCC208;">', target, '</span></strong>', after)
-  # 
-  # 
-  #     }else if(!is.na(high_log[i])){
-  #       startval <- as.numeric(high_log[i])
-  #       endval <- startval+3
-  #       target <- substr(df$VulnSummary[i], startval, endval)
-  #       before <- substr(df$VulnSummary[i], 1, startval - 1)
-  #       after  <- substr(df$VulnSummary[i], endval + 1, nchar(df$VulnSummary[i]))
-  #       df$VulnSummary[i] <- paste0(before, '<strong><span style="color:#f49e0b;">', target, '</span></strong>', after)
-  # 
-  #     }else{
-  #       next}
-  #   }
+  ## run for dataframe ----
+    result <- bold_first_term_occurrence(df, cols = sections_FWVA, glossary = glossary)
+    
+    #print(result)
 
 #EXPORT ----
   ##export excel to 3ViewerPackages folder ----
-  out_dir <- paste0(input_umbrella, input_installation_folder, "/3ViewerPackages/HTML_excels") 
-  
-  # ******** NOTE THAT THE FOLDER STRUCTURE MUST MATCH WHAT IS ABOVE ^^^ EXACTLY.  **********
-  # CHANGE out_dir AS NEEDED IF THERE ARE ANY DIFFERENCES IN THE LOCATION YOU WANT TO SAVE TO.
-  
-  if (!dir.exists(out_dir)) dir.create(out_dir, recursive = TRUE)
-  
-  output_filename <- paste0(project_name, "_HTML_formatted.xlsx")
-  shortcut_location <- file.path(input_dir, output_filename) #save the path to the future shortcut
-  
-  write_xlsx(result, shortcut_location) #create file and save to folder
-  message("Conversion complete. XLSX saved to: ", file.path(out_dir, output_filename))
+  # out_dir <- paste0(input_umbrella, input_installation_folder, "/3ViewerPackages/HTML_excels") 
+  # 
+  # # ******** NOTE THAT THE FOLDER STRUCTURE MUST MATCH WHAT IS ABOVE ^^^ EXACTLY.  **********
+  # # CHANGE out_dir AS NEEDED IF THERE ARE ANY DIFFERENCES IN THE LOCATION YOU WANT TO SAVE TO.
+  # 
+  # if (!dir.exists(out_dir)) dir.create(out_dir, recursive = TRUE)
+  # 
+  # output_filename <- paste0(project_name, "_HTML_formatted.xlsx")
+  # shortcut_location <- file.path(input_dir, output_filename) #save the path to the future shortcut
+  # 
+  # write_xlsx(result, shortcut_location) #create file and save to folder
+  # message("Conversion complete. XLSX saved to: ", file.path(out_dir, output_filename))
 
 # ---------------------------------------------------------------
 # Example usage ----
-df <- data.frame(
-  colA = c("Patient had a heart attack.", "No cardiac issues noted."),
-  colB = c("The heart attack occurred at home.", "Follow-up for heart attack risk."),
-  stringsAsFactors = FALSE
-)
-
-glossary <- c("heart attack", "heart")
-
-result <- bold_first_term_occurrence(df, cols = c("colA", "colB"), glossary = glossary)
-print(result)
+# df <- data.frame(
+#   colA = c("Patient had a heart attack.", "No cardiac issues noted."),
+#   colB = c("The heart attack occurred at home.", "Follow-up for heart attack risk."),
+#   stringsAsFactors = FALSE
+# )
+# 
+# glossary <- c("heart attack", "heart")
+# 
+# result <- bold_first_term_occurrence(df, cols = c("colA", "colB"), glossary = glossary)
+# print(result)
 
 # Expected for row 1:
 #  - "heart attack" (as a phrase) gets its first occurrence bolded in

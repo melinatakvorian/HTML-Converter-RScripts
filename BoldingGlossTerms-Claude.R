@@ -277,7 +277,7 @@ glossary <- c("heart attack", "heart")
 
 result <- bold_first_term_occurrence(df, cols = c("colA", "colB"), glossary = glossary)
 print(result)
-#
+
 # Expected for row 1:
 #  - "heart attack" (as a phrase) gets its first occurrence bolded in
 #    colA: "Patient had a <strong>heart attack</strong>."

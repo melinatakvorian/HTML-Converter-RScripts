@@ -185,6 +185,7 @@
   df <- color_vuln_text(df)
 
 #ADD THE BOLDING FUNCTION CODE
+  source("BoldingGlossTerms-Claude.R")
   
 # Export final files ----
   ##export excel to 3ViewerPackages folder ----

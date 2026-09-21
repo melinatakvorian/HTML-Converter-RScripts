@@ -173,7 +173,7 @@
   df <- ref_hanging_indents(df, subject)
 
 #change US type ----
-  #df <- update_US(df, subject, installation_type) NOT WORKING
+  df <- update_US(df, subject, installation_type)
 
 # create hex codes and numbers ----
   df <- hex_codes(df, subject)
@@ -182,9 +182,10 @@
   df <- habitat_icons(df)
 
 #color the word with the vulnerability score ---
-  #df <- color_vuln_text(df) NOT WORKING
+  df <- color_vuln_text(df)
 
-
+#ADD THE BOLDING FUNCTION CODE
+  
 # Export final files ----
   ##export excel to 3ViewerPackages folder ----
     out_dir <- paste0(input_umbrella, input_installation_folder, "/3ViewerPackages/HTML_excels") 

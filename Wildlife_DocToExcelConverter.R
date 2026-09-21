@@ -260,15 +260,15 @@ remove_end_blanks <- function(result_list){
       ##TEVAs
       #repeat this for VulnerabilityResult, Confidence, NE_Level, OE_Level, S_Level, AC_Level
       
-      #Vuln#
+      #VulnNum
       df <- df %>% 
-        mutate('Vuln#' = case_when(
+        mutate('VulnNum' = case_when(
           VulnerabilityResult == "VERY HIGH" ~ 4,
           VulnerabilityResult == "HIGH" ~ 3,
           VulnerabilityResult == "MODERATE" ~ 2,
           VulnerabilityResult == "LOW" ~ 1,
           TRUE ~ 1
-        )) %>% relocate('Vuln#', .after = VulnerabilityResult)
+        )) %>% relocate('VulnNum', .after = VulnerabilityResult)
       
       
       
@@ -284,12 +284,12 @@ remove_end_blanks <- function(result_list){
       
       #Confidence
       df <- df %>% 
-        mutate('Conf#' = case_when(
+        mutate('ConfNum' = case_when(
           Confidence == "High" ~ 3,
           Confidence == "Moderate" ~ 2,
           Confidence == "Low" ~ 1,
           TRUE ~ 1
-        )) %>% relocate('Conf#', .after = Confidence)
+        )) %>% relocate('ConfNum', .after = Confidence)
       
       #NE_Level
       df <- df %>% 
@@ -331,15 +331,15 @@ remove_end_blanks <- function(result_list){
       ##FWVAs
       #repeat this for VulnerabilityResult, E_Level, S_Level, AC_Level
       
-      #Vuln#
+      #VulnNum
       df <- df %>% 
-        mutate('Vuln#' = case_when(
+        mutate('VulnNum' = case_when(
           VulnerabilityResult == "VERY HIGH" ~ 4,
           VulnerabilityResult == "HIGH" ~ 3,
           VulnerabilityResult == "MODERATE" ~ 2,
           VulnerabilityResult == "LOW" ~ 1,
           TRUE ~ 1
-        )) %>% relocate('Vuln#', .after = VulnerabilityResult)
+        )) %>% relocate('VulnNum', .after = VulnerabilityResult)
       
       #VulnColor
       df <- df %>% 
@@ -349,7 +349,7 @@ remove_end_blanks <- function(result_list){
           VulnerabilityResult == "MODERATE" ~ "#f2e750",
           VulnerabilityResult == "LOW" ~ "#b2e109",
           TRUE ~ "none"
-        )) %>% relocate(VulnColor, .after = 'Vuln#')
+        )) %>% relocate(VulnColor, .after = 'VulnNum')
       
       #E_Level
       df <- df %>% 
@@ -431,11 +431,11 @@ all_headings <- unique(unlist(lapply(results, names)))
 # run paragraph notation editor ----
   if(subject == "TEVA"){
     #TEVAs
-    cols_to_change <- c("SITEID", "CommonName", "ScientificName", "SpeciesIDNum", "Federal Status:",
-                         "State Status:", "Other Status:", "Presence:", "Breeding Status:",
+    cols_to_change <- c("SITEID", "CommonName", "ScientificName", "SpeciesIDNum", "FedTxt",
+                         "StateTxt", "AdditionalStatus", "Presence", "BreedingStatus",
                         "FirstHabitat", "SecondHabitat", "ThirdHabitat", "FourthHabitat",
-                        "VulnerabilityResult", "Confidence","NE_Text", "NE_Level", "OE_Level",
-                        "OE_Text", "S_Text", "S_Level", "AC_Text", "AC_Level")
+                        "VulnerabilityResult", "Confidence", "VulnSummary", "NE_Text", "NE_Level", "OE_Level",
+                        "OE_Text", "S_Text", "S_Level", "AC_Text", "AC_Level", "ReferencesTxt")
   }else if(subject == "FWVA"){
     #FWVAs
     cols_to_change <- c("SITEID","HabitatCommunity", "HabitatCommIDNum",
@@ -501,25 +501,55 @@ all_headings <- unique(unlist(lapply(results, names)))
   
 # create hex codes and numbers ----
   df <- hex_codes(df, subject)
-      
+
 # add habitat_icons column ----
   df <- habitat_icons(df)
+
+#create colored text for the vulnerability ----
+  #the script needs to detect this text "vulnerability to short- and long-term weather changes" and find the word BEFORE it. 
+  #or it needs to detect the first instance of "low", "high", "moderate", "very high" in the vulnerability summary and add the hex codes
+  # <span style="color: #ff0000;">special</span>
+  low_log <- str_locate(df$VulnSummary, "low <strong")
+  med_log <- str_locate(df$VulnSummary, "moderate <strong")
+  high_log <- str_locate(df$VulnSummary, "high <strong")
+  vhigh_log <- str_locate(df$VulnSummary, "very high <strong")
   
-#line breaks [manually input columns] ----
-  if(subject == "FWVA"){
-    numbblocks <- c(5, 18) # Change to the columns that need line breaks between paragraphs
-    #add blank line after each paragraph
-    for(a in 1:length(numbblocks)){
-      col_num <- numbblocks[[a]]
-      for(b in 1:nrow(df)){
-        if(is.na(df[[col_num]][b])) next
-        
-        #replace each </p> to </p> <br>
-        temp_string <- df[[col_num]][b]
-        temp_string1 <- replace_all_except_last(temp_string, "</p>", "</p> <br>")
-        df[[col_num]][b] <- temp_string1
-      }
-    }
+  for(i in 1:nrow(df)){
+    if(!is.na(low_log[i])){
+      startval <- as.numeric(low_log[i])
+      endval <- startval+2
+      target <- substr(df$VulnSummary[i], startval, endval)
+      before <- substr(df$VulnSummary[i], 1, startval - 1)
+      after  <- substr(df$VulnSummary[i], endval + 1, nchar(df$VulnSummary[i]))
+      df$VulnSummary[i] <- paste0(before, '<strong><span style="color:#8eb407;">', target, '</span></strong>', after)
+      
+    }else if(!is.na(vhigh_log[i])){
+      startval <- as.numeric(vhigh_log[i])
+      endval <- startval+8
+      target <- substr(df$VulnSummary[i], startval, endval)
+      before <- substr(df$VulnSummary[i], 1, startval - 1)
+      after  <- substr(df$VulnSummary[i], endval + 1, nchar(df$VulnSummary[i]))
+      df$VulnSummary[i] <- paste0(before, '<strong><span style="color:#d42004;">', target, '</span></strong>', after)
+      
+    }else if(!is.na(med_log[i])){
+      startval <- as.numeric(med_log[i])
+      endval <- startval+7
+      target <- substr(df$VulnSummary[i], startval, endval)
+      before <- substr(df$VulnSummary[i], 1, startval - 1)
+      after  <- substr(df$VulnSummary[i], endval + 1, nchar(df$VulnSummary[i]))
+      df$VulnSummary[i] <- paste0(before, '<strong><span style="color:#BCC208;">', target, '</span></strong>', after)
+      
+      
+    }else if(!is.na(high_log[i])){
+      startval <- as.numeric(high_log[i])
+      endval <- startval+3
+      target <- substr(df$VulnSummary[i], startval, endval)
+      before <- substr(df$VulnSummary[i], 1, startval - 1)
+      after  <- substr(df$VulnSummary[i], endval + 1, nchar(df$VulnSummary[i]))
+      df$VulnSummary[i] <- paste0(before, '<strong><span style="color:#f49e0b;">', target, '</span></strong>', after)
+      
+    }else{
+      next}
   }
 
     

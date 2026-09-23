@@ -93,7 +93,8 @@
       output = html_file,
       from = "docx",
       to = "html",
-      standalone = TRUE
+      standalone = TRUE,
+      args = c("--wrap=none")
     )
     
     xml2::read_html(html_file)
@@ -211,6 +212,9 @@
   }
 
 # ----- * remove '\r\n' from heading names -----
+  
+  #this is no longer necessary, since we have removed the text wrapping default from the pandoc_convert() function
+  
   #if results[i] includes '\r\n', remove it
   remove_accidental_return <- function(result_list){
     

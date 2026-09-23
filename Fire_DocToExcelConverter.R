@@ -12,7 +12,7 @@
 
 ## Install / load necessary packages ----
 
-packages <- c("pandoc","xml2","rvest","writexl", "stringr", "readxl", "tidyr")
+packages <- c("pandoc","xml2","rvest","writexl", "stringr", "readxl")
 
 # Install packages not yet installed
 installed_packages <- packages %in% rownames(installed.packages())
@@ -27,27 +27,35 @@ invisible(lapply(packages, library, character.only = TRUE))
 
 #####CHANGE AS DIRECTED BELOW --- -- -- -- --- - - -- -- - -  - - - - -  --- - - - - - - --- --- --- -- ---
 
+# ----TEXT FOR YOU TO CHANGE-----------
+# Select which installation folder you're working in
+input_installation_folder <- "Cold Bay LRRS"
+
+# Write if working on AF (AIR FORCE) or Navy (NAVY):
+# inst_sheet = "NAVY"
+inst_sheet = "AIR FORCE"
+
+# If Navy, select which region
+# navy_region = "Southeast Region"
+
+# Select which analysis you're doing and the name of the file folder
 #PAY ATTENTION TO THE DIRECTION OF THE SLASHES. THEY HAVE TO BE CHANGED TO FORWARD SLASHES, AS SHOWN BELOW
-#the broad folder structure
-#AIR FORCE  
-#input_umbrella <- "N:/RStor/CEMML/ClimateChange/1_USAFClimate/1_USAF_Natural_Resources/20_2_0004_RevisitingPhase1/"
-
-#NAVY
-input_umbrella <- "N:/RStor/CEMML/ClimateChange/2_NavyClimate/Round2_Extremes_INRMP_integ/Southeast Region/"
-
-#the specific folder inside the Document to HTML Table Converter where the input files are
-input_installation_folder <- "NAS Jacksonville" #corresponds to shortName on the installation_info.xlsx
-input_SME_folder <- "/Climate/Word to HTML Conversion"
+input_SME_folder <- "/WildlandFire/Word to HTML Conversion" 
 
 #the final file name will start with this and will get the date added
-subject <- "Climate"
-project_name <- paste0(subject, "_", input_installation_folder) 
+subject <- "WildlandFire"
+project_name <- paste0(subject, "_", input_installation_folder)
+
+# this will select which base to select your data from
+ifelse(inst_sheet == "AIR FORCE",
+       input_umbrella <- "N:/RStor/CEMML/ClimateChange/1_USAFClimate/1_USAF_Natural_Resources/20_2_0004_RevisitingPhase1/",
+       input_umbrella <- paste0("N:/RStor/CEMML/ClimateChange/2_NavyClimate/Round2_Extremes_INRMP_integ/", navy_region, "/"))
 
 #####NO MORE CHANGES --- -- -- -- --- - - -- -- - -  - - - - -  --- - - - - - - --- --- --- -- ---
 
 input_dir <-  paste0(input_umbrella, input_installation_folder, input_SME_folder)
 current_date <- format(Sys.Date(), "%Y%m%d")  # e.g., "2025-09-24"
-installation_info <- readxl::read_xlsx("Installation_IDs.xlsx", sheet=2)
+installation_info <- readxl::read_xlsx("Installation_IDs.xlsx")
 
 #ERROR CATCH: open files ----
 
@@ -216,6 +224,15 @@ for (i in seq_along(results)) {
   }
 }
 
+# add full SITENAME, SITEID ----
+key <- match(input_installation_folder, installation_info$FolderName)
+
+if(!is.na(key)){
+  df[,"SITENAME"] <- installation_info$SITENAME[key]
+  df[,"SITEID"] <- installation_info$SITEID[key]
+}else(print("No match found in installation database"))
+
+
 
 ##references hanging indent ----
 #add REFERENCES SECTION HANGING INDENT <p style=padding-left:15px;text-indent:-15px;> 
@@ -229,7 +246,7 @@ for(i in 1:nrow(df)){
 }
 
 ##line breaks [manually input columns] ----
-numbblocks <- c(3:17) # Change to the columns that need line breaks between paragraphs
+numbblocks <- c(2:3) # Change to the columns that need line breaks between paragraphs
 #add blank line after each paragraph
 for(a in 1:length(numbblocks)){
   col_num <- numbblocks[[a]]
@@ -243,6 +260,32 @@ for(a in 1:length(numbblocks)){
   }
 }
 
+##add indent at the beginning of each non-bulleted paragraph ----
+indent_all_but_last_n <- function(text, skip_last = 3){
+  if(is.na(text)) return(text)
+  
+  total <- stringr::str_count(text, "<p>")
+  n_indent <- max(0, total - skip_last)
+  
+  if(n_indent == 0) return(text)
+
+for(i in 1:n_indent){
+  text <- stringr::str_replace(text, "<p>", '<p style=text-indent:15px;>')
+}
+  text
+}
+
+for(a in 1:length(numbblocks)){
+  col_num <- numbblocks[[a]]
+  for(b in 1:nrow(df)){
+    if(is.na(df[[col_num]][b])) next
+    temp_string <- df[[col_num]][b]
+    df[[col_num]][b] <- indent_all_but_last_n(temp_string, skip_last = 3)
+  }
+}
+
+
+
 #for Hydro Qualitative conversion 
 # for(i in 1:nrow(df)){
 #   df$Installation_Summary[i]
@@ -252,74 +295,31 @@ for(a in 1:length(numbblocks)){
 #   df$Installation_Summary[i] <- temp_string2 #change to temp_string2 if you are adding the line breaks
 # }
 
-# add full SITENAME, SITEID ----
-siteid_string <- df$SITEID[1]
-siteid_string1 <- stringr::str_replace_all(siteid_string, "<p>", '')
-siteid_string1 <- stringr::str_replace_all(siteid_string1, "</p>", '')
-df$SITEID[1] <- siteid_string1 
+# Export final files ----
+##export excel to 3ViewerPackages folder ----
+out_dir <- paste0(input_umbrella, input_installation_folder, "/3ViewerPackages/HTML_excels") 
+# ******** NOTE THAT THE FOLDER STRUCTURE MUST MATCH WHAT IS ABOVE ^^^ EXACTLY.  **********
+# CHANGE out_dir AS NEEDED IF THERE ARE ANY DIFFERENCES IN THE LOCATION YOU WANT TO SAVE TO.
 
-SITENAME <- installation_info$InstallationNames[installation_info$SITEID == df$SITEID[1]]
+if (!dir.exists(out_dir)) dir.create(out_dir, recursive = TRUE)
 
-df[,"Installation"] <- SITENAME
+output_filename <- paste0(project_name, "_HTML_formatted_", current_date, ".xlsx")
+write_xlsx(df, file.path(out_dir, output_filename)) #create file and save to 3ViewerPackages folder
+message("Conversion complete. XLSX saved to: ", file.path(out_dir, output_filename))
 
-    df_test <- df %>%  
-      pivot_longer(cols = c(1:17), 
-                   names_to = "Category", 
-                   values_to = "Text") 
-    
-    df_text <- df_test[c(3:6, 17),]
-    
-    # Keep only selected rows in original data frame
-    df_extremes <- df_test[c(2, 7:16),]
-    colnames(df_extremes) <- c("Installation", "Icon Name", "Description")
-    
+##create shortcut to Word to HTML folder ----
+out_full_path <- file.path(out_dir, output_filename) #save the path to the excel in 3ViewerPackages
+output_filelink <- paste0(project_name, "_HTML_formatted_", current_date, ".lnk") #create shortcut name
+shortcut_location <- file.path(input_dir, output_filelink) #save the path to the future shortcut
 
-    # Export final files ----
-    ##export excel to 3ViewerPackages folder ----
-    out_dir <- paste0(input_umbrella, input_installation_folder, "/3ViewerPackages/HTML_excels") 
-    # ******** NOTE THAT THE FOLDER STRUCTURE MUST MATCH WHAT IS ABOVE ^^^ EXACTLY.  **********
-    # CHANGE out_dir AS NEEDED IF THERE ARE ANY DIFFERENCES IN THE LOCATION YOU WANT TO SAVE TO.
-    
-    if (!dir.exists(out_dir)) dir.create(out_dir, recursive = TRUE)
-    
-    #_text file
-    output_filename_text <- paste0(project_name, "_HTML_formatted_text", current_date, ".xlsx")
-    write_xlsx(df_text, file.path(out_dir, output_filename_text)) #create file and save to 3ViewerPackages folder
-    message("Conversion complete. XLSX saved to: ", file.path(out_dir, output_filename_text))
-    
-    #_extremes file
-    output_filename_extremes <- paste0(project_name, "_HTML_formatted_extremes", current_date, ".xlsx")
-    write_xlsx(df_extremes, file.path(out_dir, output_filename_extremes)) #create file and save to 3ViewerPackages folder
-    message("Conversion complete. XLSX saved to: ", file.path(out_dir, output_filename_extremes))
-    
-    
-    ##create shortcut to Word to HTML folder ----
-    #_text shortcut
-    out_full_path_text <- file.path(out_dir, output_filename_text) #save the path to the excel in 3ViewerPackages
-    output_filelink_text <- paste0(project_name, "_ClimateText_HTML_formatted_", current_date, ".lnk") #create shortcut name
-    shortcut_location_text <- file.path(input_dir, output_filelink_text) #save the path to the future shortcut
-    
-    shell(paste0( #create shortcut to Word to HTML Conversion folder (this uses the Windows power shell)
-      'powershell -ExecutionPolicy Bypass -Command "$ws = New-Object -ComObject WScript.Shell; ',
-      '$s = $ws.CreateShortcut(\'', shortcut_location_text, '\'); ',
-      '$s.TargetPath = \'', out_full_path_text, '\'; ',
-      '$s.Save()"'
-    )) 
-    
-    #_extremes shortcut
-    out_full_path_extremes <- file.path(out_dir, output_filename_extremes) #save the path to the excel in 3ViewerPackages
-    output_filelink_extremes <- paste0(project_name, "_ClimateExtremes_HTML_formatted_", current_date, ".lnk") #create shortcut name
-    shortcut_location_extremes <- file.path(input_dir, output_filelink_extremes) #save the path to the future shortcut
-    
-    shell(paste0( #create shortcut to Word to HTML Conversion folder (this uses the Windows power shell)
-      'powershell -ExecutionPolicy Bypass -Command "$ws = New-Object -ComObject WScript.Shell; ',
-      '$s = $ws.CreateShortcut(\'', shortcut_location_extremes, '\'); ',
-      '$s.TargetPath = \'', out_full_path_extremes, '\'; ',
-      '$s.Save()"'
-    )) 
-    
-    
-    # clean environment, so that things can run properly for the next run  
-    #rm(list = ls()) 
-    
-    
+shell(paste0( #create shortcut to Word to HTML Conversion folder (this uses the Windows power shell)
+  'powershell -ExecutionPolicy Bypass -Command "$ws = New-Object -ComObject WScript.Shell; ',
+  '$s = $ws.CreateShortcut(\'', shortcut_location, '\'); ',
+  '$s.TargetPath = \'', out_full_path, '\'; ',
+  '$s.Save()"'
+)) 
+
+
+# clean environment, so that things can run properly for the next run  
+#rm(list = ls()) 
+

@@ -365,8 +365,12 @@
       }
 
     #create a df where each row is one of these lists. 
-      df_veg <- data.frame(matrix(NA_character_, nrow=length(total_rows), ncol=length(unique(all_headings_veg))),
+      df_veg <- data.frame(matrix(NA_character_, nrow=length(num_files[[1]]), ncol=length(unique(all_headings_veg))),
                            stringsAsFactors = FALSE)
+      #MT - right now, the way the number of rows is determined is nrow=length(total_rows), but total_rows = 32, instead of 3 for this dummy dataset.
+      #MT - df_veg is also only one row, despite trying to be created with nrow = 32. I will change this to nrow = length(num_files[[1]], 
+        #...which corresponds to the number of veg groups identified in the process in the code chunk above)
+      
       colnames(df_veg) <- unique(all_headings_veg)
       rownum <- 1
       

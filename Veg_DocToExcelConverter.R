@@ -356,7 +356,12 @@
             split_sections[[file]][[length(split_sections[[file]])+1]] <- num_pair #create a nested list with each index within a veg group section
             
           }else{ #case for the last instance of new veg group
-            num_pair <- c(num_files[[file]][[i]]:(length(results_veg[[file]])-1))
+
+            num_pair <- c(num_files[[file]][[i]]:(length(results_veg[[file]]))) #trying without the subtract 1
+              #MT- this used to say "num_pair <- c(num_files[[file]][[i]]:(length(results_veg[[file]]-1)))".
+                #...by removing the '-1', this includes the last index of the last heading of this section
+                #...which resolves an issue where split_sections did not include all the last heading's index
+            
             total_rows <- total_rows + length(num_pair) #sum all iterations to see how long the df should be
             
             split_sections[[file]][[length(split_sections[[file]])+1]] <- num_pair
@@ -365,32 +370,59 @@
       }
 
     #create a df where each row is one of these lists. 
-      df_veg <- data.frame(matrix(NA_character_, nrow=length(num_files[[1]]), ncol=length(unique(all_headings_veg))),
-                           stringsAsFactors = FALSE)
-      #MT - right now, the way the number of rows is determined is nrow=length(total_rows), but total_rows = 32, instead of 3 for this dummy dataset.
+      # ------------------------------------------------------------------
+      #MT - right now, the way the number of rows is determined for df_veg is nrow=length(total_rows), but total_rows = 32, instead of 3 for this dummy dataset.
       #MT - df_veg is also only one row, despite trying to be created with nrow = 32. I will change this to nrow = length(num_files[[1]], 
-        #...which corresponds to the number of veg groups identified in the process in the code chunk above)
+      #...which corresponds to the number of veg groups identified in the process in the code chunk above)
+      #MT - this adjustment worked for nrow!
       
-      colnames(df_veg) <- unique(all_headings_veg)
+      #MT- I need to also adjust the number of columns and what is going into the column names. Right now ncol=length(unique(all_headings_veg))
+      #...but this includes the names of the new veg groups (G####, G###, etc.). We need a new object to store the headings, that excludes the G### strings
+      
+      unique_headings_veg <- c()
+      veg_group_names <- c()
+      for(i in seq_along(all_headings_veg)){ 
+        if(grepl("G[0-9]+", all_headings_veg[i])){ #if the heading at this index IS a new veg group
+          veg_group_names[length(veg_group_names)+1] <- all_headings_veg[i]} #save this string to the veg_group_names object
+        
+        if(!grepl("G[0-9]+", all_headings_veg[i])){  #if the heading at this index is NOT a new veg group
+          unique_headings_veg[length(unique_headings_veg)+1] <- all_headings_veg[i]} #save this string to the end of the unique_headings_veg object
+      }
+      
+      #MT - For now, I think we should not worry about getting the veg group names into a column. 
+        #...I think it makes sense to make sure the data will be inserted correctly, then worry about that.
+      
+      df_veg <- data.frame(matrix(NA_character_, nrow=length(num_files[[1]]), ncol=length(unique_headings_veg)),
+                           stringsAsFactors = FALSE)
+
+      
+      colnames(df_veg) <- unique_headings_veg
       rownum <- 1
       
+      #MT- I am noticing an issue where the data is being input into SITEID correctly, but the rest is one column to the right.
+        #...if n_col is set to 1, then SITEID is not populated. if n_col is set to 2, then SITEID is populated, but the rest of the data is offset by one.  
+        #...This must have to do with the order that the new SITEID column is being incorporated, so I am going to move things around to see what works.
+        #...moving the SITEID to go after the veg group data worked! Now SITEID AND veg group data are in the df, as desired.
+      
+      #MT- The last issue is that there is the last cell of the df is not being populated. It is because split_sections cuts off the last header of the last veg group. 
+        #...This needs to be worked on where split_sections is created.
+        #...I found out how to get the split_sections to include the last heading in the veg group! see the edits made up there.
+
       for(file in seq_along(results_veg)){
         for(a in seq_along(split_sections[[file]])){
           # Extract the current list of indices from split_sections
           templist <- split_sections[[file]][[a]]
           
-          # Populate the first few columns with results_bio data (assuming it applies to all rows for this file)
-          df_veg[rownum, 1] <- results_bio[[file]][[1]] #subscript out of bounds
-          # df_veg[rownum, 2] <- results_bio[[file]][[2]]
-          # df_veg[rownum, 3] <- results_bio[[file]][[3]] #THE COLUMN GETS RE-WRITTEN
-          
-          n_col <- 2 # Start filling from the 4th column
+          n_col <- 1 # Start filling from the 2nd column
           
           # Extract elements from results_veg based on the indices in templist
           for(b in seq_along(templist)){
             df_veg[rownum, n_col] <- results_veg[[file]][[templist[[b]]]]
             n_col <- n_col + 1
           }
+          
+          # Populate the first column with results_bio data (assuming it applies to all rows for this file)
+          df_veg[rownum, 1] <- results_bio[[file]][[1]] #fills in the SITEID information
           
           # Move to the next row for the dataframe
           rownum <- rownum + 1

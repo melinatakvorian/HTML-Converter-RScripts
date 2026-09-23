@@ -30,18 +30,18 @@ invisible(lapply(packages, library, character.only = TRUE))
   #PAY ATTENTION TO THE DIRECTION OF THE SLASHES. THEY HAVE TO BE CHANGED TO FORWARD SLASHES, AS SHOWN BELOW
     #the broad folder structure
     #AIR FORCE  
-    input_umbrella <- "N:/RStor/CEMML/ClimateChange/1_USAFClimate/1_USAF_Natural_Resources/20_2_0004_RevisitingPhase1/"
+    #input_umbrella <- "N:/RStor/CEMML/ClimateChange/1_USAFClimate/1_USAF_Natural_Resources/20_2_0004_RevisitingPhase1/"
     
     #NAVY
-    #input_umbrella <- "N:/RStor/CEMML/ClimateChange/2_NavyClimate/Round2_Extremes_INRMP_integ/MidLant Region/"
+    input_umbrella <- "N:/RStor/CEMML/ClimateChange/2_NavyClimate/Round2_Extremes_INRMP_integ/MidLant Region/"
 
     #the specific folder inside the Document to HTML Table Converter where the input files are
-    input_installation_folder <- "JBLE-Langley" #corresponds to shortName on the installation_info.xlsx 
-    installation_type <- "Air Force" #"Navy"
-    input_SME_folder <- "/TEVA/Word to HTML Conversion"
+    input_installation_folder <- "NSA Cutler" #corresponds to shortName on the installation_info.xlsx 
+    installation_type <- "Navy" #"Navy"
+    input_SME_folder <- "/FWVA"
   
   #the final file name will start with this and will get the date added
-    subject <- "TEVA"
+    subject <- "FWVA"
     project_name <- paste0(subject, "_", input_installation_folder) 
 
 #####NO MORE CHANGES --- -- -- -- --- - - -- -- - -  - - - - -  --- - - - - - - --- --- --- -- ---
@@ -167,7 +167,7 @@ remove_end_blanks <- function(result_list){
   }
 
 
-  # ----- * replace the last instance of a substring -----
+  # ----- * replace all except the last instance of a substring -----
   replace_all_except_last <- function(s, from, to) {
     # Find the last occurrence of `from`
     matches <- gregexpr(from, s, fixed = TRUE)[[1]]
@@ -224,7 +224,36 @@ remove_end_blanks <- function(result_list){
       return(df)
     }
   }
+  # * update U.S. to US ----
+    #THE ONLY USE-CASE THIS DOES NOT HANDLE IS WHEN U.S. IS THE LAST WORD OF THE LAST SENTENCE OF THE STRING.
+    #THIS FUNCTION WILL MAKE THAT U.S. -> US, WHERE THERE IS NO PERIOD TO END THE SENTENCE
 
+  update_US <- function(df, report_type, installation_type){
+    if(installation_type == "Air Force" && report_type == "TEVA"){
+      
+      cols_to_search <- c(24,25,28,31,34) #the indices of VulnSummary, NE_Text, OE_Text, S_Text, AC_Text
+      
+      for(col in cols_to_search){ 
+        df[[col]] <- gsub("U\\.S\\. ([A-Z])", "US. \\1", df[[col]])  # detect capital letters indicating a new sentence
+        df[[col]] <- gsub("U\\.S\\.<sup", "US.<sup", df[[col]]) #detect superscripted numbers indicating a new sentence
+        df[[col]] <- gsub("U\\.S\\.", "US", df[[col]])                # everything else
+      }
+      
+      return(df)
+      
+    }else if(installation_type == "Air Force" && report_type == "FWVA"){
+      cols_to_search <- c(18, 19, 22, 25) #the indices of VulnSummary, E_Text, S_Text, AC_Text
+      
+      for(col in cols_to_search){ 
+        df[[col]] <- gsub("U\\.S\\. ([A-Z])", "US. \\1", df[[col]])  # detect capital letters indicating a new sentence
+        df[[col]] <- gsub("U\\.S\\.<sup", "US.<sup", df[[col]]) #detect superscripted numbers indicating a new sentence
+        df[[col]] <- gsub("U\\.S\\.", "US", df[[col]])                # everything else
+      }
+      
+      return(df)
+      
+    }
+  }
   # * assign Hex codes and Numeric values to columns that need it -----
   hex_codes <- function(df, report_type){
     if(report_type == "TEVA"){
@@ -345,9 +374,9 @@ remove_end_blanks <- function(result_list){
       #AC_Level
       df <- df %>% 
         mutate(AC_Color = case_when(
-          AC_Level == "High" ~ "#f49e0b",
+          AC_Level == "High" ~ "#b2e109",
           AC_Level == "Moderate" ~ "#f2e750",
-          AC_Level == "Low" ~ "#b2e109",
+          AC_Level == "Low" ~ "#f49e0b",
           TRUE ~ "none"
         )) %>% relocate(AC_Color, .after = AC_Level)
     }
@@ -409,8 +438,8 @@ all_headings <- unique(unlist(lapply(results, names)))
                         "OE_Text", "S_Text", "S_Level", "AC_Text", "AC_Level", "ReferencesTxt")
   }else if(subject == "FWVA"){
     #FWVAs
-    cols_to_change <- c("SITEID","HabitatCommunity", "HabitatCommID#",
-                        "1st_Habitat", "2nd_Habitat", "3rd_Habitat", "4th_Habitat",
+    cols_to_change <- c("SITEID","HabitatCommunity", "HabitatCommIDNum",
+                        "FirstHabitat", "SecondHabitat", "ThirdHabitat", "FourthHabitat",
                         "VulnerabilityResult", "E_Text", "E_Level", "S_Text",
                         "S_Level", "AC_Text", "AC_Level")
   }
@@ -429,22 +458,46 @@ all_headings <- unique(unlist(lapply(results, names)))
 # add full SITENAME, SITEID ----
   if(installation_type == "Navy"){
     for(i in 1:nrow(df)){
-      installation_info <- readxl::read_xlsx("Installation_IDs.xlsx", sheet=2)
-      SITENAME <- installation_info$InstallationNames[installation_info$SITEID == df$SITEID[i]]
+      installation_info <- readxl::read_xlsx("N:/RStor/CEMML/ClimateChange/Document Standards/Templates/TEMPLATES_SME_Word_Docs/Installation_IDs.xlsx", sheet=2)
+      
+      #create SITENAME and assign the value from the corresponding row of the excel spreadsheet according to SITEID
+      SITENAME <- installation_info$InstallationNames[installation_info$SITEID == df$SITEID[i]] 
+      
+      #assign the correct InstallationNames to that row of data
       df[i,"InstallationNames"] <- SITENAME
+      
+      #move the InstallationNames to the correct row 
       df <- df %>% relocate(InstallationNames, .after = SITEID)
+      
+      #create InstallationID and assign the value from the corresponding row of the excel spreadsheet according to SITEID
+      InstallationID <- installation_info$`Installation ID (Site Code)`[installation_info$SITEID == df$SITEID[i]]
+      
+      #assign the correct InstallationNames to that row of data
+      df[i,"Installation ID (Site Code)"] <- InstallationID
+      
+      #move the new column after the SITEID column
+      df <- df %>% relocate(`Installation ID (Site Code)`, .after = SITEID)
     }
   }else if(installation_type == "Air Force"){
     for(i in 1:nrow(df)){
     installation_info <- readxl::read_xlsx("Installation_IDs.xlsx", sheet=1)
+    
+    #create SITENAME and assign the value from the corresponding row of the excel spreadsheet according to SITEID
     SITENAME <- installation_info$SITENAME[installation_info$SITEID == df$SITEID[i]]
+    
+    #assign the correct SITENAME to that row of data
     df[i,"SITENAME"] <- SITENAME
+    
+    #move the SITENAME to the correct row 
     df <- df %>% relocate(SITENAME, .after = SITEID)
     }
   }
   
 #references hanging indent ----
   df <- ref_hanging_indents(df, subject)
+  
+#change US type ----
+  df <- update_US(df, subject)
   
 # create hex codes and numbers ----
   df <- hex_codes(df, subject)
@@ -498,6 +551,8 @@ all_headings <- unique(unlist(lapply(results, names)))
     }else{
       next}
   }
+
+    
   
 # Export final files ----
   ##export excel to 3ViewerPackages folder ----
@@ -509,7 +564,8 @@ all_headings <- unique(unlist(lapply(results, names)))
     if (!dir.exists(out_dir)) dir.create(out_dir, recursive = TRUE)
     
     output_filename <- paste0(project_name, "_HTML_formatted_", current_date, ".xlsx")
-    write_xlsx(df, file.path(out_dir, output_filename)) #create file and save to 3ViewerPackages folder
+    #write_xlsx(df, file.path(out_dir, output_filename)) #create file and save to 3ViewerPackages folder
+    write_xlsx(result, file.path(out_dir, output_filename)) #create file and save to 3ViewerPackages folder
     message("Conversion complete. XLSX saved to: ", file.path(out_dir, output_filename))
 
   ##create shortcut to Word to HTML folder ----

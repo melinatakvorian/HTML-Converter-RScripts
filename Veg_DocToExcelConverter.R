@@ -213,29 +213,29 @@
 
 # ----- * remove '\r\n' from heading names -----
   
-  #this is no longer necessary, since we have removed the text wrapping default from the pandoc_convert() function
+  #NO LONGER NECESSARY, since we have removed the text wrapping default from the pandoc_convert() function
   
   #if results[i] includes '\r\n', remove it
-  remove_accidental_return <- function(result_list){
-    
-    for(i in 1:length(result_list)){
-      templist <- result_list[[i]]
-      
-      for(heading in 1:length(templist)){
-        if(stringr::str_detect(names(templist)[heading], "\\r\\n")){
-          
-          #replace "\r\n" with nothing
-          headingWithProblem <- names(templist)[heading] #save heading to local object
-          
-          newHeading <- stringr::str_replace_all(headingWithProblem, "\\r\\n", " ")
-          
-          names(result_list[[i]])[heading] <- newHeading
-          print(names(result_list[[i]][heading]))
-        }else next
-      }
-    }
-    return(result_list)
-  }
+  # remove_accidental_return <- function(result_list){
+  #   
+  #   for(i in 1:length(result_list)){
+  #     templist <- result_list[[i]]
+  #     
+  #     for(heading in 1:length(templist)){
+  #       if(stringr::str_detect(names(templist)[heading], "\\r\\n")){
+  #         
+  #         #replace "\r\n" with nothing
+  #         headingWithProblem <- names(templist)[heading] #save heading to local object
+  #         
+  #         newHeading <- stringr::str_replace_all(headingWithProblem, "\\r\\n", " ")
+  #         
+  #         names(result_list[[i]])[heading] <- newHeading
+  #         print(names(result_list[[i]][heading]))
+  #       }else next
+  #     }
+  #   }
+  #   return(result_list)
+  # }
 
 
 # RUN ----
@@ -287,7 +287,7 @@
 #remove blank spaces after headings that could cause additional headers accidentally
   results_bio <- remove_end_blanks(results_bio)
   results_veg <- remove_end_blanks(results_veg)
-  results_veg <- remove_accidental_return(results_veg)
+  #results_veg <- remove_accidental_return(results_veg) #see the function above for why this is commented out
 
 
 #unfold the results list to be able to create a dataframe

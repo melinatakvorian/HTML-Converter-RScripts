@@ -429,19 +429,29 @@
         }
       }
 
-  ##Delete empty columns ----
-    test <- df_veg
-    empty_cols <- c()
+  ##Create VegGroup column and add name ----
       
-    for(i in 1:ncol(test)){
-      if(all(is.na(test[[i]]))){
-        empty_cols[length(empty_cols)+1] <- i
-      }else if(all(test[[i]] == "")){
-        empty_cols[length(empty_cols)+1] <- i
+      for(row in 1:nrow(df_veg)){
+        df_veg$VegGroup[row] <- veg_group_names[[row]]
       }
-    }
       
-    df_veg <- df_veg[ , -empty_cols]
+      df_veg <- df_veg %>% relocate(VegGroup, .before = `Group description`)
+      
+      
+  ##Delete empty columns ----
+      #THIS IS PROBABLY NOT NECESSARY ANYMORE. It was originally made to handle columns that were just there as tags, without data
+    # test <- df_veg
+    # empty_cols <- c()
+    #   
+    # for(i in 1:ncol(test)){
+    #   if(all(is.na(test[[i]]))){
+    #     empty_cols[length(empty_cols)+1] <- i
+    #   }else if(all(test[[i]] == "")){
+    #     empty_cols[length(empty_cols)+1] <- i
+    #   }
+    # }
+    #   
+    # df_veg <- df_veg[ , -empty_cols]
 
 #make Exposure Icon column for Anthony
 df_veg[, 'Exposure_Icon'] <- "Extreme Heat, Drought, Vector Borne Disease, Invasive Species, Seasonal Timing, Fire/Flooding"

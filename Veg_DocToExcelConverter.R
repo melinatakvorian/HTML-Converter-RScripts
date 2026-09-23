@@ -27,21 +27,36 @@
 
 #####CHANGE AS DIRECTED BELOW --- -- -- -- --- - - -- -- - -  - - - - -  --- - - - - - - --- --- --- -- ---
 
-  #PAY ATTENTION TO THE DIRECTION OF THE SLASHES. THEY HAVE TO BE CHANGED TO FORWARD SLASHES, AS SHOWN BELOW
-    #the broad folder structure
-    #AIR FORCE  
-    #input_umbrella <- "N:/RStor/CEMML/ClimateChange/1_USAFClimate/1_USAF_Natural_Resources/20_2_0004_RevisitingPhase1/" 
-    
-    #NAVY
-    input_umbrella <- "N:/RStor/CEMML/ClimateChange/2_NavyClimate/Round2_Extremes_INRMP_integ/MidLant Region/"
-    
-    #the specific folder inside the Document to HTML Table Converter where the input files are
-    input_installation_folder <- "NS Norfolk" #corresponds to shortName on the installation_info.xlsx
-    input_SME_folder <- "/TerrestrialVegetation/Word to HTML Conversion"
-    
-    #the final file name will start with this and will get the date added
-    subject <- "Veg"
-    project_name <- paste0(subject, "_", input_installation_folder) 
+  
+#PAY ATTENTION TO THE DIRECTION OF THE SLASHES. THEY HAVE TO BE CHANGED TO FORWARD SLASHES, AS SHOWN BELOW
+#the broad folder structure
+  
+  # ----TEXT FOR YOU TO CHANGE-----------
+  # Select which installation folder you're working in
+  input_installation_folder <- "JB Pearl Harbor Hickam"
+  
+  # Write if working on AF (AIR FORCE) or Navy (NAVY):
+  inst_sheet = "NAVY"
+  # inst_sheet = "AIR FORCE"
+  
+  # If Navy, select which region
+  # navy_region = "MidLant Region"
+  # navy_region = "Southeast Region"
+  navy_region = "Hawaii Region"
+  
+  # Select which analysis you're doing (shouldn't need to change)
+  input_SME_folder <- "/Vegetation_Habitats/Word to HTML" 
+  
+  #the final file name will start with this and will get the date added
+  subject <- "Veg"
+  project_name <- paste0(subject, "_", input_installation_folder)
+  
+  # this will select which sheet to select your data from
+  ifelse(inst_sheet == "AIR FORCE",
+         input_umbrella <- "N:/RStor/CEMML/ClimateChange/1_USAFClimate/1_USAF_Natural_Resources/20_2_0004_RevisitingPhase1/",
+         input_umbrella <- paste0("N:/RStor/CEMML/ClimateChange/2_NavyClimate/Round2_Extremes_INRMP_integ/", navy_region, "/"))
+  
+  
     
 #####NO MORE CHANGES --- -- -- -- --- - - -- -- - -  - - - - -  --- - - - - - - --- --- --- -- ---
 
@@ -97,9 +112,19 @@
         
       start_node <- headings[[section_indices[i]]]
       
-      #end_node <- if (i < length(section_indices)) headings[[section_indices[i + 1]]] else NULL
-      end_node <- if (i < length(section_indices)) headings[[i + 1]] else NULL
+      # MA - ADDED THIS 9/23 TO FIX ISSUES WITH HEADERS ACCIDENTALLY BEING INCLUDED IN OTHER SECTIONS
+      end_node <- if (section_indices[i] < length(headings))
+        headings[[section_indices[i] + 1]]
+      else
+        NULL
+      
+      # end_node <- if (i < length(section_indices)) headings[[section_indices[i + 1]]] else NULL
+      # end_node <- if (i < length(section_indices)) headings[[i + 1]] else NULL
         #print(headings[section_indices[i + 1]])
+      print(section_indices)
+
+      # print(xml_text(headings[[section_indices[i]]]))
+      # print(xml_text(headings[[section_indices[i + 1]]]))
 
       siblings <- xml2::xml_find_all(start_node, "following-sibling::*")
       if (!is.null(end_node)) {
@@ -131,7 +156,12 @@
       
       start_node <- headings[[section_indices[i]]]
       
-      end_node <- if (i < length(section_indices)) headings[[section_indices[i + 1]]] else NULL
+      # MA - ADDED THIS 9/23 TO FIX ISSUES WITH HEADERS ACCIDENTALLY BEING INCLUDED IN OTHER SECTIONS
+      end_node <- if (section_indices[i] < length(headings))
+        headings[[section_indices[i] + 1]]
+      else
+        NULL
+      # end_node <- if (i < length(section_indices)) headings[[section_indices[i + 1]]] else NULL
       #end_node <- if (i < length(section_indices)) headings[[i + 1]] else NULL
         #print(headings[section_indices[i + 1]])
       
@@ -212,7 +242,7 @@
   results_veg <- list()
   
   #for each file, convert it to HTML, Identify its sections, delete empty headers, add to a results mega-list
-    for (file in docx_files) { 
+    for (file in docx_files) {
       html_doc <- convert_docx_to_html_full(file, input_dir)
       
       #identify all headings
@@ -228,21 +258,28 @@
       last <- as.numeric(length(nlist))
       
       # Define indices for bioclimatic and vegetation sections
-      bio_indices <- c(1:8, last) # Bioclimatic sections
-      veg_indices <- c(1:3, 9:(last - 1)) # Vegetation sections
-      
+      # separated by Navy and Air Force
+
+      if(inst_sheet == "NAVY"){
+        bio_indices <- c(1:4, (last-1):last) #this is installation
+        veg_indices <- c(1, 5:(last-2)) # this is group
+      } else {
+        bio_indices <- c(1:8, last) # Bioclimatic sections
+        veg_indices <- c(1:3, 9:(last - 1)) # Vegetation sections
+      }
       
       #Create BIO table list
       sections_bio <- parse_html_sections_bio(html_doc, bio_indices)
       sections_bio <- sections_bio[names(sections_bio) != ""] #remove accidental headers
       results_bio[[basename(file)]] <- sections_bio #should be a list of headings and its text
       
-      #Create VEG table listkjo
+      #Create VEG table list
       sections_veg <- parse_html_sections_veg(html_doc, veg_indices)
       sections_veg <- sections_veg[names(sections_veg) != ""] #remove accidental headers
       results_veg[[basename(file)]] <- sections_veg #should be a list of headings and its text
     }
-
+  
+  
 #remove blank spaces after headings that could cause additional headers accidentally
   results_bio <- remove_end_blanks(results_bio)
   results_veg <- remove_end_blanks(results_veg)
@@ -251,9 +288,8 @@
 
 #unfold the results list to be able to create a dataframe
   all_headings_bio <- unique(unlist(lapply(results_bio, names)))
-  all_headings_veg <- c("SITENAME", "SITEID", "INRMPNAME")
-  all_headings_veg <- append(all_headings_veg, unique(unlist(lapply(results_veg, names))))
-
+  all_headings_veg <- unique(unlist(lapply(results_veg, names)))
+  
 # Create dataframe and input HTML in proper sections ----
   
   ##BIO----
@@ -270,8 +306,15 @@
       }
     }
 
+    ### MA - WILL HAVE TO COME BACK IN AND EDIT THIS FOR NAVY
+      # CHANGE THINGS FOR INSTALLATION, SELECTOR CSVS
+      # For now, it seems to work
+      # Need to remove <p> around SITE ID, then use that to add SiteName and Installation ID
+    
   ##VEG----
 
+    ### MA - GO BACK IN AND ADD AIR FORCE VERBAGE
+    
     #find the indices within the list that are new occurrences of 'Vegetation Group Name'
       num_files <- as.list(c(1:as.numeric(length(results_veg)))) #initialize list
       
@@ -281,7 +324,7 @@
           indices <- c()
           
           for(i in seq_along(veg_names)){ 
-            if(veg_names[i] =="New_Vegetation_Group"){  #if the heading at this index is a new veg group
+            if(grepl("G[0-9]+", veg_names[i])){  #if the heading at this index is a new veg group
               indices[length(indices)+1] <- i} #save the index to the end of the indices list
           }
           num_files[[file]] <- indices #append the indices of new veg group to this number file in the folder
@@ -330,10 +373,10 @@
           
           # Populate the first few columns with results_bio data (assuming it applies to all rows for this file)
           df_veg[rownum, 1] <- results_bio[[file]][[1]] #subscript out of bounds
-          df_veg[rownum, 2] <- results_bio[[file]][[2]]
-          df_veg[rownum, 3] <- results_bio[[file]][[3]] #THE COLUMN GETS RE-WRITTEN
+          # df_veg[rownum, 2] <- results_bio[[file]][[2]]
+          # df_veg[rownum, 3] <- results_bio[[file]][[3]] #THE COLUMN GETS RE-WRITTEN
           
-          n_col <- 4 # Start filling from the 4th column
+          n_col <- 2 # Start filling from the 4th column
           
           # Extract elements from results_veg based on the indices in templist
           for(b in seq_along(templist)){

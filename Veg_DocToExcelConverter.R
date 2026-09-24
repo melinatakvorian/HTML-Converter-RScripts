@@ -546,7 +546,7 @@
   
 # Creating Group Description csv ----
   last_grp <- length(df_veg)
-  grp_dsc_indices <- c(1:4, (last_grp-1):last_grp)
+  grp_dsc_indices <- c(1:6, (last_grp-1):last_grp)
   
   group_desc <- df_veg %>% 
     select(grp_dsc_indices)
@@ -611,17 +611,31 @@
     
     if (!dir.exists(out_dir)) dir.create(out_dir, recursive = TRUE)
   
-    #bioclimatics file
-    output_filename_bio <- paste0(project_name, "_Bioclimatics_HTML_formatted_", current_date, ".xlsx")
-    write_xlsx(df_bio, file.path(out_dir, output_filename_bio)) #create file and save to 3ViewerPackages folder
-    message("Conversion complete. XLSX saved to: ", file.path(out_dir, output_filename_bio))
+    #df_group_icons_l file
+    output_filename_group_icons <- paste0(project_name, "text_group_icons_HTML_formatted_", current_date, ".xlsx")
+    write_xlsx(df_group_icons_l, file.path(out_dir, output_filename_group_icons)) #create file and save to 3ViewerPackages folder
+    message("Conversion complete. XLSX saved to: ", file.path(out_dir, output_filename_group_icons))
     
-    #vegetation group file
-    output_filename_veg <- paste0(project_name, "_Vegetation_HTML_formatted", current_date, ".xlsx")
-    write_xlsx(df_veg, file.path(out_dir, output_filename_veg)) #create file and save to 3ViewerPackages folder
-    message("Conversion complete. XLSX saved to: ", file.path(out_dir, output_filename_veg))
+    #results_Top5 file
+    output_filename_top5 <- paste0(project_name, "_top5_HTML_formatted", current_date, ".xlsx")
+    write_xlsx(results_Top5, file.path(out_dir, output_filename_top5)) #create file and save to 3ViewerPackages folder
+    message("Conversion complete. XLSX saved to: ", file.path(out_dir, output_filename_top5))
+    
+    #text_installation (we call it df_bio)
+    output_filename_inst_text <- paste0(project_name, "_text_installation_HTML_formatted_", current_date, ".xlsx")
+    write_xlsx(df_bio, file.path(out_dir, output_filename_inst_text)) #create file and save to 3ViewerPackages folder
+    message("Conversion complete. XLSX saved to: ", file.path(out_dir, output_filename_inst_text)
+    
+    #text_group_desc
+    output_filename_group_desc <- paste0(project_name, "_group_desc_HTML_formatted_", current_date, ".xlsx")
+    write_xlsx(group_desc, file.path(out_dir, output_filename_inst_text)) #create file and save to 3ViewerPackages folder
+    message("Conversion complete. XLSX saved to: ", file.path(out_dir, output_filename_group_desc)
+    
     
   ##create shortcut to Word to HTML folder ----
+  
+    #MT - this is still to do
+  
     #bioclimatics shortcut
     out_full_path_bio <- file.path(out_dir, output_filename_bio) #save the path to the excel in 3ViewerPackages
     output_filelink_bio <- paste0(project_name, "_Bioclimatics_HTML_formatted_", current_date, ".lnk") #create shortcut name
@@ -634,18 +648,6 @@
       '$s.Save()"'
     )) 
     
-    #vegetation shortcut
-    out_full_path_veg <- file.path(out_dir, output_filename_veg) #save the path to the excel in 3ViewerPackages
-    output_filelink_veg <- paste0(project_name, "_Vegetation_HTML_formatted_", current_date, ".lnk") #create shortcut name
-    shortcut_location_veg <- file.path(input_dir, output_filelink_veg) #save the path to the future shortcut
-    
-    shell(paste0( #create shortcut to Word to HTML Conversion folder (this uses the Windows power shell)
-      'powershell -ExecutionPolicy Bypass -Command "$ws = New-Object -ComObject WScript.Shell; ',
-      '$s = $ws.CreateShortcut(\'', shortcut_location_veg, '\'); ',
-      '$s.TargetPath = \'', out_full_path_veg, '\'; ',
-      '$s.Save()"'
-    )) 
-
 # clean environment so that things can run properly for the next run  
 #rm(list = ls()) 
 

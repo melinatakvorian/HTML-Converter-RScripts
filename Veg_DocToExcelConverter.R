@@ -540,8 +540,28 @@
   results_Top5 <- results_Top5[c(3,4,5,2,1)] # Reorganizing the columns for Julia's template
   
   
-  
-  
+  # assign code values to the bioclimatic variables
+    results_Top5 <- results_top5 %>% mutate('Top5_Code' = case_when(
+      Top5_Variable == "Annual Mean Diurnal Range, °F" ~ 1,
+      Top5_Variable == "Isothermality, %"  ~ 2,
+      Top5_Variable == "Temperature Seasonality (Standard Deviation), °F" ~ 3,
+      Top5_Variable == "Temperature Seasonality (Coefficient of Variation), %" ~ 4,
+      Top5_Variable == "Max Temperature of Warmest Month, °F" ~ 5,
+      Top5_Variable == "Min Temperature of Coldest Month, °F" ~ 6,
+      Top5_Variable == "Annual Temperature Range, °F" ~ 7,
+      Top5_Variable == "Mean Temperature of Wettest Quarter, °F" ~ 8,
+      Top5_Variable == "Mean Temperature of Driest Quarter, °F"~ 9,
+      Top5_Variable == "Mean Temperature of Warmest Quarter, °F" ~ 10,
+      Top5_Variable == "Mean Temperature of Coldest Quarter, °F" ~ 11,
+      Top5_Variable == "Precipitation of Wettest Month, inches" ~ 12,
+      Top5_Variable == "Precipitation of Driest Month, inches" ~ 13,
+      Top5_Variable == "Precipitation Seasonality (Coefficient of Variation), %" ~ 14,
+      Top5_Variable == "Precipitation of Wettest Quarter, inches" ~ 15,
+      Top5_Variable == "Precipitation of Driest Quarter, inches" ~ 16,
+      Top5_Variable == "Precipitation of Coldest Quarter, inches" ~ 17,
+      Top5_Variable == "Precipitation of Warmest Quarter, inches" ~ 18,
+      TRUE ~ 0,
+    ))
 
   
 # Creating Group Description csv ----

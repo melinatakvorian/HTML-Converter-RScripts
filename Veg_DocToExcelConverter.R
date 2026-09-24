@@ -12,7 +12,7 @@
 
 ## Install / load necessary packages ----
 
-  packages <- c("pandoc","xml2","rvest","writexl", "readxl")
+  packages <- c("pandoc","xml2","rvest","writexl", "readxl", "dplyr")
   
   # Install packages not yet installed
   installed_packages <- packages %in% rownames(installed.packages())
@@ -33,19 +33,19 @@
   
   # ----TEXT FOR YOU TO CHANGE-----------
   # Select which installation folder you're working in
-  input_installation_folder <- "JB Pearl Harbor Hickam"
+  input_installation_folder <- "WPNSTA Yorktown"
   
   # Write if working on AF (AIR FORCE) or Navy (NAVY):
   inst_sheet = "NAVY"
   # inst_sheet = "AIR FORCE"
   
   # If Navy, select which region
-  # navy_region = "MidLant Region"
+  navy_region = "MidLant Region"
   # navy_region = "Southeast Region"
-  navy_region = "Hawaii Region"
+  # navy_region = "Hawaii Region"
   
   # Select which analysis you're doing (shouldn't need to change)
-  input_SME_folder <- "/Vegetation_Habitats/Word to HTML" 
+  input_SME_folder <- "/Vegetation_Habitats/Word to HTML Conversion" 
   
   #the final file name will start with this and will get the date added
   subject <- "Veg"
@@ -309,11 +309,47 @@
         }else{df_bio[i, col] <- NA} #ChatGPT help
       }
     }
-
+    
+    ##SELECTOR FOR LIST ITEMS
+    # Find the Exposure Description header in the doc
+    desc_header <- html_nodes(html_doc, "h1") %>%
+      .[html_text(.) == "Exposure Description"]
+    
+    # Get the list after the header
+    desc_list <- xml2::xml_find_all(desc_header, "following-sibling::ol")
+    
+    # Extract list items
+    items <- html_nodes(desc_list, "li")
+    item_text <- html_text(items, trim = TRUE)
+    
+    # Get Julia's table from the selector_topfive worksheet
+    lookup_Top5 <- read_excel(
+      "N:/RStor/CEMML/ClimateChange/2_NavyClimate/Round2_Extremes_INRMP_integ/_SMEs Dashboard Dev/Dashboard_inputs/5_TerrVeg/Notes for Terrestrial Vegetation Dashboard inputs.xlsx",
+      sheet = "selector_topfive",
+      range = "D9:E26",
+      col_names = c("Top5_Code", "Top5_Variable")
+    )
+    
+    # Match the table items to the list items
+    results_Top5 <- data.frame(
+      Top5_Variable = item_text,
+      stringsAsFactors = FALSE
+    ) %>%
+      left_join(lookup_Top5, by = "Top5_Variable")
+    
+    results_Top5 <- results_Top5 %>%
+      mutate(SiteID = df_bio$SITEID,
+             InstallationID = "InstallationID",
+             InstallationName = df_bio$SITENAME)
+    results_Top5 <- results_Top5[c(3,4,5,2,1)] # Reorganizing the columns for Julia's template
+    
     ### MA - WILL HAVE TO COME BACK IN AND EDIT THIS FOR NAVY
       # CHANGE THINGS FOR INSTALLATION, SELECTOR CSVS
       # For now, it seems to work
       # Need to remove <p> around SITE ID, then use that to add SiteName and Installation ID
+    
+    ### KT - Need to add in correct InstallationID source
+      # Need to remove <p> around SITEID, InstallationID, InstallationName
     
   ##VEG----
 

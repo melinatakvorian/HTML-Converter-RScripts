@@ -12,7 +12,7 @@
 
 ## Install / load necessary packages ----
 
-  packages <- c("pandoc","xml2","rvest","writexl", "readxl", "dplyr")
+  packages <- c("pandoc","xml2","rvest","writexl", "readxl", "tidyverse")
   
   # Install packages not yet installed
   installed_packages <- packages %in% rownames(installed.packages())
@@ -33,19 +33,19 @@
   
   # ----TEXT FOR YOU TO CHANGE-----------
   # Select which installation folder you're working in
-  input_installation_folder <- "WPNSTA Yorktown"
+  input_installation_folder <- "JB Pearl Harbor Hickam"
   
   # Write if working on AF (AIR FORCE) or Navy (NAVY):
   inst_sheet = "NAVY"
   # inst_sheet = "AIR FORCE"
   
   # If Navy, select which region
-  navy_region = "MidLant Region"
+  # navy_region = "MidLant Region"
   # navy_region = "Southeast Region"
-  # navy_region = "Hawaii Region"
+  navy_region = "Hawaii Region"
   
   # Select which analysis you're doing (shouldn't need to change)
-  input_SME_folder <- "/Vegetation_Habitats/Word to HTML Conversion" 
+  input_SME_folder <- "/Vegetation_Habitats/Word to HTML" 
   
   #the final file name will start with this and will get the date added
   subject <- "Veg"
@@ -326,51 +326,8 @@
       }
     }
     
-    ##SELECTOR FOR LIST ITEMS
-    # Find the Exposure Description header in the doc
-    desc_header <- html_nodes(html_doc, "h1") %>%
-      .[html_text(.) == "Exposure Description"]
-    
-    # Get the list after the header
-    desc_list <- xml2::xml_find_all(desc_header, "following-sibling::ol")
-    
-    # Extract list items
-    items <- html_nodes(desc_list, "li")
-    item_text <- html_text(items, trim = TRUE)
-    
-    # Get Julia's table from the selector_topfive worksheet
-    lookup_Top5 <- read_excel(
-      "N:/RStor/CEMML/ClimateChange/2_NavyClimate/Round2_Extremes_INRMP_integ/_SMEs Dashboard Dev/Dashboard_inputs/5_TerrVeg/Notes for Terrestrial Vegetation Dashboard inputs.xlsx",
-      sheet = "selector_topfive",
-      range = "D9:E26",
-      col_names = c("Top5_Code", "Top5_Variable")
-    )
-    
-    # Match the table items to the list items
-    results_Top5 <- data.frame(
-      Top5_Variable = item_text,
-      stringsAsFactors = FALSE
-    ) %>%
-      left_join(lookup_Top5, by = "Top5_Variable")
-    
-    results_Top5 <- results_Top5 %>%
-      mutate(SiteID = df_bio$SITEID,
-             InstallationID = "InstallationID",
-             InstallationName = df_bio$SITENAME)
-    results_Top5 <- results_Top5[c(3,4,5,2,1)] # Reorganizing the columns for Julia's template
-    
-    ### MA - WILL HAVE TO COME BACK IN AND EDIT THIS FOR NAVY
-      # CHANGE THINGS FOR INSTALLATION, SELECTOR CSVS
-      # For now, it seems to work
-      # Need to remove <p> around SITE ID, then use that to add SiteName and Installation ID
-    
-    ### KT - Need to add in correct InstallationID source
-      # Need to remove <p> around SITEID, InstallationID, InstallationName
-    
   ##VEG----
 
-    ### MA - GO BACK IN AND ADD AIR FORCE VERBAGE
-    
     #find the indices within the list that are new occurrences of 'Vegetation Group Name'
       num_files <- as.list(c(1:as.numeric(length(results_veg)))) #initialize list
       
@@ -487,9 +444,18 @@
         df_veg$VegGroup[row] <- veg_group_names[[row]]
       }
       
-      df_veg <- df_veg %>% relocate(VegGroup, .before = `Group description`)
-      
-      
+  ##Extract group name and groupNum from VegGroup
+      df_veg <- df_veg %>%         # This will split VegGroup into 2, removing the VegGroup column
+        separate_wider_regex(
+          cols = VegGroup,
+          patterns = c(             # this is code from Copilot!
+            GroupNum = "^G\\d+",    # Captures G and the numbers and the colon
+            ": ",                   # Drops the semicolon and space in between
+            GroupName = ".*"        # Captures everything else
+          ),
+          too_few = "align_start"   # Prevents errors if a row doesn't match perfectly
+        )
+
   ##Delete empty columns ----
       #THIS IS PROBABLY NOT NECESSARY ANYMORE. It was originally made to handle columns that were just there as tags, without data
     # test <- df_veg
@@ -506,19 +472,19 @@
     # df_veg <- df_veg[ , -empty_cols]
 
 ## MA - The below section won't be needed for Navy
-      
 #make Exposure Icon column for Anthony
 # df_veg[, 'Exposure_Icon'] <- "Extreme Heat, Drought, Vector Borne Disease, Invasive Species, Seasonal Timing, Fire/Flooding"
 # 
-#   ##references hanging indent ----
-#     #add REFERENCES SECTION HANGING INDENT <p style=padding-left:15px;text-indent:-15px;> 
-#     for(i in 1:nrow(df_bio)){
-#       df_bio$References[i]
-#       #replace each <p> to <p style=padding-left:15px;text-indent:-15px;>
-#       temp_string1 <- df_bio$References[i]
-#       temp_string2 <- stringr::str_replace_all(temp_string1, "<p>", "<p style=padding-left:15px;text-indent:-15px;>")
-#       df_bio$References[i] <- temp_string2
-#     }
+      
+  ##references hanging indent ----
+    #add REFERENCES SECTION HANGING INDENT <p style=padding-left:15px;text-indent:-15px;>
+    for(i in 1:nrow(df_bio)){
+      df_bio$References[i]
+      #replace each <p> to <p style=padding-left:15px;text-indent:-15px;>
+      temp_string1 <- df_bio$References[i]
+      temp_string2 <- stringr::str_replace_all(temp_string1, "<p>", "<p style=padding-left:15px;text-indent:-15px;>")
+      df_bio$References[i] <- temp_string2
+    }
 
 # add full SITENAME, SITEID ----
   
@@ -536,22 +502,111 @@
   df_veg$InstallationName <- SITENAME
   df_veg$InstallationID <- InstallationID
   
-  df_veg <- df_veg %>% relocate(c(InstallationID, InstallationName), .before = `VegGroup`)
+  df_veg <- df_veg %>% relocate(c(InstallationID, InstallationName), .before = `GroupNum`)
   df_bio <- df_bio %>% relocate(c(InstallationID, InstallationName), .after = `SITEID`)
-  
-  
-  
-  # key <- match(input_installation_folder, installation_info$FolderName)
-  # 
-  # if(!is.na(key)){
-  #   df_bio[,"SITENAME"] <- installation_info$`SITENAME/InstallationNames`[key]
-  #   df_bio[,"SITEID"] <- installation_info$SITEID[key]
-  #   
-  #   df_veg[,"SITENAME"] <- installation_info$`SITENAME/InstallationNames`[key]
-  #   df_veg[,"SITEID"] <- installation_info$SITEID[key]
-  # }else(print("No match found in installation database"))
 
+  ### QUESTION FOR KT OR MT - how can the above step be made better so it doesn't take like 12 lines of code?
+  
+# Creating Selector csv ----
+  
+  ##SELECTOR FOR LIST ITEMS
+  # Find the Exposure Description header in the doc
+  desc_header <- html_nodes(html_doc, "h1") %>%
+    .[html_text(.) == "Exposure Description"]
+  
+  # Get the list after the header
+  desc_list <- xml2::xml_find_all(desc_header, "following-sibling::ol")
+  
+  # Extract list items
+  items <- html_nodes(desc_list, "li")
+  item_text <- html_text(items, trim = TRUE)
+  
+  # Get Julia's table from the selector_topfive worksheet
+  lookup_Top5 <- read_excel(
+    "N:/RStor/CEMML/ClimateChange/2_NavyClimate/Round2_Extremes_INRMP_integ/_SMEs Dashboard Dev/Dashboard_inputs/5_TerrVeg/Notes for Terrestrial Vegetation Dashboard inputs.xlsx",
+    sheet = "selector_topfive",
+    range = "D9:E26",
+    col_names = c("Top5_Code", "Top5_Variable")
+  )
+  
+  # Match the table items to the list items
+  results_Top5 <- data.frame(
+    Top5_Variable = item_text,
+    stringsAsFactors = FALSE
+  ) %>%
+    left_join(lookup_Top5, by = "Top5_Variable")
+  
+  results_Top5 <- results_Top5 %>%
+    mutate(SiteID = df_bio$SITEID,
+           InstallationID = df_bio$InstallationID,
+           InstallationName = df_bio$InstallationName)
+  results_Top5 <- results_Top5[c(3,4,5,2,1)] # Reorganizing the columns for Julia's template
+  
+  
+  
+  
+
+  
+# Creating Group Description csv ----
+  last_grp <- length(df_veg)
+  grp_dsc_indices <- c(1:4, (last_grp-1):last_grp)
+  
+  group_desc <- df_veg %>% 
+    select(grp_dsc_indices)
+  
+
+# Creating Group Icons csv ----
+
+  #delineating category:
+  sensitivity <- c("Landscape Condition", "Fire", "Insects and Disease", "Invasive and Ruderal Vegetation")
+  adaptive_capacity <- c("Topoclimatic Variability", "Diversity within Functional Species Groups", "Keystone Species Vulnerability")
+
+  # As a test, using what I had in my test dataframe
+  # sensitivity <- c("Landscape condition", "Fire", "Insects and Disease", "Invasive and ruderal vegetation")
+  # adaptive_capacity <- c("Topoclimatic variability", "Diversity within functional species groups", "Keystones species vulnerability")
+  
+  # preparing the dataframe for pivot longer
+  df_group_icons <- df_veg %>% 
+    select(-c(6, 14, 15)) # these are hard coded based on the template word doc
+  
+  # pivoting longer
+  df_group_icons_l <- pivot_longer(
+    df_group_icons,
+    cols = -c(1:5),
+    names_to = "Icon Name",
+    values_to = "Text"
+  )
+  
+  # adding category, numeric value
+  df_group_icons_l <- df_group_icons_l %>% 
+    mutate(
+      Category = ifelse(`Icon Name` %in% sensitivity, "Sensitivity", "Adaptive Capacity"),
+      Code = case_when(`Icon Name` == sensitivity[1] ~ 1,
+                       `Icon Name` == sensitivity[2] ~ 2,
+                       `Icon Name` == sensitivity[3] ~ 3,
+                       `Icon Name` == sensitivity[4] ~ 4,
+                       `Icon Name` == adaptive_capacity[1] ~ 5,
+                       `Icon Name` == adaptive_capacity[2] ~ 6,
+                       `Icon Name` == adaptive_capacity[3] ~ 7)
+    ) %>% 
+    relocate(Code, .before = `Icon Name`) %>% 
+    relocate(Category, .before = Text)
+
+# Creating Installation csv ----
+  rownames(df_bio) <- 1
+  df_installation <- df_bio
+  ### NOTE - We probably need to go into this df and make sure adequate "breaks" are included!
+  
 # Export final files ----
+  
+  # MA - note on final export files for Navy:
+    # Selector CSV - results_Top5
+    # Group Description CSV - group_desc
+    # Group Icons csv - df_group_icons_l
+    # Installation csv - df_installation
+  
+  ### MA note - I haven't played with exporting!
+  
   ##export excel to 3ViewerPackages folder ----
     out_dir <- paste0(input_umbrella, input_installation_folder, "/3ViewerPackages/HTML_excels") 
     # ******** NOTE THAT THE FOLDER STRUCTURE MUST MATCH WHAT IS ABOVE ^^^ EXACTLY.  **********

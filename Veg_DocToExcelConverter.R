@@ -33,24 +33,19 @@
   
   # ----TEXT FOR YOU TO CHANGE-----------
   # Select which installation folder you're working in
-  input_installation_folder <- "JB Pearl Harbor Hickam"
-  
+  input_installation_folder <- "WPNSTA Yorktown"
   # Write if working on AF (AIR FORCE) or Navy (NAVY):
   inst_sheet = "NAVY"
   # inst_sheet = "AIR FORCE"
-  
   # If Navy, select which region
-  # navy_region = "MidLant Region"
+  navy_region = "MidLant Region"
   # navy_region = "Southeast Region"
-  navy_region = "Hawaii Region"
-  
+  # navy_region = "Hawaii Region"
   # Select which analysis you're doing (shouldn't need to change)
-  input_SME_folder <- "/Vegetation_Habitats/Word to HTML" 
-  
+  input_SME_folder <- "/Vegetation_Habitats/Word to HTML Conversion/TEST" 
   #the final file name will start with this and will get the date added
   subject <- "Veg"
   project_name <- paste0(subject, "_", input_installation_folder)
-  
   # this will select which sheet to select your data from
   ifelse(inst_sheet == "AIR FORCE",
          input_umbrella <- "N:/RStor/CEMML/ClimateChange/1_USAFClimate/1_USAF_Natural_Resources/20_2_0004_RevisitingPhase1/",
@@ -94,7 +89,7 @@
       from = "docx",
       to = "html",
       standalone = TRUE,
-      args = c("--wrap=none")
+      args = c("--wrap=none") #change to preserve?
     )
     
     xml2::read_html(html_file)
@@ -444,6 +439,8 @@
         df_veg$VegGroup[row] <- veg_group_names[[row]]
       }
       
+      df_veg <- df_veg %>% relocate(VegGroup, .before = 'Group_Desc')
+        
   ##Extract group name and groupNum from VegGroup
       df_veg <- df_veg %>%         # This will split VegGroup into 2, removing the VegGroup column
         separate_wider_regex(
@@ -512,7 +509,7 @@
   ##SELECTOR FOR LIST ITEMS
   # Find the Exposure Description header in the doc
   desc_header <- html_nodes(html_doc, "h1") %>%
-    .[html_text(.) == "Exposure Description"]
+    .[html_text(.) == "ExpDescription"]
   
   # Get the list after the header
   desc_list <- xml2::xml_find_all(desc_header, "following-sibling::ol")
@@ -594,7 +591,7 @@
 
 # Creating Installation csv ----
   rownames(df_bio) <- 1
-  df_installation <- df_bio
+  df_installation <- df_bio %>% relocate(NotAnalyzed, .after = 'References')
   ### NOTE - We probably need to go into this df and make sure adequate "breaks" are included!
   
 # Export final files ----

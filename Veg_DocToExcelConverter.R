@@ -12,7 +12,7 @@
 
 ## Install / load necessary packages ----
 
-  packages <- c("pandoc","xml2","rvest","writexl", "readxl")
+  packages <- c("pandoc","xml2","rvest","writexl", "readxl", "dplyr")
   
   # Install packages not yet installed
   installed_packages <- packages %in% rownames(installed.packages())
@@ -62,7 +62,7 @@
 
   input_dir <-  paste0(input_umbrella, input_installation_folder, input_SME_folder) 
   current_date <- format(Sys.Date(), "%Y%m%d")  # e.g., "2025-09-24"
-  installation_info <- readxl::read_xlsx("Installation_IDs.xlsx")
+  installation_info <- readxl::read_xlsx("Installation_IDs.xlsx", sheet = inst_sheet)
   
 
 #ERROR CATCH: open files ----
@@ -211,6 +211,22 @@
     return(result_list)
   }
 
+  # ----- * remove paragraph notation -----
+  p_be_gone <-  function(df, columns){
+    for(col in columns){
+      if (!col %in% colnames(df)) {
+        warning(paste("Column not found, skipping:", col))
+        next
+      }
+      #remove paragraph notation
+      df[[col]] <- stringr::str_replace_all(df[[col]], "<p>", '')
+      df[[col]] <- stringr::str_replace_all(df[[col]], "</p>", '')
+      
+    }
+    return(df)
+  }
+  
+  
 # ----- * remove '\r\n' from heading names -----
   
   #NO LONGER NECESSARY, since we have removed the text wrapping default from the pandoc_convert() function
@@ -453,29 +469,51 @@
     #   
     # df_veg <- df_veg[ , -empty_cols]
 
+## MA - The below section won't be needed for Navy
+      
 #make Exposure Icon column for Anthony
-df_veg[, 'Exposure_Icon'] <- "Extreme Heat, Drought, Vector Borne Disease, Invasive Species, Seasonal Timing, Fire/Flooding"
-
-  ##references hanging indent ----
-    #add REFERENCES SECTION HANGING INDENT <p style=padding-left:15px;text-indent:-15px;> 
-    for(i in 1:nrow(df_bio)){
-      df_bio$References[i]
-      #replace each <p> to <p style=padding-left:15px;text-indent:-15px;>
-      temp_string1 <- df_bio$References[i]
-      temp_string2 <- stringr::str_replace_all(temp_string1, "<p>", "<p style=padding-left:15px;text-indent:-15px;>")
-      df_bio$References[i] <- temp_string2
-    }
+# df_veg[, 'Exposure_Icon'] <- "Extreme Heat, Drought, Vector Borne Disease, Invasive Species, Seasonal Timing, Fire/Flooding"
+# 
+#   ##references hanging indent ----
+#     #add REFERENCES SECTION HANGING INDENT <p style=padding-left:15px;text-indent:-15px;> 
+#     for(i in 1:nrow(df_bio)){
+#       df_bio$References[i]
+#       #replace each <p> to <p style=padding-left:15px;text-indent:-15px;>
+#       temp_string1 <- df_bio$References[i]
+#       temp_string2 <- stringr::str_replace_all(temp_string1, "<p>", "<p style=padding-left:15px;text-indent:-15px;>")
+#       df_bio$References[i] <- temp_string2
+#     }
 
 # add full SITENAME, SITEID ----
-  key <- match(input_installation_folder, installation_info$FolderName)
   
-  if(!is.na(key)){
-    df_bio[,"SITENAME"] <- installation_info$`SITENAME/InstallationNames`[key]
-    df_bio[,"SITEID"] <- installation_info$SITEID[key]
-    
-    df_veg[,"SITENAME"] <- installation_info$`SITENAME/InstallationNames`[key]
-    df_veg[,"SITEID"] <- installation_info$SITEID[key]
-  }else(print("No match found in installation database"))
+  # MA - removing paragraph notation for both veg and bio dataframes
+  cols_to_change <- c("SITEID") #change this to the name of the columns in the specific analysis
+  df_bio <- p_be_gone(df_bio, cols_to_change)
+  df_veg <- p_be_gone(df_veg, cols_to_change)
+  
+  # Adding SITENAME and InstallationID
+  SITENAME <- installation_info$InstallationNames[installation_info$SITEID == df_bio$SITEID[1]]
+  InstallationID <- installation_info$InstallationID[installation_info$SITEID == df_bio$SITEID[1]]
+  
+  df_bio$InstallationName <- SITENAME
+  df_bio$InstallationID <- InstallationID
+  df_veg$InstallationName <- SITENAME
+  df_veg$InstallationID <- InstallationID
+  
+  df_veg <- df_veg %>% relocate(c(InstallationID, InstallationName), .before = `VegGroup`)
+  df_bio <- df_bio %>% relocate(c(InstallationID, InstallationName), .after = `SITEID`)
+  
+  
+  
+  # key <- match(input_installation_folder, installation_info$FolderName)
+  # 
+  # if(!is.na(key)){
+  #   df_bio[,"SITENAME"] <- installation_info$`SITENAME/InstallationNames`[key]
+  #   df_bio[,"SITEID"] <- installation_info$SITEID[key]
+  #   
+  #   df_veg[,"SITENAME"] <- installation_info$`SITENAME/InstallationNames`[key]
+  #   df_veg[,"SITEID"] <- installation_info$SITEID[key]
+  # }else(print("No match found in installation database"))
 
 # Export final files ----
   ##export excel to 3ViewerPackages folder ----

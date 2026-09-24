@@ -515,55 +515,56 @@
   desc_list <- xml2::xml_find_all(desc_header, "following-sibling::ol")
   
   # Extract list items
-  items <- html_nodes(desc_list, "li")
-  item_text <- html_text(items, trim = TRUE)
+  bioclimatic5 <- html_nodes(desc_list, "li")
+  bio5_text <- html_text(bioclimatic5, trim = TRUE)
   
   # Get Julia's table from the selector_topfive worksheet
   lookup_Top5 <- read_excel(
     "N:/RStor/CEMML/ClimateChange/2_NavyClimate/Round2_Extremes_INRMP_integ/_SMEs Dashboard Dev/Dashboard_inputs/5_TerrVeg/Notes for Terrestrial Vegetation Dashboard inputs.xlsx",
     sheet = "selector_topfive",
-    range = "D9:E26",
-    col_names = c("Top5_Code", "Top5_Variable")
+    range = "D9:F26",
+    col_names = c("Top5_Code", "Top5_Variable_GIS", "LongFormName_Veg")
   )
   
   # Match the table items to the list items
   results_Top5 <- data.frame(
-    Top5_Variable = item_text,
+    LongFormName_Veg = bio5_text,
     stringsAsFactors = FALSE
   ) %>%
-    left_join(lookup_Top5, by = "Top5_Variable")
-  
-  results_Top5 <- results_Top5 %>%
+    left_join(lookup_Top5 %>% select(LongFormName_Veg), by = "LongFormName_Veg") %>% 
     mutate(SiteID = df_bio$SITEID,
            InstallationID = df_bio$InstallationID,
            InstallationName = df_bio$InstallationName)
-  results_Top5 <- results_Top5[c(3,4,5,2,1)] # Reorganizing the columns for Julia's template
-  
-  
+
   # assign code values to the bioclimatic variables
-    results_Top5 <- results_top5 %>% mutate('Top5_Code' = case_when(
-      Top5_Variable == "Annual Mean Diurnal Range, °F" ~ 1,
-      Top5_Variable == "Isothermality, %"  ~ 2,
-      Top5_Variable == "Temperature Seasonality (Standard Deviation), °F" ~ 3,
-      Top5_Variable == "Temperature Seasonality (Coefficient of Variation), %" ~ 4,
-      Top5_Variable == "Max Temperature of Warmest Month, °F" ~ 5,
-      Top5_Variable == "Min Temperature of Coldest Month, °F" ~ 6,
-      Top5_Variable == "Annual Temperature Range, °F" ~ 7,
-      Top5_Variable == "Mean Temperature of Wettest Quarter, °F" ~ 8,
-      Top5_Variable == "Mean Temperature of Driest Quarter, °F"~ 9,
-      Top5_Variable == "Mean Temperature of Warmest Quarter, °F" ~ 10,
-      Top5_Variable == "Mean Temperature of Coldest Quarter, °F" ~ 11,
-      Top5_Variable == "Precipitation of Wettest Month, inches" ~ 12,
-      Top5_Variable == "Precipitation of Driest Month, inches" ~ 13,
-      Top5_Variable == "Precipitation Seasonality (Coefficient of Variation), %" ~ 14,
-      Top5_Variable == "Precipitation of Wettest Quarter, inches" ~ 15,
-      Top5_Variable == "Precipitation of Driest Quarter, inches" ~ 16,
-      Top5_Variable == "Precipitation of Coldest Quarter, inches" ~ 17,
-      Top5_Variable == "Precipitation of Warmest Quarter, inches" ~ 18,
+    results_Top5 <- results_Top5 %>% mutate('Top5_Code' = case_when(
+      LongFormName_Veg == "Annual Mean Diurnal Range, °F" ~ 1,
+      LongFormName_Veg == "Isothermality, %"  ~ 2,
+      LongFormName_Veg == "Temperature Seasonality (Standard Deviation), °F" ~ 3,
+      LongFormName_Veg == "Temperature Seasonality (Coefficient of Variation), %" ~ 4,
+      LongFormName_Veg == "Max Temperature of Warmest Month, °F" ~ 5,
+      LongFormName_Veg == "Min Temperature of Coldest Month, °F" ~ 6,
+      LongFormName_Veg == "Annual Temperature Range, °F" ~ 7,
+      LongFormName_Veg == "Mean Temperature of Wettest Quarter, °F" ~ 8,
+      LongFormName_Veg == "Mean Temperature of Driest Quarter, °F"~ 9,
+      LongFormName_Veg == "Mean Temperature of Warmest Quarter, °F" ~ 10,
+      LongFormName_Veg == "Mean Temperature of Coldest Quarter, °F" ~ 11,
+      LongFormName_Veg == "Precipitation of Wettest Month, inches" ~ 12,
+      LongFormName_Veg == "Precipitation of Driest Month, inches" ~ 13,
+      LongFormName_Veg == "Precipitation Seasonality (Coefficient of Variation), %" ~ 14,
+      LongFormName_Veg == "Precipitation of Wettest Quarter, inches" ~ 15,
+      LongFormName_Veg == "Precipitation of Driest Quarter, inches" ~ 16,
+      LongFormName_Veg == "Precipitation of Coldest Quarter, inches" ~ 17,
+      LongFormName_Veg == "Precipitation of Warmest Quarter, inches" ~ 18,
       TRUE ~ 0,
     ))
-
-  
+    
+    results_Top5 <- results_Top5 %>% 
+      left_join(lookup_Top5 %>% 
+                  select(Top5_Code, Top5_Variable_GIS), by = "Top5_Code")
+    
+    results_Top5 <- results_Top5[c(2,3,4,1,5,6)] # Reorganizing the columns for Julia's template
+    
 # Creating Group Description csv ----
   last_grp <- length(df_veg)
   grp_dsc_indices <- c(1:6, (last_grp-1):last_grp)
@@ -625,7 +626,7 @@
   ### MA note - I haven't played with exporting!
   
   ##export excel to 3ViewerPackages folder ----
-    out_dir <- paste0(input_umbrella, input_installation_folder, "/3ViewerPackages/HTML_excels") 
+    out_dir <- paste0(input_umbrella, input_installation_folder, input_SME_folder, "/3ViewerPackages/TEST") 
     # ******** NOTE THAT THE FOLDER STRUCTURE MUST MATCH WHAT IS ABOVE ^^^ EXACTLY.  **********
     # CHANGE out_dir AS NEEDED IF THERE ARE ANY DIFFERENCES IN THE LOCATION YOU WANT TO SAVE TO.
     

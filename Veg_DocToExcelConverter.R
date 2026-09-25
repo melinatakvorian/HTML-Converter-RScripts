@@ -439,7 +439,7 @@
         df_veg$VegGroup[row] <- veg_group_names[[row]]
       }
       
-      df_veg <- df_veg %>% relocate(VegGroup, .before = 'Group_Desc')
+      df_veg <- df_veg %>% relocate(VegGroup, .before = 'Group Description')
         
   ##Extract group name and groupNum from VegGroup
       df_veg <- df_veg %>%         # This will split VegGroup into 2, removing the VegGroup column
@@ -509,7 +509,7 @@
   ##SELECTOR FOR LIST ITEMS
   # Find the Exposure Description header in the doc
   desc_header <- html_nodes(html_doc, "h1") %>%
-    .[html_text(.) == "ExpDescription"]
+    .[html_text(.) == "Exposure Description"]
   
   # Get the list after the header
   desc_list <- xml2::xml_find_all(desc_header, "following-sibling::ol")
@@ -570,14 +570,14 @@
   grp_dsc_indices <- c(1:6, (last_grp-1):last_grp)
   
   group_desc <- df_veg %>% 
-    select(grp_dsc_indices)
+    select(all_of(grp_dsc_indices))
   
 
 # Creating Group Icons csv ----
 
   #delineating category:
-  sensitivity <- c("Landscape Condition", "Fire", "Insects and Disease", "Invasive and Ruderal Vegetation")
-  adaptive_capacity <- c("Topoclimatic Variability", "Diversity within Functional Species Groups", "Keystone Species Vulnerability")
+  sensitivity <- c("Landscape Condition", "Fire", "Insects and Disease", "Invasive Species")
+  adaptive_capacity <- c("Topoclimatic Variability", "Diversity", "Keystone Species")
 
   # As a test, using what I had in my test dataframe
   # sensitivity <- c("Landscape condition", "Fire", "Insects and Disease", "Invasive and ruderal vegetation")
@@ -612,7 +612,7 @@
 
 # Creating Installation csv ----
   rownames(df_bio) <- 1
-  df_installation <- df_bio %>% relocate(NotAnalyzed, .after = 'References')
+  df_installation <- df_bio %>% relocate('Other Vegetation Groups', .after = 'References')
   ### NOTE - We probably need to go into this df and make sure adequate "breaks" are included!
   
 # Export final files ----
@@ -638,19 +638,19 @@
     message("Conversion complete. XLSX saved to: ", file.path(out_dir, output_filename_group_icons))
     
     #results_Top5 file
-    output_filename_top5 <- paste0(project_name, "_top5_HTML_formatted", current_date, ".xlsx")
+    output_filename_top5 <- paste0(project_name, "_top5_HTML_formatted_", current_date, ".xlsx")
     write_xlsx(results_Top5, file.path(out_dir, output_filename_top5)) #create file and save to 3ViewerPackages folder
     message("Conversion complete. XLSX saved to: ", file.path(out_dir, output_filename_top5))
     
     #text_installation (we call it df_bio)
     output_filename_inst_text <- paste0(project_name, "_text_installation_HTML_formatted_", current_date, ".xlsx")
     write_xlsx(df_bio, file.path(out_dir, output_filename_inst_text)) #create file and save to 3ViewerPackages folder
-    message("Conversion complete. XLSX saved to: ", file.path(out_dir, output_filename_inst_text)
+    message("Conversion complete. XLSX saved to: ", file.path(out_dir, output_filename_inst_text))
     
     #text_group_desc
     output_filename_group_desc <- paste0(project_name, "_group_desc_HTML_formatted_", current_date, ".xlsx")
     write_xlsx(group_desc, file.path(out_dir, output_filename_inst_text)) #create file and save to 3ViewerPackages folder
-    message("Conversion complete. XLSX saved to: ", file.path(out_dir, output_filename_group_desc)
+    message("Conversion complete. XLSX saved to: ", file.path(out_dir, output_filename_group_desc))
     
     
   ##create shortcut to Word to HTML folder ----

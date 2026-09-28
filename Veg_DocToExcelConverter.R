@@ -45,7 +45,7 @@
   # navy_region = "Hawaii Region"
   
   # Select which analysis you're doing (shouldn't need to change)
-  input_SME_folder <- "/Vegetation_Habitats/Word to HTML Conversion/TEST" 
+  input_SME_folder <- "/Vegetation_Habitats/Word to HTML Conversion" 
   
   #the final file name will start with this and will get the date added
   subject <- "Veg"
@@ -547,8 +547,8 @@
       LongFormName_Veg == "Isothermality, %"  ~ 2,
       LongFormName_Veg == "Temperature Seasonality (Standard Deviation), °F" ~ 3,
       LongFormName_Veg == "Temperature Seasonality (Coefficient of Variation), %" ~ 4,
-      LongFormName_Veg == "Max Temperature of Warmest Month, °F" ~ 5,
-      LongFormName_Veg == "Min Temperature of Coldest Month, °F" ~ 6,
+      LongFormName_Veg == "Maximum Temperature of Warmest Month, °F" ~ 5,
+      LongFormName_Veg == "Minimum Temperature of Coldest Month, °F" ~ 6,
       LongFormName_Veg == "Annual Temperature Range, °F" ~ 7,
       LongFormName_Veg == "Mean Temperature of Wettest Quarter, °F" ~ 8,
       LongFormName_Veg == "Mean Temperature of Driest Quarter, °F"~ 9,
@@ -618,6 +618,25 @@
 # Creating Installation csv ----
   rownames(df_bio) <- 1
   df_installation <- df_bio %>% relocate('Other Vegetation Groups', .after = 'References')
+  
+  ##creating line breaks ----
+  
+  #MT- This does not work completely because the veg team only wants a line break after the veg group *description*, 
+  #...and right now this adds a line after the veg group name AND after the veg group description
+  #...it requires manually removing the additional <br>, which is the same amount of work as adding the <br> ourselves
+  numbblocks <- c(8) #corresponds to the columns with text that we need broken up
+  
+  for(a in 1:length(numbblocks)){
+    col_num <- numbblocks[[a]]
+    for(b in 1:nrow(df_installation)){
+      if(is.na(df_installation[[col_num]][b])) next
+      
+      #replace each </p> to </p> <br>
+      temp_string <- df_installation[[col_num]][b]
+      temp_string1 <- replace_all_except_last(temp_string, "</p>", "</p> <br>")
+      df_installation[[col_num]][b] <- temp_string1
+    }
+  }
   ### NOTE - We probably need to go into this df and make sure adequate "breaks" are included!
   
 # Export final files ----
@@ -631,14 +650,14 @@
   ### MA note - I haven't played with exporting!
   
   ##export excel to 3ViewerPackages folder ----
-    out_dir <- paste0(input_umbrella, input_installation_folder, input_SME_folder, "/3ViewerPackages/TEST") 
+    out_dir <- paste0(input_umbrella, input_installation_folder, "/3ViewerPackages/HTML_excels") 
     # ******** NOTE THAT THE FOLDER STRUCTURE MUST MATCH WHAT IS ABOVE ^^^ EXACTLY.  **********
     # CHANGE out_dir AS NEEDED IF THERE ARE ANY DIFFERENCES IN THE LOCATION YOU WANT TO SAVE TO.
     
     if (!dir.exists(out_dir)) dir.create(out_dir, recursive = TRUE)
   
     #df_group_icons_l file
-    output_filename_group_icons <- paste0(project_name, "text_group_icons_HTML_formatted_", current_date, ".xlsx")
+    output_filename_group_icons <- paste0(project_name, "_text_group_icons_HTML_formatted_", current_date, ".xlsx")
     write_xlsx(df_group_icons_l, file.path(out_dir, output_filename_group_icons)) #create file and save to 3ViewerPackages folder
     message("Conversion complete. XLSX saved to: ", file.path(out_dir, output_filename_group_icons))
     
@@ -647,14 +666,14 @@
     write_xlsx(results_Top5, file.path(out_dir, output_filename_top5)) #create file and save to 3ViewerPackages folder
     message("Conversion complete. XLSX saved to: ", file.path(out_dir, output_filename_top5))
     
-    #text_installation (we call it df_bio)
+    #text_installation
     output_filename_inst_text <- paste0(project_name, "_text_installation_HTML_formatted_", current_date, ".xlsx")
-    write_xlsx(df_bio, file.path(out_dir, output_filename_inst_text)) #create file and save to 3ViewerPackages folder
+    write_xlsx(df_installation, file.path(out_dir, output_filename_inst_text)) #create file and save to 3ViewerPackages folder
     message("Conversion complete. XLSX saved to: ", file.path(out_dir, output_filename_inst_text))
     
     #text_group_desc
     output_filename_group_desc <- paste0(project_name, "_group_desc_HTML_formatted_", current_date, ".xlsx")
-    write_xlsx(group_desc, file.path(out_dir, output_filename_inst_text)) #create file and save to 3ViewerPackages folder
+    write_xlsx(group_desc, file.path(out_dir, output_filename_group_desc)) #create file and save to 3ViewerPackages folder
     message("Conversion complete. XLSX saved to: ", file.path(out_dir, output_filename_group_desc))
     
     

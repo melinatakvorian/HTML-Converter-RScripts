@@ -34,18 +34,23 @@
   # ----TEXT FOR YOU TO CHANGE-----------
   # Select which installation folder you're working in
   input_installation_folder <- "WPNSTA Yorktown"
+  
   # Write if working on AF (AIR FORCE) or Navy (NAVY):
   inst_sheet = "NAVY"
   # inst_sheet = "AIR FORCE"
+  
   # If Navy, select which region
   navy_region = "MidLant Region"
   # navy_region = "Southeast Region"
   # navy_region = "Hawaii Region"
+  
   # Select which analysis you're doing (shouldn't need to change)
   input_SME_folder <- "/Vegetation_Habitats/Word to HTML Conversion/TEST" 
+  
   #the final file name will start with this and will get the date added
   subject <- "Veg"
   project_name <- paste0(subject, "_", input_installation_folder)
+  
   # this will select which sheet to select your data from
   ifelse(inst_sheet == "AIR FORCE",
          input_umbrella <- "N:/RStor/CEMML/ClimateChange/1_USAFClimate/1_USAF_Natural_Resources/20_2_0004_RevisitingPhase1/",

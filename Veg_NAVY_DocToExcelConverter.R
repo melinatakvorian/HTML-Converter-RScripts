@@ -508,6 +508,31 @@
   df_bio <- df_bio %>% relocate(c(InstallationID, InstallationName), .after = `SITEID`)
 
   ### QUESTION FOR KT OR MT - how can the above step be made better so it doesn't take like 12 lines of code?
+  ###  MT - Here is the suggestion for code to replace this
+    #...we just need to change the 'df' to 'df_veg' and 'df_bio'
+    #...this needs to be made into a function and then called, to be as efficient as possible
+  
+    for(i in 1:nrow(df)){
+      installation_info <- readxl::read_xlsx("N:/RStor/CEMML/ClimateChange/Document Standards/Templates/TEMPLATES_SME_Word_Docs/Installation_IDs.xlsx", sheet=2)
+      
+      #create SITENAME and assign the value from the corresponding row of the excel spreadsheet according to SITEID
+      SITENAME <- installation_info$InstallationNames[installation_info$SITEID == df$SITEID[i]] 
+      
+      #assign the correct InstallationNames to that row of data
+      df[i,"InstallationNames"] <- SITENAME
+      
+      #move the InstallationNames to the correct row 
+      df <- df %>% relocate(InstallationNames, .after = SITEID)
+      
+      #create InstallationID and assign the value from the corresponding row of the excel spreadsheet according to SITEID
+      InstallationID <- installation_info$`Installation ID (Site Code)`[installation_info$SITEID == df$SITEID[i]]
+      
+      #assign the correct InstallationNames to that row of data
+      df[i,"Installation ID (Site Code)"] <- InstallationID
+      
+      #move the new column after the SITEID column
+      df <- df %>% relocate(`Installation ID (Site Code)`, .after = SITEID)
+    }
   
 # Creating Selector csv ----
   

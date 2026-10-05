@@ -29,13 +29,13 @@ invisible(lapply(packages, library, character.only = TRUE))
 
 # ----TEXT FOR YOU TO CHANGE-----------
 # Select which installation folder you're working in
-input_installation_folder <- "NSA Panama City"
+input_installation_folder <- "NS Norfolk"
 
 # Write if working on AF (AIR FORCE) or Navy (NAVY):
   inst_sheet = "NAVY"
 
 # If Navy, select which region
-navy_region = "Southeast Region"
+navy_region = "MidLant Region"
 
 # Select which analysis you're doing and the name of the file folder
 #PAY ATTENTION TO THE DIRECTION OF THE SLASHES. THEY HAVE TO BE CHANGED TO FORWARD SLASHES, AS SHOWN BELOW
@@ -276,7 +276,7 @@ for(i in 1:nrow(df)){
 }
 
 ##line breaks [manually input columns] ----
-numbblocks <- c(3:8) # Change to the columns that need line breaks between paragraphs
+numbblocks <- c(4:9) # Change to the columns that need line breaks between paragraphs
 #add blank line after each paragraph
 for(a in 1:length(numbblocks)){
   col_num <- numbblocks[[a]]
@@ -292,7 +292,7 @@ for(a in 1:length(numbblocks)){
 
 
 ##paragraph indentation ----
-numbblocks <- c(3:7) # Change to the columns that need INDENTS before paragraphs
+numbblocks <- c(4:8) # Change to the columns that need INDENTS before paragraphs
 #add blank line after each paragraph
 for(a in 1:length(numbblocks)){
   col_num <- numbblocks[[a]]

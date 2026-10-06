@@ -31,17 +31,17 @@
     #the broad folder structure
     
     #AIR FORCE  
-      #input_umbrella <- "N:/RStor/CEMML/ClimateChange/1_USAFClimate/1_USAF_Natural_Resources/20_2_0004_RevisitingPhase1/"
+      input_umbrella <- "N:/RStor/CEMML/ClimateChange/1_USAFClimate/1_USAF_Natural_Resources/20_2_0004_RevisitingPhase1/"
       
-      input_umbrella <- "N:/RStor/CEMML/ClimateChange/0_Natural Resources Teams/Wildlife/_FWVAs/" #being used for testing
+      #input_umbrella <- "N:/RStor/CEMML/ClimateChange/0_Natural Resources Teams/Wildlife/_FWVAs/" #being used for testing
     
     #NAVY
       #input_umbrella <- "N:/RStor/CEMML/ClimateChange/2_NavyClimate/Round2_Extremes_INRMP_integ/MidLant Region/"
     
     #the specific folder inside the Document to HTML Table Converter where the input files are
-      input_installation_folder <- "Air Force"
+      input_installation_folder <- "JBMDL"
       installation_type <- "Air Force" #"Navy"
-      input_SME_folder <- "/Travis"
+      input_SME_folder <- "/FWVA/Word to HTML Conversion"
     
     #the final file name will start with this and will get the date added
       subject <- "FWVA"
@@ -70,7 +70,7 @@
   }
 
 # Run the Function Library ----
-  source("FunctionLibrary.R", echo = TRUE)
+  source("Functions/Wildlife-FunctionsLibrary.R", echo = TRUE)
   
 # RUN ----
   docx_files <- list.files(input_dir, pattern = "\\.docx$", full.names = TRUE) #pull list of all files in folder
@@ -184,8 +184,24 @@
 #color the word with the vulnerability score ---
   df <- color_vuln_text(df)
 
+#line breaks [manually input columns] ----
+  numbblocks <- c(18) # Change to the columns that need line breaks between paragraphs
+  #add blank line after each paragraph
+  for(a in 1:length(numbblocks)){
+    col_num <- numbblocks[[a]]
+    for(b in 1:nrow(df)){
+      if(is.na(df[[col_num]][b])) next
+      
+      #replace each </p> to </p> <br>
+      temp_string <- df[[col_num]][b]
+      temp_string1 <- replace_all_except_last(temp_string, "</p>", "</p> <br>")
+      df[[col_num]][b] <- temp_string1
+    }
+  }
+  
+  
 #ADD THE BOLDING FUNCTION CODE
-  source("BoldingGlossTerms-Claude.R")
+  source("Functions/Wildlife-Bolding_Glossary_Terms.R")
   
 # Export final files ----
   ##export excel to 3ViewerPackages folder ----

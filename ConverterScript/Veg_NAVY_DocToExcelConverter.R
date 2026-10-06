@@ -33,7 +33,7 @@
   
   # ----TEXT FOR YOU TO CHANGE-----------
   # Select which installation folder you're working in
-  input_installation_folder <- "WPNSTA Yorktown"
+  input_installation_folder <- "NSA Cutler"
   
   # Write if working on AF (AIR FORCE) or Navy (NAVY):
   inst_sheet = "NAVY"
@@ -497,7 +497,7 @@
   
   # Adding SITENAME and InstallationID
   SITENAME <- installation_info$InstallationNames[installation_info$SITEID == df_bio$SITEID[1]]
-  InstallationID <- installation_info$InstallationID[installation_info$SITEID == df_bio$SITEID[1]]
+  InstallationID <- installation_info$`Installation ID (Site Code)`[installation_info$SITEID == df_bio$SITEID[1]]
   
   df_bio$InstallationName <- SITENAME
   df_bio$InstallationID <- InstallationID
@@ -512,27 +512,28 @@
     #...we just need to change the 'df' to 'df_veg' and 'df_bio'
     #...this needs to be made into a function and then called, to be as efficient as possible
   
-    for(i in 1:nrow(df)){
-      installation_info <- readxl::read_xlsx("N:/RStor/CEMML/ClimateChange/Document Standards/Templates/TEMPLATES_SME_Word_Docs/Installation_IDs.xlsx", sheet=2)
-      
-      #create SITENAME and assign the value from the corresponding row of the excel spreadsheet according to SITEID
-      SITENAME <- installation_info$InstallationNames[installation_info$SITEID == df$SITEID[i]] 
-      
-      #assign the correct InstallationNames to that row of data
-      df[i,"InstallationNames"] <- SITENAME
-      
-      #move the InstallationNames to the correct row 
-      df <- df %>% relocate(InstallationNames, .after = SITEID)
-      
-      #create InstallationID and assign the value from the corresponding row of the excel spreadsheet according to SITEID
-      InstallationID <- installation_info$`Installation ID (Site Code)`[installation_info$SITEID == df$SITEID[i]]
-      
-      #assign the correct InstallationNames to that row of data
-      df[i,"Installation ID (Site Code)"] <- InstallationID
-      
-      #move the new column after the SITEID column
-      df <- df %>% relocate(`Installation ID (Site Code)`, .after = SITEID)
-    }
+    # for(i in 1:nrow(df)){
+    #   # installation_info <- readxl::read_xlsx("N:/RStor/CEMML/ClimateChange/Document Standards/Templates/TEMPLATES_SME_Word_Docs/Installation_IDs.xlsx", sheet=2)
+    #   # ^ this already happens earlier (MA)
+    #   
+    #   #create SITENAME and assign the value from the corresponding row of the excel spreadsheet according to SITEID
+    #   SITENAME <- installation_info$InstallationNames[installation_info$SITEID == df$SITEID[i]] 
+    #   
+    #   #assign the correct InstallationNames to that row of data
+    #   df[i,"InstallationNames"] <- SITENAME
+    #   
+    #   #move the InstallationNames to the correct row 
+    #   df <- df %>% relocate(InstallationNames, .after = SITEID)
+    #   
+    #   #create InstallationID and assign the value from the corresponding row of the excel spreadsheet according to SITEID
+    #   InstallationID <- installation_info$`Installation ID (Site Code)`[installation_info$SITEID == df$SITEID[i]]
+    #   
+    #   #assign the correct InstallationNames to that row of data
+    #   df[i,"Installation ID (Site Code)"] <- InstallationID
+    #   
+    #   #move the new column after the SITEID column
+    #   df <- df %>% relocate(`Installation ID (Site Code)`, .after = SITEID)
+    # }
   
 # Creating Selector csv ----
   

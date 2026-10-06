@@ -39,9 +39,9 @@
       #input_umbrella <- "N:/RStor/CEMML/ClimateChange/2_NavyClimate/Round2_Extremes_INRMP_integ/MidLant Region/"
     
     #the specific folder inside the Document to HTML Table Converter where the input files are
-      input_installation_folder <- "JBMDL"
+      input_installation_folder <- "New Boston SFS"
       installation_type <- "Air Force" #"Navy"
-      input_SME_folder <- "/FWVA/Word to HTML Conversion"
+      input_SME_folder <- "/Fish and Wildlife/Word to HTML Conversion"
     
     #the final file name will start with this and will get the date added
       subject <- "FWVA"

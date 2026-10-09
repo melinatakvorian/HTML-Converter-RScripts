@@ -150,7 +150,12 @@ bold_first_term_occurrence <- function(df, cols, glossary, ignore_case = TRUE) {
 
   
   ## run for dataframe ----
+  if(subject == "TEVA"){
+    result <- bold_first_term_occurrence(df, cols = sections_TEVA, glossary = glossary)
+  }else if(subject == "FWVA"){
     result <- bold_first_term_occurrence(df, cols = sections_FWVA, glossary = glossary)
+  }
+    
     
     #print(result)
 

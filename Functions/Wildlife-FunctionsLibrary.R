@@ -166,7 +166,7 @@ ref_hanging_indents <- function(df, report_type){
 update_US <- function(df, report_type, installation_type){
   if(installation_type == "Air Force" && report_type == "TEVA"){
     
-    cols_to_search <- c(24,25,28,31,34) #the indices of VulnSummary, NE_Text, OE_Text, S_Text, AC_Text
+    cols_to_search <- c(17,18,20,22,24) #the indices of VulnSummary, NE_Text, OE_Text, S_Text, AC_Text
     
     for(col in cols_to_search){ 
       df[[col]] <- gsub("U\\.S\\. ([A-Z])", "US. \\1", df[[col]])  # detect capital letters indicating a new sentence
@@ -177,7 +177,7 @@ update_US <- function(df, report_type, installation_type){
     return(df)
     
   }else if(installation_type == "Air Force" && report_type == "FWVA"){
-    cols_to_search <- c(12, 13, 15, 17) #the indices of VulnSummary, E_Text, S_Text, AC_Text
+    cols_to_search <- c(17, 18, 20, 22) #the indices of VulnSummary, E_Text, S_Text, AC_Text
     
     for(col in cols_to_search){ 
       df[[col]] <- gsub("U\\.S\\. ([A-Z])", "US. \\1", df[[col]])  # detect capital letters indicating a new sentence

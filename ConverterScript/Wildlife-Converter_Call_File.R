@@ -31,17 +31,17 @@
     #the broad folder structure
     
     #AIR FORCE  
-      input_umbrella <- "N:/RStor/CEMML/ClimateChange/1_USAFClimate/1_USAF_Natural_Resources/20_2_0004_RevisitingPhase1/"
+      #input_umbrella <- "N:/RStor/CEMML/ClimateChange/1_USAFClimate/1_USAF_Natural_Resources/20_2_0004_RevisitingPhase1/"
       
       #input_umbrella <- "N:/RStor/CEMML/ClimateChange/0_Natural Resources Teams/Wildlife/_FWVAs/" #being used for testing
     
     #NAVY
-      #input_umbrella <- "N:/RStor/CEMML/ClimateChange/2_NavyClimate/Round2_Extremes_INRMP_integ/MidLant Region/"
+      input_umbrella <- "N:/RStor/CEMML/ClimateChange/2_NavyClimate/Round2_Extremes_INRMP_integ/MidLant Region/"
     
     #the specific folder inside the Document to HTML Table Converter where the input files are
-      input_installation_folder <- "JBMDL"
-      installation_type <- "Air Force" #"Navy"
-      input_SME_folder <- "/TEVA/Word to HTML Conversion"
+      input_installation_folder <- "WPNSTA Yorktown"
+      installation_type <- "Navy" #"Air Force"
+      input_SME_folder <- "/T&E/TEVAs"
     
     #the final file name will start with this and will get the date added
       subject <- "TEVA"
@@ -104,6 +104,11 @@
     }
   }
 
+  df <- df %>% rename(
+    SpeciesIDNum = `SppID#` ,
+    ReferencesTxt = `References and Credits`
+  )
+  
 # run paragraph notation editor ----
   if(subject == "TEVA"){
     #TEVAs
@@ -173,7 +178,8 @@
   df <- ref_hanging_indents(df, subject)
 
 #change US type ----
-  df <- update_US(df, subject, installation_type)
+  #df <- update_US(df, subject, installation_type) 
+  # FOR AIR FORCE ONLY
 
 # create hex codes and numbers ----
   df <- hex_codes(df, subject)

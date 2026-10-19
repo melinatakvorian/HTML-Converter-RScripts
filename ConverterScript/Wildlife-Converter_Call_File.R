@@ -191,7 +191,7 @@
   df <- color_vuln_text(df)
 
 #line breaks [manually input columns] ----
-  numbblocks <- c(18) # Change to the columns that need line breaks between paragraphs
+  numbblocks <- c(25) # Change to the columns that need line breaks between paragraphs
   #add blank line after each paragraph
   for(a in 1:length(numbblocks)){
     col_num <- numbblocks[[a]]

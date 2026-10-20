@@ -39,12 +39,12 @@
       input_umbrella <- "N:/RStor/CEMML/ClimateChange/2_NavyClimate/Round2_Extremes_INRMP_integ/MidLant Region/"
     
     #the specific folder inside the Document to HTML Table Converter where the input files are
-      input_installation_folder <- "NSA Cutler"
+      input_installation_folder <- "WPNSTA Yorktown"
       installation_type <- "Navy" #"Air Force"
-      input_SME_folder <- "/TEVA/TEVA Write-Ups/Word to HTML Conversion"
+      input_SME_folder <- "/Fish and Wildlife/FWVAs"
     
     #the final file name will start with this and will get the date added
-      subject <- "TEVA"
+      subject <- "FWVA"
       project_name <- paste0(subject, "_", input_installation_folder) 
     
     #####NO MORE CHANGES --- -- -- -- --- - - -- -- - -  - - - - -  --- - - - - - - --- --- --- -- ---
@@ -104,21 +104,21 @@
     }
   }
   
-# change old column names ----
+# change old column names for TEVA ----
   
-  df <- df %>% rename(
-    SpeciesIDNum = `SppID#` ,
-    ReferencesTxt = `References and Credits`,
-    FirstHabitat = `1st_Habitat`,
-    SecondHabitat = `2nd_Habitat`,
-    ThirdHabitat = `3rd_Habitat`,
-    FourthHabitat = `4th_Habitat`,
-    BreedingStatus = `Breeding Status:`,
-    FedTxt = `Federal Status:`,
-    StateTxt = `State Status:`,
-    AdditionalStatus = `Other Status:`,
-    Presence = `Presence:`
-  )
+  # df <- df %>% rename(
+  #   SpeciesIDNum = `SppID#` ,
+  #   ReferencesTxt = `References and Credits`,
+  #   FirstHabitat = `1st_Habitat`,
+  #   SecondHabitat = `2nd_Habitat`,
+  #   ThirdHabitat = `3rd_Habitat`,
+  #   FourthHabitat = `4th_Habitat`,
+  #   BreedingStatus = `Breeding Status:`,
+  #   FedTxt = `Federal Status:`,
+  #   StateTxt = `State Status:`,
+  #   AdditionalStatus = `Other Status:`,
+  #   Presence = `Presence:`
+  # )
   
 # run paragraph notation editor ----
   if(subject == "TEVA"){
@@ -202,7 +202,8 @@
   df <- color_vuln_text(df)
 
 #line breaks [manually input columns] ----
-  numbblocks <- c(25) # Change to the columns that need line breaks between paragraphs
+  numbblocks <- c(19) # Change to the columns that need line breaks between paragraphs
+    #should be c(7,19) for FWVAs and 25 for TEVAs
   #add blank line after each paragraph
   for(a in 1:length(numbblocks)){
     col_num <- numbblocks[[a]]

@@ -39,9 +39,9 @@
       input_umbrella <- "N:/RStor/CEMML/ClimateChange/2_NavyClimate/Round2_Extremes_INRMP_integ/MidLant Region/"
     
     #the specific folder inside the Document to HTML Table Converter where the input files are
-      input_installation_folder <- "WPNSTA Yorktown"
+      input_installation_folder <- "NSA Cutler"
       installation_type <- "Navy" #"Air Force"
-      input_SME_folder <- "/T&E/TEVAs"
+      input_SME_folder <- "/TEVA/TEVA Write-Ups/Word to HTML Conversion"
     
     #the final file name will start with this and will get the date added
       subject <- "TEVA"
@@ -103,10 +103,21 @@
       df[i, col] <- results[[i]][[col]]
     }
   }
-
+  
+# change old column names ----
+  
   df <- df %>% rename(
     SpeciesIDNum = `SppID#` ,
-    ReferencesTxt = `References and Credits`
+    ReferencesTxt = `References and Credits`,
+    FirstHabitat = `1st_Habitat`,
+    SecondHabitat = `2nd_Habitat`,
+    ThirdHabitat = `3rd_Habitat`,
+    FourthHabitat = `4th_Habitat`,
+    BreedingStatus = `Breeding Status:`,
+    FedTxt = `Federal Status:`,
+    StateTxt = `State Status:`,
+    AdditionalStatus = `Other Status:`,
+    Presence = `Presence:`
   )
   
 # run paragraph notation editor ----

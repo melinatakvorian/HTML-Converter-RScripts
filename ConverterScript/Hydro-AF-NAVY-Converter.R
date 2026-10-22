@@ -31,7 +31,7 @@ invisible(lapply(packages, library, character.only = TRUE))
  
 # ----TEXT FOR YOU TO CHANGE-----------
   # Select which installation folder you're working in
-  input_installation_folder <- "Fort Yukon LRRS"
+  input_installation_folder <- "Clear SFS"
 
   # Write if working on AF (AIR FORCE) or Navy (NAVY):
   # inst_sheet = "NAVY"

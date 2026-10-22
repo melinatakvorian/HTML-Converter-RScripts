@@ -41,10 +41,10 @@
     #the specific folder inside the Document to HTML Table Converter where the input files are
       input_installation_folder <- "JBMDL"
       installation_type <- "Air Force" #"Navy"
-      input_SME_folder <- "/TEVA/Word to HTML Conversion 2"
+      input_SME_folder <- "/FWVA/Word to HTML Conversion2"
     
     #the final file name will start with this and will get the date added
-      subject <- "TEVA"
+      subject <- "FWVA"
       project_name <- paste0(subject, "_", input_installation_folder) 
     
     #####NO MORE CHANGES --- -- -- -- --- - - -- -- - -  - - - - -  --- - - - - - - --- --- --- -- ---
@@ -202,8 +202,8 @@
   df <- color_vuln_text(df)
 
 #line breaks [manually input columns] ----
-  numbblocks <- c(25) # Change to the columns that need line breaks between paragraphs
-    #should be c(7,19) for FWVAs and 25 for TEVAs
+  numbblocks <- c(5,18) # Change to the columns that need line breaks between paragraphs
+    #should be c(5,18) for FWVAs and 25 for TEVAs
   #add blank line after each paragraph
   for(a in 1:length(numbblocks)){
     col_num <- numbblocks[[a]]
@@ -213,6 +213,21 @@
       #replace each </p> to </p> <br>
       temp_string <- df[[col_num]][b]
       temp_string1 <- replace_all_except_last(temp_string, "</p>", "</p> <br>")
+      df[[col_num]][b] <- temp_string1
+    }
+  }
+  
+  numbblocks <- c(6) # Change to the columns that need line breaks between lines
+  #should be c(6) for FWVAs and 25 for TEVAs
+  #add blank line after each veg group
+  for(a in 1:length(numbblocks)){
+    col_num <- numbblocks[[a]]
+    for(b in 1:nrow(df)){
+      if(is.na(df[[col_num]][b])) next
+      
+      #replace each <br> to </p> <br>
+      temp_string <- df[[col_num]][b]
+      temp_string1 <- replace_all_except_last(temp_string, "<br>", "</p> <br> <p>")
       df[[col_num]][b] <- temp_string1
     }
   }
@@ -230,14 +245,14 @@
     
     if (!dir.exists(out_dir)) dir.create(out_dir, recursive = TRUE)
     
-    output_filename <- paste0(project_name, "_HTML_formatted_1", current_date, ".xlsx")
+    output_filename <- paste0(project_name, "_HTML_formatted_", current_date, ".xlsx")
     #write_xlsx(df, file.path(out_dir, output_filename)) #create file and save to 3ViewerPackages folder
     write_xlsx(result, file.path(out_dir, output_filename)) #create file and save to 3ViewerPackages folder
     message("Conversion complete. XLSX saved to: ", file.path(out_dir, output_filename))
     
   ##create shortcut to Word to HTML folder ----
     out_full_path <- file.path(out_dir, output_filename) #save the path to the excel in 3ViewerPackages
-    output_filelink <- paste0(project_name, "_HTML_formatted_1", current_date, ".lnk") #create shortcut name
+    output_filelink <- paste0(project_name, "_HTML_formatted_", current_date, ".lnk") #create shortcut name
     shortcut_location <- file.path(input_dir, output_filelink) #save the path to the future shortcut
     
     shell(paste0( #create shortcut to Word to HTML Conversion folder (this uses the Windows power shell)

@@ -141,9 +141,9 @@ ref_hanging_indents <- function(df, report_type){
   if(report_type == "TEVA"){
     for(i in 1:nrow(df)){
       #replace each <p> to <p style=padding-left:15px;text-indent:-15px;>
-      temp_string <- df$`References and Credits`[i]
+      temp_string <- df$`ReferencesTxt`[i]
       temp_string1 <- stringr::str_replace_all(temp_string, "<p>", '<p style=padding-left:15px;text-indent:-15px;>')
-      df$`References and Credits`[i] <- temp_string1 
+      df$`ReferencesTxt`[i] <- temp_string1 
     }
     return(df)
   }else if(report_type == "FWVA"){

@@ -31,20 +31,20 @@
     #the broad folder structure
     
     #AIR FORCE  
-      #input_umbrella <- "N:/RStor/CEMML/ClimateChange/1_USAFClimate/1_USAF_Natural_Resources/20_2_0004_RevisitingPhase1/"
+      input_umbrella <- "N:/RStor/CEMML/ClimateChange/1_USAFClimate/1_USAF_Natural_Resources/20_2_0004_RevisitingPhase1/"
       
       #input_umbrella <- "N:/RStor/CEMML/ClimateChange/0_Natural Resources Teams/Wildlife/_FWVAs/" #being used for testing
     
     #NAVY
-      input_umbrella <- "N:/RStor/CEMML/ClimateChange/2_NavyClimate/Round2_Extremes_INRMP_integ/MidLant Region/"
+      #input_umbrella <- "N:/RStor/CEMML/ClimateChange/2_NavyClimate/Round2_Extremes_INRMP_integ/MidLant Region/"
     
     #the specific folder inside the Document to HTML Table Converter where the input files are
-      input_installation_folder <- "WPNSTA Yorktown"
-      installation_type <- "Navy" #"Air Force"
-      input_SME_folder <- "/Fish and Wildlife/FWVAs"
+      input_installation_folder <- "JBMDL"
+      installation_type <- "Air Force" #"Navy"
+      input_SME_folder <- "/TEVA/Word to HTML Conversion 2"
     
     #the final file name will start with this and will get the date added
-      subject <- "FWVA"
+      subject <- "TEVA"
       project_name <- paste0(subject, "_", input_installation_folder) 
     
     #####NO MORE CHANGES --- -- -- -- --- - - -- -- - -  - - - - -  --- - - - - - - --- --- --- -- ---
@@ -127,7 +127,7 @@
                         "StateTxt", "AdditionalStatus", "Presence", "BreedingStatus",
                         "FirstHabitat", "SecondHabitat", "ThirdHabitat", "FourthHabitat",
                         "VulnerabilityResult", "Confidence", "VulnSummary", "NE_Text", "NE_Level", "OE_Level",
-                        "OE_Text", "S_Text", "S_Level", "AC_Text", "AC_Level", "ReferencesTxt")
+                        "OE_Text", "S_Text", "S_Level", "AC_Text", "AC_Level")
   }else if(subject == "FWVA"){
     #FWVAs
     cols_to_change <- c("SITEID","HabitatCommunity", "HabitatCommIDNum",
@@ -189,7 +189,7 @@
   df <- ref_hanging_indents(df, subject)
 
 #change US type ----
-  #df <- update_US(df, subject, installation_type) 
+  df <- update_US(df, subject, installation_type) 
   # FOR AIR FORCE ONLY
 
 # create hex codes and numbers ----
@@ -202,7 +202,7 @@
   df <- color_vuln_text(df)
 
 #line breaks [manually input columns] ----
-  numbblocks <- c(19) # Change to the columns that need line breaks between paragraphs
+  numbblocks <- c(25) # Change to the columns that need line breaks between paragraphs
     #should be c(7,19) for FWVAs and 25 for TEVAs
   #add blank line after each paragraph
   for(a in 1:length(numbblocks)){
@@ -230,14 +230,14 @@
     
     if (!dir.exists(out_dir)) dir.create(out_dir, recursive = TRUE)
     
-    output_filename <- paste0(project_name, "_HTML_formatted_", current_date, ".xlsx")
+    output_filename <- paste0(project_name, "_HTML_formatted_1", current_date, ".xlsx")
     #write_xlsx(df, file.path(out_dir, output_filename)) #create file and save to 3ViewerPackages folder
     write_xlsx(result, file.path(out_dir, output_filename)) #create file and save to 3ViewerPackages folder
     message("Conversion complete. XLSX saved to: ", file.path(out_dir, output_filename))
     
   ##create shortcut to Word to HTML folder ----
     out_full_path <- file.path(out_dir, output_filename) #save the path to the excel in 3ViewerPackages
-    output_filelink <- paste0(project_name, "_HTML_formatted_", current_date, ".lnk") #create shortcut name
+    output_filelink <- paste0(project_name, "_HTML_formatted_1", current_date, ".lnk") #create shortcut name
     shortcut_location <- file.path(input_dir, output_filelink) #save the path to the future shortcut
     
     shell(paste0( #create shortcut to Word to HTML Conversion folder (this uses the Windows power shell)

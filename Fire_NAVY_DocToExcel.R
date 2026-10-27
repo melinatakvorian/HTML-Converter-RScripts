@@ -29,7 +29,7 @@ invisible(lapply(packages, library, character.only = TRUE))
 
 # ----TEXT FOR YOU TO CHANGE-----------
 # Select which installation folder you're working in
-input_installation_folder <- "NSA Panama City"
+input_installation_folder <- "NAVSTA Mayport"
 
 # Write if working on AF (AIR FORCE) or Navy (NAVY):
   inst_sheet = "NAVY"
@@ -276,7 +276,7 @@ for(i in 1:nrow(df)){
 }
 
 ##line breaks [manually input columns] ----
-numbblocks <- c(4:9) # Change to the columns that need line breaks between paragraphs
+numbblocks <- c(4:8) # Change to the columns that need line breaks between paragraphs
 #add blank line after each paragraph
 for(a in 1:length(numbblocks)){
   col_num <- numbblocks[[a]]
@@ -310,7 +310,7 @@ for(a in 1:length(numbblocks)){
   # pivoting longer
   df_long <- df %>% 
     pivot_longer(
-      cols = c(4:9),
+      cols = c(4:8),
       names_to = "Chart",
       values_to = "Text"
   )

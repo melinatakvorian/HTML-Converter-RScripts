@@ -31,7 +31,7 @@ invisible(lapply(packages, library, character.only = TRUE))
 
 # ----TEXT FOR YOU TO CHANGE-----------
 # Select which installation folder you're working in
-input_installation_folder <- "NAS Jacksonville"
+input_installation_folder <- "NSB Kings Bay"
 
 # Write if working on AF (AIR FORCE) or Navy (NAVY):
 inst_sheet = "NAVY"
@@ -272,7 +272,8 @@ for(i in 1:nrow(df)){
 }
   
 ##line breaks [manually input columns] ----
-numbblocks <- c(6,8) # Change to the columns that need line breaks between paragraphs
+
+numbblocks <- c(5,7) # Change to the columns that need line breaks between paragraphs
     #add blank line after each paragraph
     for(a in 1:length(numbblocks)){
       col_num <- numbblocks[[a]]
@@ -296,7 +297,10 @@ numbblocks <- c(6,8) # Change to the columns that need line breaks between parag
   
   if(inst_sheet == "NAVY"){
     # choose columns to remove. This selects the first (ObjectID) and last 8 (metadata for AGOL)
-    cols_to_remove <- c(1, (ncol(df)-8):ncol(df)) 
+    # cols_to_remove <- c(1, (ncol(df)-8):ncol(df)) 
+    
+    # for kings bay, there was no objectID column and only 7 columns to remove instead of 8?
+    cols_to_remove <- c((ncol(df)-7):ncol(df)) 
     
     # get rid of unnecessary <p> notation to help with ScenarioID encoding
     df2 <- p_be_gone(df, c("Navy_Scenario", "AnnualChanceEvent"))

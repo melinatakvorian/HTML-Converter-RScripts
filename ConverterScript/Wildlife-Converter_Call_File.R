@@ -39,9 +39,9 @@
       #input_umbrella <- "N:/RStor/CEMML/ClimateChange/2_NavyClimate/Round2_Extremes_INRMP_integ/MidLant Region/"
     
     #the specific folder inside the Document to HTML Table Converter where the input files are
-      input_installation_folder <- "JBMDL"
+      input_installation_folder <- "JB Elmendorf-Richardson"
       installation_type <- "Air Force" #"Navy"
-      input_SME_folder <- "/FWVA/Word to HTML Conversion2"
+      input_SME_folder <- "/FWVA/Word to HTML Conversion"
     
     #the final file name will start with this and will get the date added
       subject <- "FWVA"
@@ -119,6 +119,23 @@
   #   AdditionalStatus = `Other Status:`,
   #   Presence = `Presence:`
   # )
+  
+# change old column names for FWVA ----
+  
+  # df <- df %>% rename(
+  #   #References = `References and Credits`,
+  #   FirstHabitat = `1st_Habitat`,
+  #   SecondHabitat = `2nd_Habitat`,
+  #   ThirdHabitat = `3rd_Habitat`,
+  #   FourthHabitat = `4th_Habitat`,
+  #   BreedingStatus = `Breeding Status:`,
+  #   FedTxt = `Federal Status:`,
+  #   StateTxt = `State Status:`,
+  #   AdditionalStatus = `Other Status:`,
+  #   Presence = `Presence:`
+  # )
+  
+  df <- df %>% rename(HabitatCommIDNum = `HabitatCommID#`)
   
 # run paragraph notation editor ----
   if(subject == "TEVA"){

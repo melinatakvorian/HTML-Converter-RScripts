@@ -31,16 +31,17 @@ invisible(lapply(packages, library, character.only = TRUE))
  
 # ----TEXT FOR YOU TO CHANGE-----------
   # Select which installation folder you're working in
-  input_installation_folder <- "Clear SFS"
+  input_installation_folder <- "JB Pearl Harbor Hickam"
 
   # Write if working on AF (AIR FORCE) or Navy (NAVY):
-  # inst_sheet = "NAVY"
-  inst_sheet = "AIR FORCE"
+  inst_sheet = "NAVY"
+  # inst_sheet = "AIR FORCE"
 
   # If Navy, select which region
   # navy_region = "MidLant Region"
   # navy_region = "Southeast Region"
-  # navy_region = "Hawaii Region"
+  navy_region = "Hawaii Region"
+  # navy_region = "Northwest Region"
   
   # Select which analysis you're doing (shouldn't need to change)
   input_SME_folder <- "/Hydrology/Word to HTML" 
@@ -758,7 +759,7 @@ for(file in seq_along(results_disr)){
     
     ### Adding back in SiteID and adding InstallationID, also TimePeriod
     SITEID <- installation_info$SITEID[installation_info$InstallationNames == df3$Installation[1]]
-    InstallationID <- installation_info$InstallationID[installation_info$InstallationNames == df3$Installation[1]]
+    InstallationID <- installation_info$'Installation ID (Site Code)'[installation_info$InstallationNames == df3$Installation[1]]
     
     df4 <- df3 %>% 
       mutate(SITEID = SITEID, 

@@ -33,15 +33,15 @@
   
   # ----TEXT FOR YOU TO CHANGE-----------
   # Select which installation folder you're working in
-  input_installation_folder <- "NSA Cutler"
+  input_installation_folder <- "NSA Panama City"
   
   # Write if working on AF (AIR FORCE) or Navy (NAVY):
   inst_sheet = "NAVY"
   # inst_sheet = "AIR FORCE"
   
   # If Navy, select which region
-  navy_region = "MidLant Region"
-  # navy_region = "Southeast Region"
+  # navy_region = "MidLant Region"
+  navy_region = "Southeast Region"
   # navy_region = "Hawaii Region"
   
   # Select which analysis you're doing (shouldn't need to change)
@@ -209,6 +209,25 @@
       }
     }
     return(result_list)
+  }
+  
+  # ----- * replace the last instance of a substring -----
+  replace_all_except_last <- function(s, from, to) {
+    # Find the last occurrence of `from`
+    matches <- gregexpr(from, s, fixed = TRUE)[[1]]
+    
+    # No occurrences — return as-is
+    if (matches[1] == -1){return(s)}
+    
+    last_pos <- tail(matches, 1)
+    last_len <- attr(matches, "match.length") |> tail(1)
+    
+    # Split into before and after (inclusive of) the last match
+    before <- substr(s, 1, last_pos - 1)
+    after  <- substr(s, last_pos, nchar(s))
+    
+    # Replace all occurrences in the prefix, leave the tail unchanged
+    paste0(gsub(from, to, before, fixed = TRUE), after)
   }
 
   # ----- * remove paragraph notation -----
@@ -647,10 +666,27 @@
   
   ##creating line breaks ----
   
-  #MT- This does not work completely because the veg team only wants a line break after the veg group *description*, 
-  #...and right now this adds a line after the veg group name AND after the veg group description
-  #...it requires manually removing the additional <br>, which is the same amount of work as adding the <br> ourselves
-  numbblocks <- c(8) #corresponds to the columns with text that we need broken up
+  # places that need line breaks:
+    # df_group_icons_l shouldn't need any since they're usually single paragraphs
+    # results_Top5 won't need any
+
+  # Group_desc - add a <br> to Group Description column
+  numbblocks <- 6
+  
+  for(a in 1:length(numbblocks)){
+    col_num <- numbblocks[[a]]
+    for(b in 1:nrow(group_desc)){
+      if(is.na(group_desc[[col_num]][b])) next
+      
+      #replace each </p> to </p> <br>
+      temp_string <- group_desc[[col_num]][b]
+      temp_string1 <- replace_all_except_last(temp_string, "</p>", "</p> <br>")
+      group_desc[[col_num]][b] <- temp_string1
+    }
+  }
+  
+  # df_installation will need breaks for 6 and 8 (5 and 7 could also be done but holding off for viewer)
+  numbblocks <- c(6,8)
   
   for(a in 1:length(numbblocks)){
     col_num <- numbblocks[[a]]
@@ -663,6 +699,24 @@
       df_installation[[col_num]][b] <- temp_string1
     }
   }
+  
+  
+  #MT- This does not work completely because the veg team only wants a line break after the veg group *description*, 
+  #...and right now this adds a line after the veg group name AND after the veg group description
+  #...it requires manually removing the additional <br>, which is the same amount of work as adding the <br> ourselves
+  # numbblocks <- c(8) #corresponds to the columns with text that we need broken up
+  # 
+  # for(a in 1:length(numbblocks)){
+  #   col_num <- numbblocks[[a]]
+  #   for(b in 1:nrow(df_installation)){
+  #     if(is.na(df_installation[[col_num]][b])) next
+  #     
+  #     #replace each </p> to </p> <br>
+  #     temp_string <- df_installation[[col_num]][b]
+  #     temp_string1 <- replace_all_except_last(temp_string, "</p>", "</p> <br>")
+  #     df_installation[[col_num]][b] <- temp_string1
+  #   }
+  # }
   ### NOTE - We probably need to go into this df and make sure adequate "breaks" are included!
   
 # Export final files ----

@@ -12,7 +12,7 @@
 
 ## Install / load necessary packages ----
 
-  packages <- c("pandoc","xml2","rvest","writexl", "readxl")
+  packages <- c("pandoc","xml2","rvest","writexl", "readxl", "tidyverse")
   
   # Install packages not yet installed
   installed_packages <- packages %in% rownames(installed.packages())
@@ -30,14 +30,19 @@
   #PAY ATTENTION TO THE DIRECTION OF THE SLASHES. THEY HAVE TO BE CHANGED TO FORWARD SLASHES, AS SHOWN BELOW
     #the broad folder structure
     #AIR FORCE  
-    #input_umbrella <- "N:/RStor/CEMML/ClimateChange/1_USAFClimate/1_USAF_Natural_Resources/20_2_0004_RevisitingPhase1/" 
+    input_umbrella <- "N:/RStor/CEMML/ClimateChange/1_USAFClimate/1_USAF_Natural_Resources/20_2_0004_RevisitingPhase1/"
     
     #NAVY
-    input_umbrella <- "N:/RStor/CEMML/ClimateChange/2_NavyClimate/Round2_Extremes_INRMP_integ/MidLant Region/"
+    # input_umbrella <- "N:/RStor/CEMML/ClimateChange/2_NavyClimate/Round2_Extremes_INRMP_integ/MidLant Region/"
     
     #the specific folder inside the Document to HTML Table Converter where the input files are
-    input_installation_folder <- "NS Norfolk" #corresponds to shortName on the installation_info.xlsx
+    input_installation_folder <- "Pituffik Space Base" #corresponds to shortName on the installation_info.xlsx
     input_SME_folder <- "/TerrestrialVegetation/Word to HTML Conversion"
+    
+    # Select this if the installation is qualitative (no veg groups or 1 row stating there are no veg groups)
+    # IF IT IS qualitative, some of the code to create the df_veg file won't work
+    #   That is ok! We technically only use the df_bio dataframe to create our output veg file
+    qualitative <- TRUE
     
     #the final file name will start with this and will get the date added
     subject <- "Veg"
@@ -203,6 +208,20 @@
     return(result_list)
   }
 
+# ----- * remove paragraph notation -----
+  p_be_gone <-  function(df, columns){
+    for(col in columns){
+      if (!col %in% colnames(df)) {
+        warning(paste("Column not found, skipping:", col))
+        next
+      }
+      #remove paragraph notation
+      df[[col]] <- stringr::str_replace_all(df[[col]], "<p>", '')
+      df[[col]] <- stringr::str_replace_all(df[[col]], "</p>", '')
+      
+    }
+    return(df)
+  }
 
 # RUN ----
   
@@ -383,6 +402,33 @@ df_veg[, 'Exposure_Icon'] <- "Extreme Heat, Drought, Vector Borne Disease, Invas
     df_veg[,"SITENAME"] <- installation_info$`SITENAME/InstallationNames`[key]
     df_veg[,"SITEID"] <- installation_info$SITEID[key]
   }else(print("No match found in installation database"))
+
+
+# If installation is qualitative, this will format and export the code correctly
+if(qualitative == TRUE){
+  # format code for the TerrestrialVegetation excel doc (groups)
+  df_veg_groups <- df_bio %>% 
+    select(c(1, 2, 5, 6)) %>% 
+    mutate(OBJECTID = "") %>% 
+    relocate(OBJECTID, .before = "SITENAME")
+  # remove unnecessary <p> notation from SITENAME and SITEID
+  cols_to_change <- c("SITENAME", "SITEID")
+  df_veg_groups <- p_be_gone(df_veg_groups, cols_to_change)
+  
+  # format code for the SitewideTerrestrialVegetation excel doc
+  df_sitewide <- df_bio %>% 
+    select(-c(5:8)) %>% 
+    mutate(OBJECTID = "") %>% 
+    relocate(OBJECTID, .before = "SITENAME")
+    
+  # remove unnecessary <p> notation from SITENAME and SITEID
+  cols_to_change <- c("SITENAME", "SITEID")
+  df_sitewide <- p_be_gone(df_sitewide, cols_to_change)
+  
+  # Prep the two files for export:
+  df_bio <- df_sitewide
+  df_veg <- df_veg_groups
+}
 
 # Export final files ----
   ##export excel to 3ViewerPackages folder ----

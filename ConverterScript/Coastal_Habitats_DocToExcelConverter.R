@@ -31,14 +31,15 @@ invisible(lapply(packages, library, character.only = TRUE))
 
 # ----TEXT FOR YOU TO CHANGE-----------
 # Select which installation folder you're working in
-input_installation_folder <- "NAS Jacksonville"
+input_installation_folder <- "NSA Cutler"
 
 # Write if working on AF (AIR FORCE) or Navy (NAVY):
 inst_sheet = "NAVY"
 # inst_sheet = "AIR FORCE"
 
 # If Navy, select which region
-navy_region = "Southeast Region"
+navy_region = "MidLant Region"
+# navy_region = "Southeast Region"
 
 # Select which analysis you're doing and the name of the file folder
 #PAY ATTENTION TO THE DIRECTION OF THE SLASHES. THEY HAVE TO BE CHANGED TO FORWARD SLASHES, AS SHOWN BELOW
@@ -240,7 +241,13 @@ all_headings <- unique(unlist(lapply(results, names)))
   }
   
 ##remove paragraph notation where desired (MA moved this from below to get SITENAME code to work ----
-  cols_to_change <- c("SITEID") #change this to the name of the columns in the specific analysis
+  
+  # Rename SiteID to SITEID - may only be necessary for Norfolk? Should work anyway
+  if("SiteID" %in% colnames(df)){
+    df <- df %>% rename(SITEID = SiteID)
+  }
+  
+  cols_to_change <- c("SITEID", "Coastal_Ecosystem") #change this to the name of the columns in the specific analysis
   df <- p_be_gone(df, cols_to_change)
   
 ## add full SITENAME, SITEID ----

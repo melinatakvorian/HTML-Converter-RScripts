@@ -39,7 +39,7 @@
       #input_umbrella <- "N:/RStor/CEMML/ClimateChange/2_NavyClimate/Round2_Extremes_INRMP_integ/MidLant Region/"
     
     #the specific folder inside the Document to HTML Table Converter where the input files are
-      input_installation_folder <- "Travis AFB"
+      input_installation_folder <- "Eglin"
       installation_type <- "Air Force" #"Navy"
       input_SME_folder <- "/FWVA"
     

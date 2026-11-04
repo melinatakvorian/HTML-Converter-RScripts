@@ -39,9 +39,9 @@
       #input_umbrella <- "N:/RStor/CEMML/ClimateChange/2_NavyClimate/Round2_Extremes_INRMP_integ/MidLant Region/"
     
     #the specific folder inside the Document to HTML Table Converter where the input files are
-      input_installation_folder <- "JB Elmendorf-Richardson"
+      input_installation_folder <- "Travis AFB"
       installation_type <- "Air Force" #"Navy"
-      input_SME_folder <- "/FWVA/Word to HTML Conversion"
+      input_SME_folder <- "/FWVA"
     
     #the final file name will start with this and will get the date added
       subject <- "FWVA"
@@ -135,7 +135,7 @@
   #   Presence = `Presence:`
   # )
   
-  df <- df %>% rename(HabitatCommIDNum = `HabitatCommID#`)
+  # df <- df %>% rename(HabitatCommIDNum = `HabitatCommID#`)
   
 # run paragraph notation editor ----
   if(subject == "TEVA"){

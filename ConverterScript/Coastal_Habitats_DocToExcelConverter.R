@@ -31,7 +31,7 @@ invisible(lapply(packages, library, character.only = TRUE))
 
 # ----TEXT FOR YOU TO CHANGE-----------
 # Select which installation folder you're working in
-input_installation_folder <- "NAVSTA Mayport"
+input_installation_folder <- "NSA Panama City"
 
 # Write if working on AF (AIR FORCE) or Navy (NAVY):
 inst_sheet = "NAVY"
@@ -225,6 +225,15 @@ for (file in docx_files) { #for each file, convert it to HTML, Identify its sect
 results <- remove_end_blanks(results)
 results <- remove_accidental_return(results)
 
+
+# Rename SiteID to SITEID - may only be necessary for Norfolk? Should work anyway
+for(i in seq_along(results)){
+  if("SiteID" %in% names(results[[i]])){
+    # results[[i]] <- results[[i]] %>% rename(SITEID = SiteID)
+    names(results[[i]])[names(results[[i]]) == "SiteID"] <- "SITEID"
+  }
+}
+
 #unfold the results list to be able to create a dataframe
 all_headings <- unique(unlist(lapply(results, names)))
 
@@ -242,10 +251,10 @@ all_headings <- unique(unlist(lapply(results, names)))
   
 ##remove paragraph notation where desired (MA moved this from below to get SITENAME code to work ----
   
-  # Rename SiteID to SITEID - may only be necessary for Norfolk? Should work anyway
-  if("SiteID" %in% colnames(df)){
-    df <- df %>% rename(SITEID = SiteID)
-  }
+  # # Rename SiteID to SITEID - may only be necessary for Norfolk? Should work anyway
+  # if("SiteID" %in% colnames(df)){
+  #   df <- df %>% rename(SITEID = SiteID)
+  # }
   
   cols_to_change <- c("SITEID", "Coastal_Ecosystem") #change this to the name of the columns in the specific analysis
   df <- p_be_gone(df, cols_to_change)

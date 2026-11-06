@@ -304,7 +304,7 @@ replace_all_except_last_three <- function(s, from, to) {
 
 ## Line breaks for other columns ----
 # Exclude Monthlies (column 5)
-numbblocks <- c(4, 6:8) # Change to the columns that need line breaks between paragraphs
+numbblocks <- c(4, 6:ncol(df)) # Change to the columns that need line breaks between paragraphs
 #add blank line after each paragraph
 
 for(a in 1:length(numbblocks)) {

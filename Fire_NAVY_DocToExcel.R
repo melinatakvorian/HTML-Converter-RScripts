@@ -29,7 +29,7 @@ invisible(lapply(packages, library, character.only = TRUE))
 
 # ----TEXT FOR YOU TO CHANGE-----------
 # Select which installation folder you're working in
-input_installation_folder <- "NAVSTA Mayport"
+input_installation_folder <- "NSA Panama City"
 
 # Write if working on AF (AIR FORCE) or Navy (NAVY):
   inst_sheet = "NAVY"
@@ -275,42 +275,80 @@ for(i in 1:nrow(df)){
   df$References[i] <- temp_string1 #change to temp_string2 if you are adding the line breaks
 }
 
-##line breaks [manually input columns] ----
-numbblocks <- c(4:8) # Change to the columns that need line breaks between paragraphs
+
+## Function for Monthlies column only ----
+replace_all_except_last_three <- function(s, from, to) {
+  
+  # Find all occurrences
+  matches <- gregexpr(from, s, fixed = TRUE)[[1]]
+  
+  # If 3 or fewer occurrences, return as-is
+  if (matches[1] == -1 || length(matches) <= 3) {
+    return(s)
+  }
+  
+  # Position of the 3rd-from-last occurrence
+  third_last_pos <- matches[length(matches) - 2]
+  
+  # Split string before the last 3 occurrences
+  before <- substr(s, 1, third_last_pos - 1)
+  after  <- substr(s, third_last_pos, nchar(s))
+  
+  # Replace all occurrences in the prefix only
+  paste0(
+    gsub(from, to, before, fixed = TRUE),
+    after
+  )
+}
+
+
+## Line breaks for other columns ----
+# Exclude Monthlies (column 5)
+numbblocks <- c(4, 6:8) # Change to the columns that need line breaks between paragraphs
 #add blank line after each paragraph
-for(a in 1:length(numbblocks)){
+
+for(a in 1:length(numbblocks)) {
+
   col_num <- numbblocks[[a]]
-  for(b in 1:nrow(df)){
+
+  for(b in 1:nrow(df)) {
+
     if(is.na(df[[col_num]][b])) next
-    
-    #replace each </p> to </p> <br>
+
     temp_string <- df[[col_num]][b]
-    temp_string1 <- replace_all_except_last(temp_string, "</p>", "</p> <br>")
+
+    # Add <br> after every paragraph except the last one
+    temp_string1 <- replace_all_except_last(
+      temp_string,
+      "</p>",
+      "</p> <br>"
+    )
+
     df[[col_num]][b] <- temp_string1
   }
 }
 
 
-##paragraph indentation ----
-numbblocks <- c(4:8) # Change to the columns that need INDENTS before paragraphs
-#add blank line after each paragraph
-for(a in 1:length(numbblocks)){
-  col_num <- numbblocks[[a]]
-  for(b in 1:nrow(df)){
-    if(is.na(df[[col_num]][b])) next
-    
-    #replace each <p> to <p style=text-indent:15px;>
-    temp_string <- df[[col_num]][b]
-    temp_string1 <- stringr::str_replace_all(temp_string, "<p>", '<p style=text-indent:15px;>')
-    df[[col_num]][b] <- temp_string1
-  }
+## Monthlies column (column 5) ----
+for(b in 1:nrow(df)){
+  if(is.na(df$Monthlies[b])) next
+  
+  temp_string <- df$Monthlies[b]
+  
+  temp_string1 <- replace_all_except_last_three(
+    temp_string,
+    "</p>",
+    "</p> <br>"
+  )
+  
+  df$Monthlies[b] <- temp_string1
 }
 
 #Pivot table longer -----
   # pivoting longer
   df_long <- df %>% 
     pivot_longer(
-      cols = c(4:8),
+      cols = 4:ncol(df),
       names_to = "Chart",
       values_to = "Text"
   )

@@ -31,16 +31,16 @@ invisible(lapply(packages, library, character.only = TRUE))
  
 # ----TEXT FOR YOU TO CHANGE-----------
   # Select which installation folder you're working in
-  input_installation_folder <- "JB Pearl Harbor Hickam"
+  input_installation_folder <- "WPNSTA Yorktown"
 
   # Write if working on AF (AIR FORCE) or Navy (NAVY):
   inst_sheet = "NAVY"
   # inst_sheet = "AIR FORCE"
 
   # If Navy, select which region
-  # navy_region = "MidLant Region"
+  navy_region = "MidLant Region"
   # navy_region = "Southeast Region"
-  navy_region = "Hawaii Region"
+  # navy_region = "Hawaii Region"
   # navy_region = "Northwest Region"
   
   # Select which analysis you're doing (shouldn't need to change)
@@ -467,7 +467,7 @@ for(file in seq_along(results_disr)){
                 "Dry_Change", "Wet_Change")
   
   #assign names
-  colnames(all_scenarios_df2)[cols:cols_w_nos] <- new_cols #this one errors, don't worry about it
+  colnames(all_scenarios_df2)[cols:cols_w_nos] <- new_cols
   
   #move columns to where Anthony wants them
   all_scenarios_df2 <- all_scenarios_df2 %>% 
@@ -511,7 +511,8 @@ for(file in seq_along(results_disr)){
         }
       }
   
-    ##add indent at the beginning of each non-bulleted paragraph ----
+    ##add indent at the beginning of each non-bulleted paragraph - ONLY for Air Force! ----
+    if(inst_sheet == "AIR FORCE"){
       for(a in 1:length(numbblocks)){
         col_num <- numbblocks[[a]]
         for(b in 1:nrow(all_scenarios_df3)){
@@ -524,6 +525,8 @@ for(file in seq_along(results_disr)){
           all_scenarios_df3[[col_num]][b] <- temp_string1
         }
       }
+    }
+
     
     ##add blank line after each bulleted paragraph ----
       for(i in 1:nrow(all_scenarios_df3)){
@@ -571,6 +574,11 @@ for(file in seq_along(results_disr)){
              scenario_period = recode(scenario_period, "Historical/Historical" = "Modeled Historical Baseline")) %>% 
       relocate(scenario_period, .before = Scenario) %>% 
       select(-Scenario, -Period, -SITEID)
+    
+    # add an extra <br> to the beginning of references (adds it to all columns, only want the first)
+    sample_doc1 <- sample_doc1 %>% 
+      mutate(References = paste0("<br>", References),
+             References = replace(References, c(2:5), NA))
     
     sample_doc_long <- sample_doc1 %>% 
       pivot_longer(cols = names(sample_doc1)[2:9])
@@ -772,6 +780,15 @@ for(file in seq_along(results_disr)){
         TRUE ~ ""), .before = 6) %>% 
      select(-Installation)
     
+    # adding in code in case the start of the Precipitation and Drought section begins with text instead of bullet points
+    look_for <- "</p> <p>"
+    
+    df5 <- df4 %>% 
+      mutate(Text = ifelse(Chart == "Summary" & Condition == "Precipitation and Drought" & str_sub(Text, end = 8) == look_for, 
+                           paste0("<br>", Text),
+                           Text
+                             ))
+    
   }
   
   # Export final files ----
@@ -779,7 +796,7 @@ for(file in seq_along(results_disr)){
   
   # Figure out what output to use (AF vs NAVY) ############# MA ADDED THIS TO MAKE SURE THE RIGHT OUTPUT COMES OUT, ALSO FILENAME HAS CHANGED TO REFLECT THIS
   if (inst_sheet == "NAVY") {
-    output_file <- df4
+    output_file <- df5
   } else {
     output_file <- all_scenarios_df3
   }

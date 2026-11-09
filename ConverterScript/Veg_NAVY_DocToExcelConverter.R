@@ -33,15 +33,15 @@
   
   # ----TEXT FOR YOU TO CHANGE-----------
   # Select which installation folder you're working in
-  input_installation_folder <- "NSA Panama City"
+  input_installation_folder <- "WPNSTA Yorktown"
   
   # Write if working on AF (AIR FORCE) or Navy (NAVY):
   inst_sheet = "NAVY"
   # inst_sheet = "AIR FORCE"
   
   # If Navy, select which region
-  # navy_region = "MidLant Region"
-  navy_region = "Southeast Region"
+  navy_region = "MidLant Region"
+  # navy_region = "Southeast Region"
   # navy_region = "Hawaii Region"
   
   # Select which analysis you're doing (shouldn't need to change)
@@ -568,13 +568,17 @@
   bioclimatic5 <- html_nodes(desc_list, "li")
   bio5_text <- html_text(bioclimatic5, trim = TRUE)
   
+  
   # Get Julia's table from the selector_topfive worksheet
-  lookup_Top5 <- read_excel(
-    "N:/RStor/CEMML/ClimateChange/2_NavyClimate/Round2_Extremes_INRMP_integ/_SMEs Dashboard Dev/Dashboard_inputs/5_TerrVeg/Notes for Terrestrial Vegetation Dashboard inputs.xlsx",
-    sheet = "selector_topfive",
-    range = "D9:F26",
-    col_names = c("Top5_Code", "Top5_Variable_GIS", "LongFormName_Veg")
+  lookup_Top5 <- read.csv(
+    "N:/RStor/CEMML/ClimateChange/2_NavyClimate/Round2_Extremes_INRMP_integ/_SMEs Dashboard Dev/Dashboard_inputs/5_TerrVeg/CEMML_veg_key_bioclim.csv"
   )
+  
+  # edit the lookup file a bit to make it match our file
+  lookup_Top5 <- lookup_Top5 %>% 
+    mutate(LongFormName_Veg = paste0(Bioclim_Var_Name, ", ", Units)) %>% 
+    rename(Top5_Code = Bioclim_Var_Code)
+  
   
   # Match the table items to the list items
   results_Top5 <- data.frame(
@@ -609,11 +613,16 @@
       TRUE ~ 0,
     ))
     
-    results_Top5 <- results_Top5 %>% 
-      left_join(lookup_Top5 %>% 
-                  select(Top5_Code, Top5_Variable_GIS), by = "Top5_Code")
+    # results_Top5 <- results_Top5 %>%
+    #   left_join(lookup_Top5 %>%
+    #               select(Top5_Code, Top5_Variable_GIS), by = "Top5_Code")
+    results_Top5 <- results_Top5 %>%
+      left_join(lookup_Top5 %>%
+                  select(Bioclim_Var_Name, Units, Top5_Code), by = "Top5_Code") %>% 
+      select(-LongFormName_Veg) %>% 
+      rename(SITEID = SiteID,
+             Top5_Variable = Bioclim_Var_Name)
     
-    results_Top5 <- results_Top5[c(2,3,4,1,5,6)] # Reorganizing the columns for Julia's template
     
 # Creating Group Description csv ----
   last_grp <- length(df_veg)
@@ -622,6 +631,20 @@
   group_desc <- df_veg %>% 
     select(all_of(grp_dsc_indices))
   
+  # Group_desc - add a <br> to Group Description column ----
+  numbblocks <- 6
+  
+  for(a in 1:length(numbblocks)){
+    col_num <- numbblocks[[a]]
+    for(b in 1:nrow(group_desc)){
+      if(is.na(group_desc[[col_num]][b])) next
+      
+      #replace each </p> to </p> <br>
+      temp_string <- group_desc[[col_num]][b]
+      temp_string1 <- replace_all_except_last(temp_string, "</p>", "</p> <br>")
+      group_desc[[col_num]][b] <- temp_string1
+    }
+  }
 
 # Creating Group Icons csv ----
 
@@ -664,29 +687,21 @@
   rownames(df_bio) <- 1
   df_installation <- df_bio %>% relocate('Other Vegetation Groups', .after = 'References')
   
-  ##creating line breaks ----
+  # indent the exposure description
+    #replace each <p> to <p style=padding-left:15px>
   
-  # places that need line breaks:
-    # df_group_icons_l shouldn't need any since they're usually single paragraphs
-    # results_Top5 won't need any
-
-  # Group_desc - add a <br> to Group Description column
-  numbblocks <- 6
+  # remove errant formatting characters
+  df_installation$`Exposure Description` <-
+    gsub("\\r|\\n", "", df_installation$`Exposure Description`)
+ 
+  temp_string1 <- df_installation$`Exposure Description`[1]
+  temp_string2 <- stringr::str_replace_all(temp_string1, "</ol> <p>", "</ol> <p style=padding-left:40px;>")
+  df_installation$'Exposure Description'[1] <- temp_string2
+  # going for a 40px indent right now, but may need to change depending on how it looks on the dashboard!
   
-  for(a in 1:length(numbblocks)){
-    col_num <- numbblocks[[a]]
-    for(b in 1:nrow(group_desc)){
-      if(is.na(group_desc[[col_num]][b])) next
-      
-      #replace each </p> to </p> <br>
-      temp_string <- group_desc[[col_num]][b]
-      temp_string1 <- replace_all_except_last(temp_string, "</p>", "</p> <br>")
-      group_desc[[col_num]][b] <- temp_string1
-    }
-  }
-  
+  # Adding line breaks
   # df_installation will need breaks for 6 and 8 (5 and 7 could also be done but holding off for viewer)
-  numbblocks <- c(6,8)
+  numbblocks <- c(6,7,8)
   
   for(a in 1:length(numbblocks)){
     col_num <- numbblocks[[a]]
@@ -699,6 +714,17 @@
       df_installation[[col_num]][b] <- temp_string1
     }
   }
+  
+  # silly step, but REMOVE line breaks between bolded veg groups and their following paragraphs
+  # replace </strong></p> <br> with  </strong></p>
+  temp_string1 <- df_installation$`Other Vegetation Groups`[1]
+  temp_string2 <- stringr::str_replace_all(temp_string1, "</strong></p> <br>", "</strong></p>")
+  df_installation$`Other Vegetation Groups` <- temp_string2
+  
+  
+  ##creating line breaks ----
+
+
   
   
   #MT- This does not work completely because the veg team only wants a line break after the veg group *description*, 

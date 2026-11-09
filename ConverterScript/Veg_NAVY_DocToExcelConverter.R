@@ -33,7 +33,7 @@
   
   # ----TEXT FOR YOU TO CHANGE-----------
   # Select which installation folder you're working in
-  input_installation_folder <- "WPNSTA Yorktown"
+  input_installation_folder <- "NSA Cutler"
   
   # Write if working on AF (AIR FORCE) or Navy (NAVY):
   inst_sheet = "NAVY"
@@ -613,9 +613,6 @@
       TRUE ~ 0,
     ))
     
-    # results_Top5 <- results_Top5 %>%
-    #   left_join(lookup_Top5 %>%
-    #               select(Top5_Code, Top5_Variable_GIS), by = "Top5_Code")
     results_Top5 <- results_Top5 %>%
       left_join(lookup_Top5 %>%
                   select(Bioclim_Var_Name, Units, Top5_Code), by = "Top5_Code") %>% 
@@ -721,10 +718,6 @@
   temp_string2 <- stringr::str_replace_all(temp_string1, "</strong></p> <br>", "</strong></p>")
   df_installation$`Other Vegetation Groups` <- temp_string2
   
-  
-  ##creating line breaks ----
-
-
   
   
   #MT- This does not work completely because the veg team only wants a line break after the veg group *description*, 

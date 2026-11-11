@@ -33,7 +33,7 @@
   
   # ----TEXT FOR YOU TO CHANGE-----------
   # Select which installation folder you're working in
-  input_installation_folder <- "NSA Cutler"
+  input_installation_folder <- "NS Norfolk"
   
   # Write if working on AF (AIR FORCE) or Navy (NAVY):
   inst_sheet = "NAVY"
@@ -562,7 +562,7 @@
     .[html_text(.) == "Exposure Description"]
   
   # Get the list after the header
-  desc_list <- xml2::xml_find_all(desc_header, "following-sibling::ol")
+  desc_list <- xml2::xml_find_all(desc_header, "following-sibling::ul")
   
   # Extract list items
   bioclimatic5 <- html_nodes(desc_list, "li")
@@ -692,7 +692,7 @@
     gsub("\\r|\\n", "", df_installation$`Exposure Description`)
  
   temp_string1 <- df_installation$`Exposure Description`[1]
-  temp_string2 <- stringr::str_replace_all(temp_string1, "</ol> <p>", "</ol> <p style=padding-left:40px;>")
+  temp_string2 <- stringr::str_replace_all(temp_string1, "</ul> <p>", "</ul> <p style=padding-left:40px;>")
   df_installation$'Exposure Description'[1] <- temp_string2
   # going for a 40px indent right now, but may need to change depending on how it looks on the dashboard!
   

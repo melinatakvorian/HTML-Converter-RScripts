@@ -31,14 +31,14 @@ invisible(lapply(packages, library, character.only = TRUE))
 
 # ----TEXT FOR YOU TO CHANGE-----------
 # Select which installation folder you're working in
-input_installation_folder <- "NAS Jacksonville"
+input_installation_folder <- "WPNSTA Yorktown"
 
 # Write if working on AF (AIR FORCE) or Navy (NAVY):
 inst_sheet = "NAVY"
 # inst_sheet = "AIR FORCE"
 
 # If Navy, select which region
-navy_region = "Southeast Region"
+navy_region = "MidLant Region"
 
 # Select which analysis you're doing and the name of the file folder
 #PAY ATTENTION TO THE DIRECTION OF THE SLASHES. THEY HAVE TO BE CHANGED TO FORWARD SLASHES, AS SHOWN BELOW
@@ -239,6 +239,13 @@ all_headings <- unique(unlist(lapply(results, names)))
     }
   }
   
+  # Make sure SITEID column is filled, and get rid of InstallationName column for now
+  if("SITENAME" %in% all_headings) {
+    df <- df %>% 
+      mutate(SITEID = first(SITEID)) %>% 
+      select(-SITENAME)
+  }
+  
 ##remove paragraph notation where desired (MA moved this from below to get SITENAME code to work ----
   cols_to_change <- c("SITEID") #change this to the name of the columns in the specific analysis
   df <- p_be_gone(df, cols_to_change)
@@ -297,37 +304,45 @@ numbblocks <- c(5,7) # Change to the columns that need line breaks between parag
   
   if(inst_sheet == "NAVY"){
     # choose columns to remove. This selects the first (ObjectID) and last 8 (metadata for AGOL)
-    cols_to_remove <- c(1, (ncol(df)-7):ncol(df))
     
-    # for kings bay, there was no objectID column and only 7 columns to remove instead of 8?
-    # cols_to_remove <- c((ncol(df)-7):ncol(df)) 
+    # Writing new code to only remove ObjectID if it's in the headers list
+    if("ObjectID" %in% all_headings){
+      cols_to_remove <- c(1, (ncol(df)-7):ncol(df))
+    } else {
+      cols_to_remove <- (ncol(df)-7):ncol(df)
+    }
     
     # get rid of unnecessary <p> notation to help with ScenarioID encoding
-    df2 <- p_be_gone(df, c("Navy_Scenario", "AnnualChanceEvent"))
+    # If you run into an error here, it may be because it's called "Navy_Scenario"
+    # writing code to change that so the rest works:
+    if("Navy_Scenario" %in% all_headings){
+      df <- df %>% rename(Scenario = Navy_Scenario)
+    }
+    
+    
+    df2 <- p_be_gone(df, c("Scenario", "AnnualChanceEvent"))
     
     # put it all together, encode ScenarioID
     df_navy <- df2 %>% 
       select(-all_of(cols_to_remove)) %>%  # remove unnecessary columns
       mutate(ScenarioID = case_when(
-        Navy_Scenario == "Moderate/Near Term" & AnnualChanceEvent == "None" ~ 1,
-        Navy_Scenario == "Moderate/Near Term" & AnnualChanceEvent == "5% ACE" ~ 2,
-        Navy_Scenario == "Moderate/Near Term" & AnnualChanceEvent == "1% ACE" ~ 3,
-        Navy_Scenario == "Moderate/Far Term" & AnnualChanceEvent == "None" ~ 4,
-        Navy_Scenario == "Moderate/Far Term" & AnnualChanceEvent == "5% ACE" ~ 5,
-        Navy_Scenario == "Moderate/Far Term" & AnnualChanceEvent == "1% ACE" ~ 6,
-        Navy_Scenario == "High/Near Term" & AnnualChanceEvent == "None" ~ 7,
-        Navy_Scenario == "High/Near Term" & AnnualChanceEvent == "5% ACE" ~ 8,
-        Navy_Scenario == "High/Near Term" & AnnualChanceEvent == "1% ACE" ~ 9,
-        Navy_Scenario == "High/Far Term" & AnnualChanceEvent == "None" ~ 10,
-        Navy_Scenario == "High/Far Term" & AnnualChanceEvent == "5% ACE" ~ 11,
-        Navy_Scenario == "High/Far Term" & AnnualChanceEvent == "1% ACE" ~ 12)) %>% 
+        Scenario == "Moderate/Near Term" & AnnualChanceEvent == "None" ~ 1,
+        Scenario == "Moderate/Near Term" & str_detect(AnnualChanceEvent, "5") ~ 2, # if these don't work, may need to add ACE to them
+        Scenario == "Moderate/Near Term" & str_detect(AnnualChanceEvent, "1") ~ 3,
+        Scenario == "Moderate/Far Term" & AnnualChanceEvent == "None" ~ 4,
+        Scenario == "Moderate/Far Term" & str_detect(AnnualChanceEvent, "5") ~ 5,
+        Scenario == "Moderate/Far Term" & str_detect(AnnualChanceEvent, "1") ~ 6,
+        Scenario == "High/Near Term" & AnnualChanceEvent == "None" ~ 7,
+        Scenario == "High/Near Term" & str_detect(AnnualChanceEvent, "5") ~ 8,
+        Scenario == "High/Near Term" & str_detect(AnnualChanceEvent, "1") ~ 9,
+        Scenario == "High/Far Term" & AnnualChanceEvent == "None" ~ 10,
+        Scenario == "High/Far Term" & str_detect(AnnualChanceEvent, "5") ~ 11,
+        Scenario == "High/Far Term" & str_detect(AnnualChanceEvent, "1") ~ 12)) %>% 
       relocate(SITEID, .after = InstallationNames) %>% 
-      relocate(ScenarioID, .after = Navy_Scenario) %>% 
+      relocate(ScenarioID, .after = Scenario) %>% 
       arrange(ScenarioID)
   }
   
-  
-
 
 # Export final files ----
   

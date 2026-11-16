@@ -31,11 +31,11 @@ invisible(lapply(packages, library, character.only = TRUE))
  
 # ----TEXT FOR YOU TO CHANGE-----------
   # Select which installation folder you're working in
-  input_installation_folder <- "WPNSTA Yorktown"
+  input_installation_folder <- "Kirtland AFB"
 
   # Write if working on AF (AIR FORCE) or Navy (NAVY):
-  inst_sheet = "NAVY"
-  # inst_sheet = "AIR FORCE"
+  # inst_sheet = "NAVY"
+  inst_sheet = "AIR FORCE"
 
   # If Navy, select which region
   navy_region = "MidLant Region"
@@ -801,27 +801,77 @@ for(file in seq_along(results_disr)){
     output_file <- all_scenarios_df3
   }
   
-  out_dir <- paste0(input_umbrella, input_installation_folder, "/3ViewerPackages/HTML_excels") 
-  # ******** NOTE THAT THE FOLDER STRUCTURE MUST MATCH WHAT IS ABOVE ^^^ EXACTLY.  **********
-  # CHANGE out_dir AS NEEDED IF THERE ARE ANY DIFFERENCES IN THE LOCATION YOU WANT TO SAVE TO.
-  
-  if (!dir.exists(out_dir)) dir.create(out_dir, recursive = TRUE)
-  
-  output_filename <- paste0(project_name, "_HTML_formatted_", current_date, ".xlsx")
-  write_xlsx(output_file, file.path(out_dir, output_filename)) #create file and save to 3ViewerPackages folder
-  message("Conversion complete. XLSX saved to: ", file.path(out_dir, output_filename))
-  
-  ##create shortcut to Word to HTML folder ----
-  out_full_path <- file.path(out_dir, output_filename) #save the path to the excel in 3ViewerPackages
-  output_filelink <- paste0(project_name, "_HTML_formatted_", current_date, ".lnk") #create shortcut name
-  shortcut_location <- file.path(input_dir, output_filelink) #save the path to the future shortcut
-  
-  shell(paste0( #create shortcut to Word to HTML Conversion folder (this uses the Windows power shell)
-    'powershell -ExecutionPolicy Bypass -Command "$ws = New-Object -ComObject WScript.Shell; ',
-    '$s = $ws.CreateShortcut(\'', shortcut_location, '\'); ',
-    '$s.TargetPath = \'', out_full_path, '\'; ',
-    '$s.Save()"'
-  )) 
+  # For AF only: need to split into historical and scenario, by cutting off first row from the rest
+  if (inst_sheet == "AIR FORCE") {
+    output_file_hist <- output_file[1,]
+    output_file_scen <- output_file[2:5,]
+    
+    # Now, initialize the exports
+    out_dir <- paste0(input_umbrella, input_installation_folder, "/3ViewerPackages/HTML_excels") 
+    # ******** NOTE THAT THE FOLDER STRUCTURE MUST MATCH WHAT IS ABOVE ^^^ EXACTLY.  **********
+    
+    if (!dir.exists(out_dir)) dir.create(out_dir, recursive = TRUE)
+    
+    # Save historical file ----
+    name_hist <- "_Historical"
+    output_filename <- paste0(project_name, "_HTML_formatted_", current_date, name_hist, ".xlsx")
+    write_xlsx(output_file_hist, file.path(out_dir, output_filename)) #create file and save to 3ViewerPackages folder
+    message("Conversion complete. XLSX saved to: ", file.path(out_dir, output_filename))
+    
+    ##create shortcut to Word to HTML folder ----
+    out_full_path <- file.path(out_dir, output_filename) #save the path to the excel in 3ViewerPackages
+    output_filelink <- paste0(project_name, "_HTML_formatted_", current_date, name_hist, ".lnk") #create shortcut name
+    shortcut_location <- file.path(input_dir, output_filelink) #save the path to the future shortcut
+    
+    shell(paste0( #create shortcut to Word to HTML Conversion folder (this uses the Windows power shell)
+      'powershell -ExecutionPolicy Bypass -Command "$ws = New-Object -ComObject WScript.Shell; ',
+      '$s = $ws.CreateShortcut(\'', shortcut_location, '\'); ',
+      '$s.TargetPath = \'', out_full_path, '\'; ',
+      '$s.Save()"'
+    )) 
+    
+    # Save scenario file ----
+    name_scen <- "_Scenario"
+    output_filename <- paste0(project_name, "_HTML_formatted_", current_date, name_scen, ".xlsx")
+    write_xlsx(output_file_scen, file.path(out_dir, output_filename)) #create file and save to 3ViewerPackages folder
+    message("Conversion complete. XLSX saved to: ", file.path(out_dir, output_filename))
+    
+    ##create shortcut to Word to HTML folder ----
+    out_full_path <- file.path(out_dir, output_filename) #save the path to the excel in 3ViewerPackages
+    output_filelink <- paste0(project_name, "_HTML_formatted_", current_date, name_scen, ".lnk") #create shortcut name
+    shortcut_location <- file.path(input_dir, output_filelink) #save the path to the future shortcut
+    
+    shell(paste0( #create shortcut to Word to HTML Conversion folder (this uses the Windows power shell)
+      'powershell -ExecutionPolicy Bypass -Command "$ws = New-Object -ComObject WScript.Shell; ',
+      '$s = $ws.CreateShortcut(\'', shortcut_location, '\'); ',
+      '$s.TargetPath = \'', out_full_path, '\'; ',
+      '$s.Save()"'
+    )) 
+  } else {
+    # This is what to do with Navy output!
+    
+    out_dir <- paste0(input_umbrella, input_installation_folder, "/3ViewerPackages/HTML_excels") 
+    # ******** NOTE THAT THE FOLDER STRUCTURE MUST MATCH WHAT IS ABOVE ^^^ EXACTLY.  **********
+    # CHANGE out_dir AS NEEDED IF THERE ARE ANY DIFFERENCES IN THE LOCATION YOU WANT TO SAVE TO.
+    
+    if (!dir.exists(out_dir)) dir.create(out_dir, recursive = TRUE)
+    
+    output_filename <- paste0(project_name, "_HTML_formatted_", current_date, ".xlsx")
+    write_xlsx(output_file, file.path(out_dir, output_filename)) #create file and save to 3ViewerPackages folder
+    message("Conversion complete. XLSX saved to: ", file.path(out_dir, output_filename))
+    
+    ##create shortcut to Word to HTML folder ----
+    out_full_path <- file.path(out_dir, output_filename) #save the path to the excel in 3ViewerPackages
+    output_filelink <- paste0(project_name, "_HTML_formatted_", current_date, ".lnk") #create shortcut name
+    shortcut_location <- file.path(input_dir, output_filelink) #save the path to the future shortcut
+    
+    shell(paste0( #create shortcut to Word to HTML Conversion folder (this uses the Windows power shell)
+      'powershell -ExecutionPolicy Bypass -Command "$ws = New-Object -ComObject WScript.Shell; ',
+      '$s = $ws.CreateShortcut(\'', shortcut_location, '\'); ',
+      '$s.TargetPath = \'', out_full_path, '\'; ',
+      '$s.Save()"'
+    )) 
+  }
 
   
   

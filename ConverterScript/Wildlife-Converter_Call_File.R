@@ -37,9 +37,9 @@
       input_umbrella <- "N:/RStor/CEMML/ClimateChange/2_NavyClimate/Round2_Extremes_INRMP_integ/MidLant Region/"
     
     #the specific folder inside the Document to HTML Table Converter where the input files are
-      input_installation_folder <- "NS Norfolk"
+      input_installation_folder <- "WPNSTA Yorktown"
       installation_type <- "Navy" #"Navy"
-      input_SME_folder <- "/T&E/Word to HTML Conversion"
+      input_SME_folder <- "/T&E/TEVAs"
     
     #the final file name will start with this and will get the date added
       subject <- "TEVA"
@@ -104,22 +104,22 @@
 
 # change old column names for TEVA ----
   
-  df <- df %>% rename(
-    SpeciesIDNum = `SppID#` ,
-    ReferencesTxt = `References and Credits`,
-    FirstHabitat = `1st_Habitat`,
-    SecondHabitat = `2nd_Habitat`,
-    ThirdHabitat = `3rd_Habitat`,
-    FourthHabitat = `4th_Habitat`,
-    BreedingStatus = `Breeding Status:`,
-    FedTxt = `Federal Status:`,
-    StateTxt = `State Status:`,
-    AdditionalStatus = `Other Status:`,
-    Presence = `Presence:`
-  )
-  
-  df <- df %>% select(-c('SITENAME', '1st_Habitat_Icon', '2nd_Habitat_Icon', '3rd_Habitat_Icon', '4th_Habitat_Icon', 'Vuln#', 'VulnColor', 'Conf#', 'NE_Color', 'OE_Color', 'S_Color', 'AC_Color'))
-  df$SITEID <- 1
+  # df <- df %>% rename(
+  #   SpeciesIDNum = `SppID#` ,
+  #   ReferencesTxt = `References and Credits`,
+  #   FirstHabitat = `1st_Habitat`,
+  #   SecondHabitat = `2nd_Habitat`,
+  #   ThirdHabitat = `3rd_Habitat`,
+  #   FourthHabitat = `4th_Habitat`,
+  #   BreedingStatus = `Breeding Status:`,
+  #   FedTxt = `Federal Status:`,
+  #   StateTxt = `State Status:`,
+  #   AdditionalStatus = `Other Status:`,
+  #   Presence = `Presence:`
+  # )
+  # 
+  # df <- df %>% select(-c('SITENAME', '1st_Habitat_Icon', '2nd_Habitat_Icon', '3rd_Habitat_Icon', '4th_Habitat_Icon', 'Vuln#', 'VulnColor', 'Conf#', 'NE_Color', 'OE_Color', 'S_Color', 'AC_Color'))
+  # df$SITEID <- 1
   
 # change old column names for FWVA ----
   
@@ -136,8 +136,8 @@
   #   Presence = `Presence:`
   # )
   
- # df <- df %>% rename(SpeciesIDNum = `SppID#`)
- # df <- df %>% rename(ReferencesTxt = `References and Credits`)
+ df <- df %>% rename(SpeciesIDNum = `SppID#`)
+ df <- df %>% rename(ReferencesTxt = `References and Credits`)
   
 # run paragraph notation editor ----
   if(subject == "TEVA"){

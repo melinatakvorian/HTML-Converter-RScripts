@@ -39,10 +39,10 @@
     #the specific folder inside the Document to HTML Table Converter where the input files are
       input_installation_folder <- "WPNSTA Yorktown"
       installation_type <- "Navy" #"Navy"
-      input_SME_folder <- "/T&E/TEVAs"
+      input_SME_folder <- "/Fish and Wildlife/FWVAs"
     
     #the final file name will start with this and will get the date added
-      subject <- "TEVA"
+      subject <- "FWVA"
       project_name <- paste0(subject, "_", input_installation_folder) 
     
     #####NO MORE CHANGES --- -- -- -- --- - - -- -- - -  - - - - -  --- - - - - - - --- --- --- -- ---
@@ -133,8 +133,8 @@
   #   Presence = `Presence:`
   # )
   
- df <- df %>% rename(SpeciesIDNum = `SppID#`)
- df <- df %>% rename(ReferencesTxt = `References and Credits`)
+ # df <- df %>% rename(SpeciesIDNum = `SppID#`)
+ # df <- df %>% rename(ReferencesTxt = `References and Credits`)
   
 # run paragraph notation editor ----
   if(subject == "TEVA"){
@@ -221,8 +221,8 @@
   df_bold <- color_vuln_text(df_bold, installation_type)
 
 #line breaks [manually input columns] ----
-  numbblocks <- c(24) # Change to the columns that need line breaks between paragraphs (the VulnSummary)
-    #should be c(5,18) for FWVAs and 23 for TEVAs
+  numbblocks <- c(18) # Change to the columns that need line breaks between paragraphs (the VulnSummary)
+    #should be c(18) for FWVAs and 23 for TEVAs
   #add blank line after each paragraph
   for(a in 1:length(numbblocks)){
     col_num <- numbblocks[[a]]
@@ -237,9 +237,25 @@
   }
   
   if(subject == "FWVA"){
-    numbblocks <- c() # Change to the columns that need line breaks between lines (the VegGroupings section)
-    #should be #?# for FWVAs
+    numbblocks <- c(7) # Change to the columns that need line breaks between lines (the VegGroupings section)
+    #should be 7 for FWVAs
     #add blank line after each veg group
+    for(a in 1:length(numbblocks)){
+      col_num <- numbblocks[[a]]
+      for(b in 1:nrow(df_bold)){
+        if(is.na(df_bold[[col_num]][b])) next
+        
+        #replace each <br> to nothing
+        temp_string <- df_bold[[col_num]][b]
+        temp_string1 <- stringr::str_replace_all(temp_string, "</p> <p>", "</p> <br> <p>")
+        df_bold[[col_num]][b] <- temp_string1
+      }
+    }
+  }
+  
+  if(subject == "TEVA"){
+    numbblocks <- c(33) # Add line break before references
+    
     for(a in 1:length(numbblocks)){
       col_num <- numbblocks[[a]]
       for(b in 1:nrow(df_bold)){
@@ -247,28 +263,27 @@
         
         #replace each <br> to </p> <br>
         temp_string <- df_bold[[col_num]][b]
-        temp_string1 <- replace_all_except_last(temp_string, "<br>", "</p> <br> <p>")
+        temp_string1 <- stringr::str_replace_all(temp_string, "<u>References:</u></p>", "<u>References:</u></p> <br>")
+        df_bold[[col_num]][b] <- temp_string1
+      }
+    }  
+  }else if(subject == "FWVA"){
+    numbblocks <- c(25) # Add line break before references
+    for(a in 1:length(numbblocks)){
+      col_num <- numbblocks[[a]]
+      for(b in 1:nrow(df_bold)){
+        if(is.na(df_bold[[col_num]][b])) next
+        
+        #replace each <br> to </p> <br>
+        temp_string <- df_bold[[col_num]][b]
+        temp_string1 <- stringr::str_replace_all(temp_string, "<p style=padding-left:15px;text-indent:-15px;>1.", 
+                                                 "<br> <p style=padding-left:15px;text-indent:-15px;>1.")
         df_bold[[col_num]][b] <- temp_string1
       }
     }
+    
   }
 
-  
-  numbblocks <- c(33) # Add line break before references
-  #should be #?# for FWVAs and 32 for TEVAs
-  
-  for(a in 1:length(numbblocks)){
-    col_num <- numbblocks[[a]]
-    for(b in 1:nrow(df_bold)){
-      if(is.na(df_bold[[col_num]][b])) next
-      
-      #replace each <br> to </p> <br>
-      temp_string <- df_bold[[col_num]][b]
-      temp_string1 <- stringr::str_replace_all(temp_string, "<u>References:</u></p>", "<u>References:</u></p> <br>")
-      df_bold[[col_num]][b] <- temp_string1
-    }
-  }
-  
 
   
 # Export final files ----

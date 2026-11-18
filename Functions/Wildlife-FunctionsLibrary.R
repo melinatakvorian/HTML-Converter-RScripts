@@ -422,8 +422,9 @@ color_vuln_text <- function(df, installation_type){
         
       }else next
   }
-  return(df)
-}
+      return(df)
+    }
+  }
   
 # color_vuln_text <- function(df){
 #   ##doing it without bolding ----

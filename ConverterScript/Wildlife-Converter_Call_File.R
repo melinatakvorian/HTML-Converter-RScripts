@@ -249,6 +249,21 @@
     }
   }
   
+  numbblocks <- c() # Add line break before references
+  #should be c() for FWVAs and 25 for TEVAs
+  
+  #add blank line after each veg group
+  for(a in 1:length(numbblocks)){
+    col_num <- numbblocks[[a]]
+    for(b in 1:nrow(df)){
+      if(is.na(df[[col_num]][b])) next
+      
+      #replace each <br> to </p> <br>
+      temp_string <- df[[col_num]][b]
+      temp_string1 <- replace_all_except_last(temp_string, "<u>References:</u>", "<u>References:</u> <br>")
+      df[[col_num]][b] <- temp_string1
+    }
+  }
   
 #ADD THE BOLDING FUNCTION CODE
   source("Functions/Wildlife-Bolding_Glossary_Terms.R")

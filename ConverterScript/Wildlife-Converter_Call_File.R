@@ -218,52 +218,54 @@
   source("Functions/Wildlife-Bolding_Glossary_Terms.R")
   
 #color the word with the vulnerability score ---
-  df <- color_vuln_text(df, installation_type)
+  df_bold <- color_vuln_text(df_bold, installation_type)
 
 #line breaks [manually input columns] ----
-  numbblocks <- c(5,18) # Change to the columns that need line breaks between paragraphs
-    #should be c(5,18) for FWVAs and 25 for TEVAs
+  numbblocks <- c(24) # Change to the columns that need line breaks between paragraphs (the VulnSummary)
+    #should be c(5,18) for FWVAs and 23 for TEVAs
   #add blank line after each paragraph
   for(a in 1:length(numbblocks)){
     col_num <- numbblocks[[a]]
-    for(b in 1:nrow(df)){
-      if(is.na(df[[col_num]][b])) next
+    for(b in 1:nrow(df_bold)){
+      if(is.na(df_bold[[col_num]][b])) next
       
       #replace each </p> to </p> <br>
-      temp_string <- df[[col_num]][b]
+      temp_string <- df_bold[[col_num]][b]
       temp_string1 <- replace_all_except_last(temp_string, "</p>", "</p> <br>")
-      df[[col_num]][b] <- temp_string1
+      df_bold[[col_num]][b] <- temp_string1
     }
   }
   
-  numbblocks <- c(6) # Change to the columns that need line breaks between lines
-  #should be c(6) for FWVAs and 25 for TEVAs
-  #add blank line after each veg group
-  for(a in 1:length(numbblocks)){
-    col_num <- numbblocks[[a]]
-    for(b in 1:nrow(df)){
-      if(is.na(df[[col_num]][b])) next
-      
-      #replace each <br> to </p> <br>
-      temp_string <- df[[col_num]][b]
-      temp_string1 <- replace_all_except_last(temp_string, "<br>", "</p> <br> <p>")
-      df[[col_num]][b] <- temp_string1
+  if(subject == "FWVA"){
+    numbblocks <- c() # Change to the columns that need line breaks between lines (the VegGroupings section)
+    #should be #?# for FWVAs
+    #add blank line after each veg group
+    for(a in 1:length(numbblocks)){
+      col_num <- numbblocks[[a]]
+      for(b in 1:nrow(df_bold)){
+        if(is.na(df_bold[[col_num]][b])) next
+        
+        #replace each <br> to </p> <br>
+        temp_string <- df_bold[[col_num]][b]
+        temp_string1 <- replace_all_except_last(temp_string, "<br>", "</p> <br> <p>")
+        df_bold[[col_num]][b] <- temp_string1
+      }
     }
   }
+
   
-  numbblocks <- c() # Add line break before references
-  #should be c() for FWVAs and 25 for TEVAs
+  numbblocks <- c(33) # Add line break before references
+  #should be #?# for FWVAs and 32 for TEVAs
   
-  #add blank line after each veg group
   for(a in 1:length(numbblocks)){
     col_num <- numbblocks[[a]]
-    for(b in 1:nrow(df)){
-      if(is.na(df[[col_num]][b])) next
+    for(b in 1:nrow(df_bold)){
+      if(is.na(df_bold[[col_num]][b])) next
       
       #replace each <br> to </p> <br>
-      temp_string <- df[[col_num]][b]
-      temp_string1 <- replace_all_except_last(temp_string, "<u>References:</u>", "<u>References:</u> <br>")
-      df[[col_num]][b] <- temp_string1
+      temp_string <- df_bold[[col_num]][b]
+      temp_string1 <- stringr::str_replace_all(temp_string, "<u>References:</u></p>", "<u>References:</u></p> <br>")
+      df_bold[[col_num]][b] <- temp_string1
     }
   }
   
@@ -279,8 +281,8 @@
     if (!dir.exists(out_dir)) dir.create(out_dir, recursive = TRUE)
     
     output_filename <- paste0(project_name, "_HTML_formatted_", current_date, ".xlsx")
-    #write_xlsx(df, file.path(out_dir, output_filename)) #create file and save to 3ViewerPackages folder
-    write_xlsx(result, file.path(out_dir, output_filename)) #create file and save to 3ViewerPackages folder
+    #write_xlsx(df_bold, file.path(out_dir, output_filename)) #create file and save to 3ViewerPackages folder
+    write_xlsx(df_bold, file.path(out_dir, output_filename)) #create file and save to 3ViewerPackages folder
     message("Conversion complete. XLSX saved to: ", file.path(out_dir, output_filename))
     
   ##create shortcut to Word to HTML folder ----

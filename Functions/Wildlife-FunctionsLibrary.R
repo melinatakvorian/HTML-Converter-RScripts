@@ -317,7 +317,25 @@ hex_codes <- function(df, report_type, installation_type){
       )) %>% relocate(AC_Color, .after = AC_Level)
   }
   else if(installation_type == "Navy"){
-    df_no_change <- df
+    #VulnNum
+    df <- df %>% 
+      mutate('VulnNum' = case_when(
+        VulnerabilityResult == "VERY HIGH" ~ 4,
+        VulnerabilityResult == "HIGH" ~ 3,
+        VulnerabilityResult == "MODERATE" ~ 2,
+        VulnerabilityResult == "LOW" ~ 1,
+        TRUE ~ 1
+      )) %>% relocate('VulnNum', .after = VulnerabilityResult)
+    
+    #Confidence
+    df <- df %>% 
+      mutate('ConfNum' = case_when(
+        Confidence == "High" ~ 3,
+        Confidence == "Moderate" ~ 2,
+        Confidence == "Low" ~ 1,
+        TRUE ~ 1
+      )) %>% relocate('ConfNum', .after = Confidence)
+    
   }
 }
 

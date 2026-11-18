@@ -31,20 +31,18 @@
     #the broad folder structure
     
     #AIR FORCE  
-      input_umbrella <- "N:/RStor/CEMML/ClimateChange/1_USAFClimate/1_USAF_Natural_Resources/20_2_0004_RevisitingPhase1/"
-      
-      #input_umbrella <- "N:/RStor/CEMML/ClimateChange/0_Natural Resources Teams/Wildlife/_FWVAs/" #being used for testing
+      #input_umbrella <- "N:/RStor/CEMML/ClimateChange/1_USAFClimate/1_USAF_Natural_Resources/20_2_0004_RevisitingPhase1/"
     
     #NAVY
-      #input_umbrella <- "N:/RStor/CEMML/ClimateChange/2_NavyClimate/Round2_Extremes_INRMP_integ/MidLant Region/"
+      input_umbrella <- "N:/RStor/CEMML/ClimateChange/2_NavyClimate/Round2_Extremes_INRMP_integ/MidLant Region/"
     
     #the specific folder inside the Document to HTML Table Converter where the input files are
-      input_installation_folder <- "Eglin"
-      installation_type <- "Air Force" #"Navy"
-      input_SME_folder <- "/FWVA"
+      input_installation_folder <- "WPNSTA Yorktown"
+      installation_type <- "Navy" #"Navy"
+      input_SME_folder <- "/T&E/TEVAs"
     
     #the final file name will start with this and will get the date added
-      subject <- "FWVA"
+      subject <- "TEVA"
       project_name <- paste0(subject, "_", input_installation_folder) 
     
     #####NO MORE CHANGES --- -- -- -- --- - - -- -- - -  - - - - -  --- - - - - - - --- --- --- -- ---
@@ -103,7 +101,7 @@
       df[i, col] <- results[[i]][[col]]
     }
   }
-  
+
 # change old column names for TEVA ----
   
   # df <- df %>% rename(
@@ -135,7 +133,8 @@
   #   Presence = `Presence:`
   # )
   
-  df <- df %>% rename(HabitatCommIDNum = `HabitatCommID#`)
+ df <- df %>% rename(SpeciesIDNum = `SppID#`)
+ df <- df %>% rename(ReferencesTxt = `References and Credits`)
   
 # run paragraph notation editor ----
   if(subject == "TEVA"){
@@ -143,7 +142,7 @@
     cols_to_change <- c("SITEID", "CommonName", "ScientificName", "SpeciesIDNum", "FedTxt",
                         "StateTxt", "AdditionalStatus", "Presence", "BreedingStatus",
                         "FirstHabitat", "SecondHabitat", "ThirdHabitat", "FourthHabitat",
-                        "VulnerabilityResult", "Confidence", "VulnSummary", "NE_Text", "NE_Level", "OE_Level",
+                        "VulnerabilityResult", "Confidence", "NE_Text", "NE_Level", "OE_Level",
                         "OE_Text", "S_Text", "S_Level", "AC_Text", "AC_Level")
   }else if(subject == "FWVA"){
     #FWVAs
@@ -206,17 +205,20 @@
   df <- ref_hanging_indents(df, subject)
 
 #change US type ----
-  df <- update_US(df, subject, installation_type) 
+  #df <- update_US(df, subject, installation_type) 
   # FOR AIR FORCE ONLY
 
 # create hex codes and numbers ----
-  df <- hex_codes(df, subject)
+  df <- hex_codes(df, subject, installation_type)
 
 # add habitat_icons column ----
   df <- habitat_icons(df)
 
+# add bolding ----
+  source("Functions/Wildlife-Bolding_Glossary_Terms.R")
+  
 #color the word with the vulnerability score ---
-  df <- color_vuln_text(df)
+  df <- color_vuln_text(df, installation_type)
 
 #line breaks [manually input columns] ----
   numbblocks <- c(5,18) # Change to the columns that need line breaks between paragraphs
@@ -265,8 +267,7 @@
     }
   }
   
-#ADD THE BOLDING FUNCTION CODE
-  source("Functions/Wildlife-Bolding_Glossary_Terms.R")
+
   
 # Export final files ----
   ##export excel to 3ViewerPackages folder ----

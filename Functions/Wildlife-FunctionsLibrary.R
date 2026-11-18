@@ -317,7 +317,7 @@ hex_codes <- function(df, report_type, installation_type){
       )) %>% relocate(AC_Color, .after = AC_Level)
   }
   else if(installation_type == "Navy"){
-    next
+    df_no_change <- df
   }
 }
 
@@ -342,13 +342,15 @@ color_vuln_text <- function(df, installation_type){
   #or it needs to detect the first instance of "low", "high", "moderate", "very high" in the vulnerability summary and add the hex codes
   # <span style="color: #ff0000;">special</span>
   
-  low_log <- str_locate(df$VulnSummary, "low <strong")
-  med_log <- str_locate(df$VulnSummary, "moderate <strong")
-  high_log <- str_locate(df$VulnSummary, "high <strong")
-  vhigh_log <- str_locate(df$VulnSummary, "very high <strong")
-  
   
   if(installation_type == "Navy"){
+    
+    low_log <- str_locate(df$VulnSummary, "low <strong")
+    med_log <- str_locate(df$VulnSummary, "moderate <strong")
+    high_log <- str_locate(df$VulnSummary, "high <strong")
+    vhigh_log <- str_locate(df$VulnSummary, "very high <strong")  
+    
+    
     for(i in 1:nrow(df)){
       if(!is.na(low_log[i])){
         startval <- as.numeric(low_log[i])
@@ -384,8 +386,16 @@ color_vuln_text <- function(df, installation_type){
         df$VulnSummary[i] <- paste0(before, '<strong><span style="color:#f49e0b;">', target, '</span></strong>', after)
         
       }else next
+    }
+    return(df)
   }
   else if(installation_type == "Air Force"){
+    
+    low_log <- str_locate(df$VulnSummary, "low <strong")
+    med_log <- str_locate(df$VulnSummary, "moderate <strong")
+    high_log <- str_locate(df$VulnSummary, "high <strong")
+    vhigh_log <- str_locate(df$VulnSummary, "very high <strong")
+    
     for(i in 1:nrow(df)){
       if(!is.na(low_log[i])){
         startval <- as.numeric(low_log[i])

@@ -37,12 +37,12 @@
       input_umbrella <- "N:/RStor/CEMML/ClimateChange/2_NavyClimate/Round2_Extremes_INRMP_integ/MidLant Region/"
     
     #the specific folder inside the Document to HTML Table Converter where the input files are
-      input_installation_folder <- "WPNSTA Yorktown"
+      input_installation_folder <- "NS Norfolk"
       installation_type <- "Navy" #"Navy"
-      input_SME_folder <- "/Fish and Wildlife/FWVAs"
+      input_SME_folder <- "/T&E/Word to HTML Conversion"
     
     #the final file name will start with this and will get the date added
-      subject <- "FWVA"
+      subject <- "TEVA"
       project_name <- paste0(subject, "_", input_installation_folder) 
     
     #####NO MORE CHANGES --- -- -- -- --- - - -- -- - -  - - - - -  --- - - - - - - --- --- --- -- ---
@@ -104,19 +104,22 @@
 
 # change old column names for TEVA ----
   
-  # df <- df %>% rename(
-  #   SpeciesIDNum = `SppID#` ,
-  #   ReferencesTxt = `References and Credits`,
-  #   FirstHabitat = `1st_Habitat`,
-  #   SecondHabitat = `2nd_Habitat`,
-  #   ThirdHabitat = `3rd_Habitat`,
-  #   FourthHabitat = `4th_Habitat`,
-  #   BreedingStatus = `Breeding Status:`,
-  #   FedTxt = `Federal Status:`,
-  #   StateTxt = `State Status:`,
-  #   AdditionalStatus = `Other Status:`,
-  #   Presence = `Presence:`
-  # )
+  df <- df %>% rename(
+    SpeciesIDNum = `SppID#` ,
+    ReferencesTxt = `References and Credits`,
+    FirstHabitat = `1st_Habitat`,
+    SecondHabitat = `2nd_Habitat`,
+    ThirdHabitat = `3rd_Habitat`,
+    FourthHabitat = `4th_Habitat`,
+    BreedingStatus = `Breeding Status:`,
+    FedTxt = `Federal Status:`,
+    StateTxt = `State Status:`,
+    AdditionalStatus = `Other Status:`,
+    Presence = `Presence:`
+  )
+  
+  df <- df %>% select(-c('SITENAME', '1st_Habitat_Icon', '2nd_Habitat_Icon', '3rd_Habitat_Icon', '4th_Habitat_Icon', 'Vuln#', 'VulnColor', 'Conf#', 'NE_Color', 'OE_Color', 'S_Color', 'AC_Color'))
+  df$SITEID <- 1
   
 # change old column names for FWVA ----
   
@@ -205,8 +208,9 @@
   df <- ref_hanging_indents(df, subject)
 
 #change US type ----
-  #df <- update_US(df, subject, installation_type) 
-  # FOR AIR FORCE ONLY
+  if(installation_type == "Air Force"){
+    df <- update_US(df, subject, installation_type) 
+  }
 
 # create hex codes and numbers ----
   df <- hex_codes(df, subject, installation_type)
@@ -221,7 +225,7 @@
   df_bold <- color_vuln_text(df_bold, installation_type)
 
 #line breaks [manually input columns] ----
-  numbblocks <- c(18) # Change to the columns that need line breaks between paragraphs (the VulnSummary)
+  numbblocks <- c(24, 33) # Change to the columns that need line breaks between paragraphs (the VulnSummary, References)
     #should be c(18) for FWVAs and 23 for TEVAs
   #add blank line after each paragraph
   for(a in 1:length(numbblocks)){
@@ -253,38 +257,36 @@
     }
   }
   
-  if(subject == "TEVA"){
-    numbblocks <- c(33) # Add line break before references
-    
-    for(a in 1:length(numbblocks)){
-      col_num <- numbblocks[[a]]
-      for(b in 1:nrow(df_bold)){
-        if(is.na(df_bold[[col_num]][b])) next
-        
-        #replace each <br> to </p> <br>
-        temp_string <- df_bold[[col_num]][b]
-        temp_string1 <- stringr::str_replace_all(temp_string, "<u>References:</u></p>", "<u>References:</u></p> <br>")
-        df_bold[[col_num]][b] <- temp_string1
-      }
-    }  
-  }else if(subject == "FWVA"){
-    numbblocks <- c(25) # Add line break before references
-    for(a in 1:length(numbblocks)){
-      col_num <- numbblocks[[a]]
-      for(b in 1:nrow(df_bold)){
-        if(is.na(df_bold[[col_num]][b])) next
-        
-        #replace each <br> to </p> <br>
-        temp_string <- df_bold[[col_num]][b]
-        temp_string1 <- stringr::str_replace_all(temp_string, "<p style=padding-left:15px;text-indent:-15px;>1.", 
-                                                 "<br> <p style=padding-left:15px;text-indent:-15px;>1.")
-        df_bold[[col_num]][b] <- temp_string1
-      }
-    }
-    
-  }
-
-
+  # if(subject == "TEVA"){
+  #   numbblocks <- c(33) # Add line break before references
+  #   
+  #   for(a in 1:length(numbblocks)){
+  #     col_num <- numbblocks[[a]]
+  #     for(b in 1:nrow(df_bold)){
+  #       if(is.na(df_bold[[col_num]][b])) next
+  #       
+  #       #replace each <br> to </p> <br>
+  #       temp_string <- df_bold[[col_num]][b]
+  #       temp_string1 <- stringr::str_replace_all(temp_string, "<u>References:</u></p>", "<u>References:</u></p> <br>")
+  #       df_bold[[col_num]][b] <- temp_string1
+  #     }
+  #   }  
+  # }else if(subject == "FWVA"){
+  #   numbblocks <- c(25) # Add line break before references
+  #   for(a in 1:length(numbblocks)){
+  #     col_num <- numbblocks[[a]]
+  #     for(b in 1:nrow(df_bold)){
+  #       if(is.na(df_bold[[col_num]][b])) next
+  #       
+  #       #replace each <br> to </p> <br>
+  #       temp_string <- df_bold[[col_num]][b]
+  #       temp_string1 <- stringr::str_replace_all(temp_string, "<p style=padding-left:15px;text-indent:-15px;>1.", 
+  #                                                "<br> <p style=padding-left:15px;text-indent:-15px;>1.")
+  #       df_bold[[col_num]][b] <- temp_string1
+  #     }
+  #   }
+  #   
+  # }
   
 # Export final files ----
   ##export excel to 3ViewerPackages folder ----

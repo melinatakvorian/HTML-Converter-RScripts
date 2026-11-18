@@ -135,7 +135,7 @@
   #   Presence = `Presence:`
   # )
   
-  # df <- df %>% rename(HabitatCommIDNum = `HabitatCommID#`)
+  df <- df %>% rename(HabitatCommIDNum = `HabitatCommID#`)
   
 # run paragraph notation editor ----
   if(subject == "TEVA"){

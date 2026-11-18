@@ -191,8 +191,8 @@ update_US <- function(df, report_type, installation_type){
 }
 
 # * assign Hex codes and Numeric values to columns that need it -----
-hex_codes <- function(df, report_type){
-  if(report_type == "TEVA"){
+hex_codes <- function(df, report_type, installation_type){
+  if(report_type == "TEVA" && installation_type == "Air Force"){
     ##TEVAs
     #repeat this for VulnerabilityResult, Confidence, NE_Level, OE_Level, S_Level, AC_Level
     
@@ -263,7 +263,7 @@ hex_codes <- function(df, report_type){
         AC_Level == "Low" ~ "#f49e0b",
         TRUE ~ "none"
       )) %>% relocate(AC_Color, .after = AC_Level)
-  }else if(report_type == "FWVA"){
+  }else if(report_type == "FWVA" && installation_type == "Air Force"){
     ##FWVAs
     #repeat this for VulnerabilityResult, E_Level, S_Level, AC_Level
     
@@ -316,6 +316,9 @@ hex_codes <- function(df, report_type){
         TRUE ~ "none"
       )) %>% relocate(AC_Color, .after = AC_Level)
   }
+  else if(installation_type == "Navy"){
+    next
+  }
 }
 
 
@@ -333,103 +336,103 @@ habitat_icons <- function(df){
 }
 
 # * color vulnerability text ----
-  # color_vuln_text <- function(df){
-  #   #create colored text for the vulnerability 
-  #   #the script needs to detect this text "vulnerability to short- and long-term weather changes" and find the word BEFORE it. 
-  #   #or it needs to detect the first instance of "low", "high", "moderate", "very high" in the vulnerability summary and add the hex codes
-  #   # <span style="color: #ff0000;">special</span>
-  #   
-  #   low_log <- str_locate(df$VulnSummary, "low <strong")
-  #   med_log <- str_locate(df$VulnSummary, "moderate <strong")
-  #   high_log <- str_locate(df$VulnSummary, "high <strong")
-  #   vhigh_log <- str_locate(df$VulnSummary, "very high <strong")
-  #   
-  #   for(i in 1:nrow(df)){
-  #     if(!is.na(low_log[i])){
-  #       startval <- as.numeric(low_log[i])
-  #       endval <- startval+2
-  #       target <- substr(df$VulnSummary[i], startval, endval)
-  #       before <- substr(df$VulnSummary[i], 1, startval - 1)
-  #       after  <- substr(df$VulnSummary[i], endval + 1, nchar(df$VulnSummary[i]))
-  #       df$VulnSummary[i] <- paste0(before, '<strong><span style="color:#8eb407;">', target, '</span></strong>', after)
-  #       
-  #     }else if(!is.na(vhigh_log[i])){
-  #       startval <- as.numeric(vhigh_log[i])
-  #       endval <- startval+8
-  #       target <- substr(df$VulnSummary[i], startval, endval)
-  #       before <- substr(df$VulnSummary[i], 1, startval - 1)
-  #       after  <- substr(df$VulnSummary[i], endval + 1, nchar(df$VulnSummary[i]))
-  #       df$VulnSummary[i] <- paste0(before, '<strong><span style="color:#d42004;">', target, '</span></strong>', after)
-  #       
-  #     }else if(!is.na(med_log[i])){
-  #       startval <- as.numeric(med_log[i])
-  #       endval <- startval+7
-  #       target <- substr(df$VulnSummary[i], startval, endval)
-  #       before <- substr(df$VulnSummary[i], 1, startval - 1)
-  #       after  <- substr(df$VulnSummary[i], endval + 1, nchar(df$VulnSummary[i]))
-  #       df$VulnSummary[i] <- paste0(before, '<strong><span style="color:#BCC208;">', target, '</span></strong>', after)
-  #       
-  #       
-  #     }else if(!is.na(high_log[i])){
-  #       startval <- as.numeric(high_log[i])
-  #       endval <- startval+3
-  #       target <- substr(df$VulnSummary[i], startval, endval)
-  #       before <- substr(df$VulnSummary[i], 1, startval - 1)
-  #       after  <- substr(df$VulnSummary[i], endval + 1, nchar(df$VulnSummary[i]))
-  #       df$VulnSummary[i] <- paste0(before, '<strong><span style="color:#f49e0b;">', target, '</span></strong>', after)
-  #       
-  #     }else next
-  #   }
-  #   return(df)
-  # }
-  
-color_vuln_text <- function(df){
-  ##doing it without bolding ----
-    #the script needs to detect this text "vulnerability to short- and long-term weather changes" and find the word BEFORE it.
-    #or it needs to detect the first instance of "low", "high", "moderate", "very high" in the vulnerability summary and add the hex codes
-    # <span style="color: #ff0000;">special</span>
-    low_log <- str_locate(df$VulnSummary, "low vul")
-    med_log <- str_locate(df$VulnSummary, "moderate vul")
-    high_log <- str_locate(df$VulnSummary, "high vul")
-    vhigh_log <- str_locate(df$VulnSummary, "very high vul")
+color_vuln_text <- function(df, installation_type){
+  #create colored text for the vulnerability
+  #the script needs to detect this text "vulnerability to short- and long-term weather changes" and find the word BEFORE it.
+  #or it needs to detect the first instance of "low", "high", "moderate", "very high" in the vulnerability summary and add the hex codes
+  # <span style="color: #ff0000;">special</span>
 
-    for(i in 1:nrow(df)){
-      if(!is.na(low_log[i])){
-        startval <- as.numeric(low_log[i])
-        endval <- startval+2
-        target <- substr(df$VulnSummary[i], startval, endval)
-        before <- substr(df$VulnSummary[i], 1, startval - 1)
-        after  <- substr(df$VulnSummary[i], endval + 1, nchar(df$VulnSummary[i]))
-        df$VulnSummary[i] <- paste0(before, '<strong><span style="color:#8eb407;">', target, '</span></strong>', after)
+  low_log <- str_locate(df$VulnSummary, "low <strong")
+  med_log <- str_locate(df$VulnSummary, "moderate <strong")
+  high_log <- str_locate(df$VulnSummary, "high <strong")
+  vhigh_log <- str_locate(df$VulnSummary, "very high <strong")
 
-      }else if(!is.na(vhigh_log[i])){
-        startval <- as.numeric(vhigh_log[i])
-        endval <- startval+8
-        target <- substr(df$VulnSummary[i], startval, endval)
-        before <- substr(df$VulnSummary[i], 1, startval - 1)
-        after  <- substr(df$VulnSummary[i], endval + 1, nchar(df$VulnSummary[i]))
-        df$VulnSummary[i] <- paste0(before, '<strong><span style="color:#d42004;">', target, '</span></strong>', after)
+  for(i in 1:nrow(df)){
+    if(!is.na(low_log[i])){
+      startval <- as.numeric(low_log[i])
+      endval <- startval+2
+      target <- substr(df$VulnSummary[i], startval, endval)
+      before <- substr(df$VulnSummary[i], 1, startval - 1)
+      after  <- substr(df$VulnSummary[i], endval + 1, nchar(df$VulnSummary[i]))
+      df$VulnSummary[i] <- paste0(before, '<strong><span style="color:#D9C991;">', target, '</span></strong>', after)
 
-      }else if(!is.na(med_log[i])){
-        startval <- as.numeric(med_log[i])
-        endval <- startval+7
-        target <- substr(df$VulnSummary[i], startval, endval)
-        before <- substr(df$VulnSummary[i], 1, startval - 1)
-        after  <- substr(df$VulnSummary[i], endval + 1, nchar(df$VulnSummary[i]))
-        df$VulnSummary[i] <- paste0(before, '<strong><span style="color:#BCC208;">', target, '</span></strong>', after)
+    }else if(!is.na(vhigh_log[i])){
+      startval <- as.numeric(vhigh_log[i])
+      endval <- startval+8
+      target <- substr(df$VulnSummary[i], startval, endval)
+      before <- substr(df$VulnSummary[i], 1, startval - 1)
+      after  <- substr(df$VulnSummary[i], endval + 1, nchar(df$VulnSummary[i]))
+      df$VulnSummary[i] <- paste0(before, '<strong><span style="color:#db624f;">', target, '</span></strong>', after)
+
+    }else if(!is.na(med_log[i])){
+      startval <- as.numeric(med_log[i])
+      endval <- startval+7
+      target <- substr(df$VulnSummary[i], startval, endval)
+      before <- substr(df$VulnSummary[i], 1, startval - 1)
+      after  <- substr(df$VulnSummary[i], endval + 1, nchar(df$VulnSummary[i]))
+      df$VulnSummary[i] <- paste0(before, '<strong><span style="color:#fecc5c;">', target, '</span></strong>', after)
 
 
-      }else if(!is.na(high_log[i])){
-        startval <- as.numeric(high_log[i])
-        endval <- startval+3
-        target <- substr(df$VulnSummary[i], startval, endval)
-        before <- substr(df$VulnSummary[i], 1, startval - 1)
-        after  <- substr(df$VulnSummary[i], endval + 1, nchar(df$VulnSummary[i]))
-        df$VulnSummary[i] <- paste0(before, '<strong><span style="color:#f49e0b;">', target, '</span></strong>', after)
+    }else if(!is.na(high_log[i])){
+      startval <- as.numeric(high_log[i])
+      endval <- startval+3
+      target <- substr(df$VulnSummary[i], startval, endval)
+      before <- substr(df$VulnSummary[i], 1, startval - 1)
+      after  <- substr(df$VulnSummary[i], endval + 1, nchar(df$VulnSummary[i]))
+      df$VulnSummary[i] <- paste0(before, '<strong><span style="color:#f49e0b;">', target, '</span></strong>', after)
 
-      }else next
-    }
-    return(df)
+    }else next
+  }
+  return(df)
 }
+  
+# color_vuln_text <- function(df){
+#   ##doing it without bolding ----
+#     #the script needs to detect this text "vulnerability to short- and long-term weather changes" and find the word BEFORE it.
+#     #or it needs to detect the first instance of "low", "high", "moderate", "very high" in the vulnerability summary and add the hex codes
+#     # <span style="color: #ff0000;">special</span>
+#     low_log <- str_locate(df$VulnSummary, "low vul")
+#     med_log <- str_locate(df$VulnSummary, "moderate vul")
+#     high_log <- str_locate(df$VulnSummary, "high vul")
+#     vhigh_log <- str_locate(df$VulnSummary, "very high vul")
+# 
+#     for(i in 1:nrow(df)){
+#       if(!is.na(low_log[i])){
+#         startval <- as.numeric(low_log[i])
+#         endval <- startval+2
+#         target <- substr(df$VulnSummary[i], startval, endval)
+#         before <- substr(df$VulnSummary[i], 1, startval - 1)
+#         after  <- substr(df$VulnSummary[i], endval + 1, nchar(df$VulnSummary[i]))
+#         df$VulnSummary[i] <- paste0(before, '<strong><span style="color:#8eb407;">', target, '</span></strong>', after)
+# 
+#       }else if(!is.na(vhigh_log[i])){
+#         startval <- as.numeric(vhigh_log[i])
+#         endval <- startval+8
+#         target <- substr(df$VulnSummary[i], startval, endval)
+#         before <- substr(df$VulnSummary[i], 1, startval - 1)
+#         after  <- substr(df$VulnSummary[i], endval + 1, nchar(df$VulnSummary[i]))
+#         df$VulnSummary[i] <- paste0(before, '<strong><span style="color:#d42004;">', target, '</span></strong>', after)
+# 
+#       }else if(!is.na(med_log[i])){
+#         startval <- as.numeric(med_log[i])
+#         endval <- startval+7
+#         target <- substr(df$VulnSummary[i], startval, endval)
+#         before <- substr(df$VulnSummary[i], 1, startval - 1)
+#         after  <- substr(df$VulnSummary[i], endval + 1, nchar(df$VulnSummary[i]))
+#         df$VulnSummary[i] <- paste0(before, '<strong><span style="color:#BCC208;">', target, '</span></strong>', after)
+# 
+# 
+#       }else if(!is.na(high_log[i])){
+#         startval <- as.numeric(high_log[i])
+#         endval <- startval+3
+#         target <- substr(df$VulnSummary[i], startval, endval)
+#         before <- substr(df$VulnSummary[i], 1, startval - 1)
+#         after  <- substr(df$VulnSummary[i], endval + 1, nchar(df$VulnSummary[i]))
+#         df$VulnSummary[i] <- paste0(before, '<strong><span style="color:#f49e0b;">', target, '</span></strong>', after)
+# 
+#       }else next
+#     }
+#     return(df)
+# }
   
     

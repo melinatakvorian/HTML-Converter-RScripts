@@ -39,10 +39,10 @@
     #the specific folder inside the Document to HTML Table Converter where the input files are
       input_installation_folder <- "WPNSTA Yorktown"
       installation_type <- "Navy" #"Navy"
-      input_SME_folder <- "/T&E/TEVAs"
+      input_SME_folder <- "/Fish and Wildlife/FWVAs"
     
     #the final file name will start with this and will get the date added
-      subject <- "TEVA"
+      subject <- "FWVA"
       project_name <- paste0(subject, "_", input_installation_folder) 
     
     #####NO MORE CHANGES --- -- -- -- --- - - -- -- - -  - - - - -  --- - - - - - - --- --- --- -- ---
@@ -136,8 +136,8 @@
   #   Presence = `Presence:`
   # )
   
- df <- df %>% rename(SpeciesIDNum = `SppID#`)
- df <- df %>% rename(ReferencesTxt = `References and Credits`)
+ # df <- df %>% rename(SpeciesIDNum = `SppID#`)
+ # df <- df %>% rename(ReferencesTxt = `References and Credits`)
   
 # run paragraph notation editor ----
   if(subject == "TEVA"){
@@ -225,8 +225,8 @@
   df_bold <- color_vuln_text(df_bold, installation_type)
 
 #line breaks [manually input columns] ----
-  numbblocks <- c(24, 33) # Change to the columns that need line breaks between paragraphs (the VulnSummary, References)
-    #should be c(18) for FWVAs and 23 for TEVAs
+  numbblocks <- c(18, 25) # Change to the columns that need line breaks between paragraphs (the VulnSummary, References)
+    #should be c(18, 25) for FWVAs and c(??, 33) for TEVAs
   #add blank line after each paragraph
   for(a in 1:length(numbblocks)){
     col_num <- numbblocks[[a]]

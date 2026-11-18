@@ -316,7 +316,10 @@ hex_codes <- function(df, report_type, installation_type){
         TRUE ~ "none"
       )) %>% relocate(AC_Color, .after = AC_Level)
   }
-  else if(installation_type == "Navy"){
+  else if(report_type == "TEVA" && installation_type == "Navy"){
+    ## Navy TEVAs
+    #repeat this for VulnerabilityResult, Confidence
+    
     #VulnNum
     df <- df %>% 
       mutate('VulnNum' = case_when(
@@ -336,6 +339,20 @@ hex_codes <- function(df, report_type, installation_type){
         TRUE ~ 1
       )) %>% relocate('ConfNum', .after = Confidence)
     
+  }
+  else if(report_type == "FWVA" && installation_type == "Navy"){
+    ##Navy FWVAs
+    #repeat this for VulnerabilityResult
+    
+    #VulnNum
+    df <- df %>% 
+      mutate('VulnNum' = case_when(
+        VulnerabilityResult == "VERY HIGH" ~ 4,
+        VulnerabilityResult == "HIGH" ~ 3,
+        VulnerabilityResult == "MODERATE" ~ 2,
+        VulnerabilityResult == "LOW" ~ 1,
+        TRUE ~ 1
+      )) %>% relocate('VulnNum', .after = VulnerabilityResult)
   }
 }
 

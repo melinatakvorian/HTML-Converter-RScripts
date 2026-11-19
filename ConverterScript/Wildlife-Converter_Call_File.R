@@ -37,9 +37,9 @@
       input_umbrella <- "N:/RStor/CEMML/ClimateChange/2_NavyClimate/Round2_Extremes_INRMP_integ/MidLant Region/"
     
     #the specific folder inside the Document to HTML Table Converter where the input files are
-      input_installation_folder <- "NS Norfolk"
+      input_installation_folder <- "NSA Cutler"
       installation_type <- "Navy" #"Navy"
-      input_SME_folder <- "/F&W/Word to HTML Conversion"
+      input_SME_folder <- "/FWVA"
     
     #the final file name will start with this and will get the date added
       subject <- "FWVA"
@@ -123,18 +123,14 @@
   
 # change old column names for FWVA ----
   
-  # df <- df %>% rename(
-  #   #References = `References and Credits`,
-  #   FirstHabitat = `1st_Habitat`,
-  #   SecondHabitat = `2nd_Habitat`,
-  #   ThirdHabitat = `3rd_Habitat`,
-  #   FourthHabitat = `4th_Habitat`,
-  #   BreedingStatus = `Breeding Status:`,
-  #   FedTxt = `Federal Status:`,
-  #   StateTxt = `State Status:`,
-  #   AdditionalStatus = `Other Status:`,
-  #   Presence = `Presence:`
-  # )
+  df <- df %>% rename(
+    #References = `References and Credits`,
+    FirstHabitat = `1st_Habitat`,
+    SecondHabitat = `2nd_Habitat`,
+    ThirdHabitat = `3rd_Habitat`,
+    FourthHabitat = `4th_Habitat`,
+    HabitatCommIDNum = `HabitatCommID#`
+  )
   
  # df <- df %>% rename(SpeciesIDNum = `SppID#`)
  # df <- df %>% rename(ReferencesTxt = `References and Credits`)
